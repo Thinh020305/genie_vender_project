@@ -9,7 +9,52 @@
 * 🟢 You can import this file directly.
 */
 
+export const Role = {
+  ADMIN: 'ADMIN',
+  DEVELOPER: 'DEVELOPER',
+  REVIEWER: 'REVIEWER'
+} as const
+
+export type Role = (typeof Role)[keyof typeof Role]
 
 
-// This file is empty because there are no enums in the schema.
-export {}
+export const ServiceType = {
+  OUTSOURCING: 'OUTSOURCING',
+  SI: 'SI',
+  PRODUCT: 'PRODUCT',
+  CONSULTING: 'CONSULTING',
+  SPECIALIZED_TECH: 'SPECIALIZED_TECH'
+} as const
+
+export type ServiceType = (typeof ServiceType)[keyof typeof ServiceType]
+
+
+export const SourceType = {
+  PUBLIC_WEBSITE: 'PUBLIC_WEBSITE',
+  DIRECTORY: 'DIRECTORY',
+  LINKEDIN: 'LINKEDIN',
+  ARTICLE: 'ARTICLE',
+  DEMO_DATA: 'DEMO_DATA'
+} as const
+
+export type SourceType = (typeof SourceType)[keyof typeof SourceType]
+
+
+export const SummaryType = {
+  PROFILE_SUMMARY: 'PROFILE_SUMMARY',
+  LLM_SUMMARY: 'LLM_SUMMARY',
+  MANUAL_NOTE: 'MANUAL_NOTE'
+} as const
+
+export type SummaryType = (typeof SummaryType)[keyof typeof SummaryType]
+
+
+export const VendorClassification = {
+  OUTSOURCING_VENDOR: 'OUTSOURCING_VENDOR',
+  SI_COMPANY: 'SI_COMPANY',
+  PRODUCT_COMPANY: 'PRODUCT_COMPANY',
+  CONSULTING_IT_SERVICE: 'CONSULTING_IT_SERVICE',
+  SPECIALIZED_TECH_VENDOR: 'SPECIALIZED_TECH_VENDOR'
+} as const
+
+export type VendorClassification = (typeof VendorClassification)[keyof typeof VendorClassification]

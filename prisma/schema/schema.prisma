@@ -1,6 +1,6 @@
 generator client {
   provider     = "prisma-client"
-  output       = "../src/generated/prisma"
+  output       = "../../src/generated/prisma"
   moduleFormat = "cjs"
 }
 
@@ -13,6 +13,7 @@ model User {
   email String  @unique
   name  String?
   posts Post[]
+   role  Role   @default(DEVELOPER)
 }
 
 model Post {
