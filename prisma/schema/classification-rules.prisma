@@ -1,25 +1,15 @@
-// Bo luat phan loai vendor: keyword -> VendorClassification.
-// Chua khai back-relation toi ClassificationHistory vi model do chua ton tai trong schema;
-// khai som se lam `prisma validate` fail cho ca nhom. Bo sung sau, khong sinh DDL moi.
 model ClassificationRule {
   id Int @id @default(autoincrement())
 
-  // VarChar(100) thay vi String tu do: cot nay nam trong btree index cua @@unique,
-  // chuoi qua dai co the vuot gioi han entry cua index va lam INSERT that bai.
   keyword              String               @db.VarChar(100)
   targetClassification VendorClassification
 
-  // Bat buoc NOT NULL: ORDER BY cua PostgreSQL day NULL ve cuoi khi sap tang va len dau
-  // khi sap giam, nen NULL se pha vo tinh deterministic cua thuat toan chon rule.
   priority Int @default(100)
   weight   Int @default(1)
 
-  // Hai khai niem khac nhau, khong duoc gop chung mot cot:
-  // isActive = bat/tat tam thoi (PATCH /:id/status), deletedAt = da xoa (DELETE /:id).
   isActive  Boolean   @default(true)
   deletedAt DateTime?
 
-  // createdAt khong chi la metadata: day la tieu chi tie-break bac ba khi chon rule thang.
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
