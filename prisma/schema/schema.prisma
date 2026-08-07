@@ -13,7 +13,7 @@ model User {
   email String  @unique
   name  String?
   posts Post[]
-   role  Role   @default(DEVELOPER)
+  role  Role    @default(DEVELOPER)
 }
 
 model Post {

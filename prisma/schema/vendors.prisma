@@ -1,1 +1,18 @@
+model Vendor {
+  id             Int                  @id @default(autoincrement())
+  name           String               @db.VarChar(255)  
+  description    String?              @db.Text          
+  classification VendorClassification
 
+  // Trường hỗ trợ xóa mềm & thời gian
+  deletedAt      DateTime?
+  createdAt      DateTime             @default(now())
+  updatedAt      DateTime             @updatedAt
+
+  // Mối quan hệ tới các bảng khác theo sơ đồ ERD mới
+  sources                 VendorSource[]
+  classificationHistories ClassificationHistory[]
+  summaries               VendorSummary[]
+
+  @@map("vendors")
+}
