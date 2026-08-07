@@ -387,6 +387,31 @@ Mọi endpoint đều yêu cầu JWT (trừ khi có `@Public()`). Response đư�
 | 12 | DELETE | `/classification-rules/:id` | Soft delete rule | ADMIN |
 | 13 | POST | `/classification-rules/preview` | Chạy thử bộ luật trên một đoạn text hoặc `vendorId`, trả về nhóm dự kiến + rule đã khớp. **Không ghi DB** | ADMIN, DEVELOPER |
 
+#### Contract của `matchedRules` (endpoint #13)
+
+`matchedRules` có **đúng 6 field**, không hơn không kém:
+
+```text
+id:                   number
+keyword:              string
+targetClassification: VendorClassification
+priority:             number
+weight:               number
+createdAt:            Date
+```
+
+- Đây chính là shape do **`RuleMatcherService.match()`** trả về (kiểu `MatchableRule` trong [rule-matcher.service.ts](src/classification/rule-matcher.service.ts)). Tầng response **dùng lại nguyên shape này**.
+- **Không bao gồm `deletedAt`, `isActive`, `updatedAt`.**
+- `deletedAt` và `isActive` **không mang giá trị thông tin trong preview**: preview chỉ xét rule chưa xóa và đang `isActive = true`, nên hai field này luôn là hằng số (`null` và `true`) ở mọi phần tử.
+- `updatedAt` **không phải tiêu chí giải thích kết quả match** — nó không xuất hiện trong bất kỳ nấc tie-break nào ở mục 8.2.
+- Sáu field giữ lại tương ứng đúng **4 nấc tie-break** của mục 8.2 (`priority`, `weight`, `createdAt`, `id`) cộng **2 field định danh** (`keyword` đã khớp, `targetClassification` là kết quả).
+
+**Ràng buộc khi hiện thực Service:**
+
+- Bản ghi Prisma `ClassificationRule` (9 cột) **phải được projection thành đúng 6 field trên TRƯỚC khi truyền vào `RuleMatcherService.match()`**.
+- **Không được truyền object Prisma đầy đủ trực tiếp vào matcher.** `match()` dùng `.filter().sort()` nên giữ nguyên tham chiếu object; truyền nguyên bản ghi sẽ khiến `deletedAt` lọt ra response mà TypeScript không cảnh báo.
+- **Không tạo thêm mapper `matchedRules` → response DTO** nếu không có yêu cầu mới. Một phép projection duy nhất ở đầu vào là đủ.
+
 ### 10.3 `vendor-summaries` — base `/vendor-summaries`
 
 | # | Method | Endpoint | Mô tả | Quyền |
