@@ -24,7 +24,7 @@ export class VendorsController {
   async create(@Body() createVendorDto: CreateVendorDto) {
     const data = await this.vendorsService.create(createVendorDto);
     return {
-      status: 200,
+      status: 201,
       message: 'success',
       data,
     };

@@ -2,6 +2,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 import { CreateVendorDto } from './dto/create-vendor.dto';
+import { QueryVendorDto } from './dto/query-vendor.dto';
 import { UpdateVendorDto } from './dto/update-vendor.dto';
 
 @Injectable()
@@ -33,7 +34,7 @@ export class VendorsService {
   }
 
   // Cập nhật thông tin Vendor
-  async update(id: number, updateVendorDto: any) {
+  async update(id: number, updateVendorDto: UpdateVendorDto) {
     // Kiểm tra xem vendor có tồn tại và chưa bị xóa không
     await this.findOne(id);
 
