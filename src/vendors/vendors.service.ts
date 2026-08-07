@@ -2,6 +2,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 import { CreateVendorDto } from './dto/create-vendor.dto';
+import { UpdateVendorDto } from './dto/update-vendor.dto';
 
 @Injectable()
 export class VendorsService {
@@ -29,6 +30,30 @@ export class VendorsService {
     }
 
     return vendor;
+  }
+
+  // Cập nhật thông tin Vendor
+  async update(id: number, updateVendorDto: any) {
+    // Kiểm tra xem vendor có tồn tại và chưa bị xóa không
+    await this.findOne(id);
+
+    return this.prisma.vendor.update({
+      where: { id },
+      data: updateVendorDto,
+    });
+  }
+
+  // Xóa mềm (Soft Delete) Vendor
+  async remove(id: number) {
+    // Kiểm tra xem vendor có tồn tại không trước khi xóa
+    await this.findOne(id);
+
+    return this.prisma.vendor.update({
+      where: { id },
+      data: {
+        deletedAt: new Date(), // Ghi nhận thời gian xóa
+      },
+    });
   }
 
   // Lấy danh sách Vendor với Phân trang, Tìm kiếm & Lọc
