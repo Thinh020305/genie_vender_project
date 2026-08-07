@@ -9,10 +9,10 @@ model Vendor {
   createdAt      DateTime             @default(now())
   updatedAt      DateTime             @updatedAt
 
-  // Mối quan hệ tới các bảng khác theo sơ đồ ERD mới
-  sources                 VendorSource[]
-  classificationHistories ClassificationHistory[]
-  summaries               VendorSummary[]
+  // Mối quan hệ tới các bảng khác theo sơ đồ ERD mới (Mở lại comment khi đã có thông tin bảng)
+  // sources                 VendorSource[]
+  // classificationHistories ClassificationHistory[]
+  // summaries               VendorSummary[]
 
   @@map("vendors")
 }
