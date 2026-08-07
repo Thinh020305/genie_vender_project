@@ -5,10 +5,12 @@ import {
   Get,
   Body,
   Param,
+  Query,
   ParseIntPipe,
 } from '@nestjs/common';
 import { VendorsService } from './vendors.service';
 import { CreateVendorDto } from './dto/create-vendor.dto';
+import { QueryVendorDto } from './dto/query-vendor.dto';
 
 @Controller('vendors')
 export class VendorsController {
@@ -18,6 +20,17 @@ export class VendorsController {
   @Post()
   async create(@Body() createVendorDto: CreateVendorDto) {
     const data = await this.vendorsService.create(createVendorDto);
+    return {
+      status: 200,
+      message: 'success',
+      data,
+    };
+  }
+
+  // GET /api/vendors - Danh sách phân trang, tìm kiếm, lọc
+  @Get()
+  async findAll(@Query() query: QueryVendorDto) {
+    const data = await this.vendorsService.findAll(query);
     return {
       status: 200,
       message: 'success',

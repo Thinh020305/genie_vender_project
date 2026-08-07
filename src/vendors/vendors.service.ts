@@ -30,4 +30,62 @@ export class VendorsService {
 
     return vendor;
   }
+
+  // Lấy danh sách Vendor với Phân trang, Tìm kiếm & Lọc
+  async findAll(query: QueryVendorDto) {
+    const {
+      page = 1,
+      limit = 10,
+      search,
+      classification,
+      sortBy = 'createdAt',
+      sortOrder = 'desc',
+    } = query;
+
+    const skip = (page - 1) * limit;
+
+    // Xây dựng bộ điều kiện truy vấn (Where)
+    const whereCondition: any = {
+      deletedAt: null, // Chỉ lấy những record chưa bị xóa mềm
+    };
+
+    // 1. Logic lọc tổng hợp (Filter)
+    if (classification) {
+      whereCondition.classification = classification;
+    }
+
+    // 2. Logic tìm kiếm từ khóa (Keyword Search)
+    if (search) {
+      whereCondition.OR = [
+        { name: { contains: search, mode: 'insensitive' } },
+        { description: { contains: search, mode: 'insensitive' } },
+      ];
+    }
+
+    // 3. Truy vấn Database (Chạy song song đếm tổng số và lấy dữ liệu)
+    const [items, total] = await Promise.all([
+      this.prisma.vendor.findMany({
+        where: whereCondition,
+        skip,
+        take: limit,
+        orderBy: {
+          [sortBy]: sortOrder,
+        },
+      }),
+      this.prisma.vendor.count({
+        where: whereCondition,
+      }),
+    ]);
+
+    // Trả về dữ liệu kèm Metadata phân trang
+    return {
+      items,
+      meta: {
+        total,
+        page,
+        limit,
+        lastPage: Math.ceil(total / limit),
+      },
+    };
+  }
 }
