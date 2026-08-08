@@ -1,337 +1,94 @@
-// =============================================================================
-// GENIE VINA - VIETNAM IT VENDOR INTELLIGENCE
-// TARGET ERD  |  import truc tiep vao https://dbdiagram.io
-// =============================================================================
-// Nguon spec: docs/Genie Vina.pdf - Step 1. ERD Design
-// 6 bang | 5 khoa ngoai | 3 unique | 8 index | 5 enum | 0 quan he N:N
-//
-// Ten bang o day dung snake_case DUNG NHU PDF.
-// Khi hien thuc bang Prisma: model PascalCase so it + @@map ve ten duoi day.
-// =============================================================================
-
-Project genie_vina {
-  database_type: 'PostgreSQL'
-  Note: '''
-    Genie Vina - Vietnam IT/SW Vendor Intelligence (Demo MVP)
-
-    Cong ty Han Quoc can so sanh nha cung cap IT/SW Viet Nam. Thong tin nam rai rac
-    o website, gioi thieu cong ty, bai bao, LinkedIn, trang danh ba -> can cau truc hoa
-    de dang ky, tra cuu, tim kiem, loc, phan loai va tom tat.
-
-    13 RANG BUOC KHONG THE HIEN DUOC TRONG DBML - phai thuc thi o tang service.
-    Chi tiet va truy vet day du: xem docs/erd.md muc 7.3.
-
-      INV-1   companyName, location, serviceType, techStack bat buoc khi luu.
-              (PDF Step 3.2)
-      INV-2   website / sourceUrl chi duoc rong voi du lieu demo giao duc.
-              Xac dinh demo bang: vendor co >=1 source sourceType = DEMO_DATA.
-              (PDF Step 3.2)
-      INV-3   Marker demo-data ghi o vendors.note.
-              vendor_sources.memo chi chu thich TUNG NGUON.
-      INV-4   Source Control - vendor phai thoa (a) co >=1 source co sourceUrl,
-              HOAC (b) note chua "source unverified" / "demo data".
-              Kiem tai POST /api/vendors (luc do vendor luon co 0 source
-              -> bat buoc thoa (b) -> note la field bat buoc trong CreateVendorDto).
-              (PDF Step 3.3)
-      INV-5   CAM luu thong tin cong ty khong cong khai, tai lieu rieng tu,
-              du lieu ca nhan. (PDF Step 3.3)
-      INV-6   classification chi doi qua PATCH /vendors/{id}/classification;
-              cap nhat vendor + ghi classification_histories trong CUNG transaction.
-              UpdateVendorDto KHONG duoc co field classification. (PDF Step 3.5)
-      INV-7   Ket qua LLM CHI la tham khao. Phan loai cuoi cung phai duoc team
-              review va giai thich bang bang chung. (PDF Step 3.7)
-      INV-8   password luu hash, khong bao gio tra ve trong response.
-      INV-9   KHONG co cot score / rank / recommendation (PDF Step 3.4 va 3.8).
-      INV-10  Moi truy van doc VA thong ke phai loc deletedAt IS NULL.
-              GET /vendors/stats bo qua dieu nay se cho so lieu SAI.
-      INV-11  techStack phai co >=1 phan tu. Postgres/DBML khong ep duoc mang khong rong
-              -> DTO dung @ArrayNotEmpty(). (PDF Step 3.2)
-      INV-12  location phai duoc chuan hoa truoc khi luu (trim + gop khoang trang +
-              chuan hoa hoa/thuong), neu khong thong ke "by location" se bi phan manh.
-      INV-13  PATCH /classification tu choi khi gia tri moi TRUNG gia tri hien tai.
-  '''
+// 1. Quản lý người dùng & Phân quyền
+Table members {
+  id int [pk, increment]
+  email varchar [unique, not null]
+  password varchar [not null]
+  name varchar [not null]
+  role enum('ADMIN', 'DEVELOPER', 'REVIEWER') [not null]
+  createdAt timestamp [default: `now()`]
 }
 
-// =============================================================================
-// ENUMS
-// =============================================================================
-
-Enum role_enum {
-  ADMIN
-  DEVELOPER
-  REVIEWER
+// 2. Danh mục (Catalogs) - Giúp dữ liệu chuẩn hóa
+Table locations {
+  id int [pk, increment]
+  name varchar [unique, not null] // Hanoi, HCMC, Da Nang...
 }
 
-Enum service_type_enum {
-  OUTSOURCING
-  SI
-  PRODUCT
-  CONSULTING
-  SPECIALIZED_TECH
+Table technologies {
+  id int [pk, increment]
+  name varchar [unique, not null] // React, Node.js, Java...
 }
 
-Enum source_type_enum {
-  PUBLIC_WEBSITE
-  DIRECTORY
-  LINKEDIN
-  ARTICLE
-  DEMO_DATA
+Table languages {
+  id int [pk, increment]
+  name varchar [unique, not null] // English, Korean, Japanese...
 }
 
-Enum summary_type_enum {
-  PROFILE_SUMMARY
-  LLM_SUMMARY
-  MANUAL_NOTE
-}
-
-Enum vendor_classification_enum {
-  OUTSOURCING_VENDOR
-  SI_COMPANY
-  PRODUCT_COMPANY
-  CONSULTING_IT_SERVICE
-  SPECIALIZED_TECH_VENDOR
-}
-
-// =============================================================================
-// 1. VENDORS
-// =============================================================================
-
+// 3. Thực thể chính: Vendor
 Table vendors {
   id int [pk, increment]
-  vendorCode varchar(50) [not null, note: 'Ma dinh danh nghiep vu. UNIQUE khai o khoi Indexes']
-  companyName varchar(255) [not null, note: 'Step 3.2 - bat buoc kiem tra truoc khi luu']
-  website varchar(2048) [null, note: 'Step 3.2 - chi duoc rong voi du lieu demo giao duc']
-  location varchar(255) [not null, note: 'Step 3.2 bat buoc. Step 3.6 loc va thong ke. INV-12 phai chuan hoa']
-  serviceType service_type_enum [not null, note: 'Step 3.2 bat buoc. Step 3.6 tim kiem va thong ke']
-  techStack "text[]" [not null, note: 'Step 3.2 bat buoc. INV-11 phai co >=1 phan tu - DB khong ep duoc']
-  industryExperience text [null, note: 'Step 3.6 dung de tim kiem']
-  languageCapability "text[]" [not null, note: 'Step 3.6 dung de loc. Mang rong = chua biet']
-  companySize varchar(50) [null, note: 'PDF khong dinh nghia enum nen de dang chuoi']
-  classification vendor_classification_enum [null, note: 'null = chua duoc phan loai. Gan qua PATCH /vendors/id/classification']
-  note text [null, note: 'INV-3 marker tuan thu nguon cap vendor. Bat buoc trong CreateVendorDto - xem INV-4']
-  deletedAt timestamptz [null, note: 'Soft delete. PDF Step 2 cho phep "admin only OR soft delete"']
-  createdAt timestamptz [not null, default: `now()`]
-  updatedAt timestamptz [not null]
-
-  Indexes {
-    vendorCode [unique, name: 'vendors_vendorCode_key']
-    classification [name: 'vendors_classification_idx', note: 'btree - loc va thong ke']
-    location [name: 'vendors_location_idx', note: 'btree - loc va thong ke. Chi dung khi INV-12 duoc thuc thi']
-    serviceType [name: 'vendors_serviceType_idx', note: 'btree - tim kiem va thong ke']
-    techStack [name: 'vendors_techStack_idx', note: 'GIN - loc chinh xac theo tech stack']
-    languageCapability [name: 'vendors_languageCapability_idx', note: 'GIN - loc chinh xac theo language capability']
-  }
-
-  Note: '''
-    Minimum Vendor Data Fields (PDF Step 1):
-      vendorCode, companyName, website, location, serviceType, techStack,
-      industryExperience, languageCapability, companySize, sourceUrl,
-      classification, note
-    Luu y: sourceUrl trong danh sach tren thuoc bang vendor_sources, KHONG phai vendors.
-
-    techStack va languageCapability dung kieu mang -> VI PHAM 1NF CO CHU DICH.
-    Phuong an chuan hoa can them 2-4 bang ngoai 6 bang spec -> over-engineering
-    cho Demo MVP. Mang + GIN la giai phap native cua PostgreSQL, cho phep loc
-    chinh xac (khong trung nham "Java" voi "JavaScript").
-
-    KHONG co cot isActive, score, rank hay recommendation.
-  '''
+  vendorCode varchar [unique, not null]
+  companyName varchar [not null]
+  website varchar
+  locationId int [ref: > locations.id]
+  serviceType enum('OUTSOURCING', 'SI', 'PRODUCT', 'CONSULTING', 'SPECIALIZED_TECH')
+  industryExperience text
+  companySize varchar
+  classificationId int [ref: > classification_rules.id] // Link trực tiếp tới tiêu chí
+  note text
+  createdAt timestamp [default: `now()`]
+  updatedAt timestamp
+  deletedAt timestamp // Soft delete
 }
 
-// =============================================================================
-// 2. VENDOR_SOURCES
-// =============================================================================
+// 4. Các bảng quan hệ N:M (Junction Tables)
+Table vendor_technologies {
+  vendorId int [ref: > vendors.id]
+  technologyId int [ref: > technologies.id]
+  primary key (vendorId, technologyId)
+}
 
+Table vendor_languages {
+  vendorId int [ref: > vendors.id]
+  languageId int [ref: > languages.id]
+  primary key (vendorId, languageId)
+}
+
+// 5. Nguồn bằng chứng (Evidence)
 Table vendor_sources {
   id int [pk, increment]
-  vendorId int [not null]
-  sourceType source_type_enum [not null]
-  sourceUrl varchar(2048) [null, note: 'Step 3.2 - chi duoc rong voi du lieu demo']
-  sourceTitle varchar(255) [null]
-  checkedAt timestamptz [not null, default: `now()`, note: 'Moc NGHIEP VU - thoi diem kiem chung nguon']
-  memo text [null, note: 'INV-3 chu thich TUNG NGUON. Marker demo cap vendor nam o vendors.note']
-
-  Indexes {
-    vendorId [name: 'vendor_sources_vendorId_idx']
-  }
-
-  Note: '''
-    PDF chi liet ke 7 field - KHONG co createdAt / updatedAt / deletedAt.
-    Source API chi co POST, GET, PATCH - KHONG co DELETE -> khong can xoa mem.
-
-    KHONG dat unique (vendorId, sourceUrl): PDF khong yeu cau, va vi sourceUrl
-    nullable nen PostgreSQL coi moi NULL la khac nhau - unique khong chan duoc trung.
-  '''
+  vendorId int [ref: > vendors.id]
+  sourceType enum('PUBLIC_WEBSITE', 'DIRECTORY', 'LINKEDIN', 'ARTICLE', 'DEMO_DATA')
+  sourceUrl varchar
+  sourceTitle varchar
+  checkedAt timestamp
+  memo text
 }
 
-// =============================================================================
-// 3. CLASSIFICATION_RULES  - catalog tieu chi, KHONG phai rule engine
-// =============================================================================
-
+// 6. Quy tắc & Lịch sử phân loại
 Table classification_rules {
   id int [pk, increment]
-  classificationName vendor_classification_enum [not null, note: 'enum + unique -> dung 5 dong, moi nhom mot dong. UNIQUE khai o khoi Indexes']
-  description text [not null, note: 'Mo ta nhom - vi du "software outsourcing or project-based development vendor"']
-  judgmentCriteria text [not null, note: 'Can cu de phan loai']
-  createdAt timestamptz [not null, default: `now()`]
-
-  Indexes {
-    classificationName [unique, name: 'classification_rules_classificationName_key']
-  }
-
-  Note: '''
-    DAY LA CATALOG TIEU CHI, KHONG PHAI RULE ENGINE.
-
-    PDF Step 2 chi co MOT endpoint:  GET /api/classification-rules
-    KHONG co POST / PATCH / DELETE -> du lieu nap bang seed.
-
-    Standard Classification Criteria (PDF Step 2) - noi dung 5 dong:
-      OUTSOURCING_VENDOR      software outsourcing or project-based development vendor
-      SI_COMPANY              enterprise system implementation, integration, maintenance
-      PRODUCT_COMPANY         owns SaaS, platform, solution, or software product
-      CONSULTING_IT_SERVICE   IT consulting, operation, project management, or advisory
-      SPECIALIZED_TECH_VENDOR AI, Cloud, Data, Cybersecurity, Blockchain, etc.
-
-    KHONG CO KHOA NGOAI. Bang doc lap hoan toan.
-    Khong tao FK tu vendors.classification sang day: enum da ep mien gia tri roi,
-    them FK la rang buoc trung lap va bat catalog phai co du lieu truoc khi tao vendor.
-  '''
+  classificationName varchar [unique] // Outsourcing Vendor, SI Company...
+  description text
+  judgmentCriteria text
 }
-
-// =============================================================================
-// 4. CLASSIFICATION_HISTORIES  - audit trail
-// =============================================================================
 
 Table classification_histories {
   id int [pk, increment]
-  vendorId int [not null]
-  changedBy int [not null, note: 'Step 3.5 - luon phai truy duoc AI da doi phan loai']
-  previousClassification vendor_classification_enum [null, note: 'null o lan phan loai dau tien']
-  newClassification vendor_classification_enum [not null, note: 'INV-13 phai khac gia tri hien tai']
-  changedAt timestamptz [not null, default: `now()`]
-  reason text [not null, note: 'Step 3.4 doi hoi giai thich bang bang chung']
-
-  Indexes {
-    (vendorId, changedAt) [name: 'classification_histories_vendorId_changedAt_idx', note: 'Truy van thuc te sap xep changedAt DESC - DBML khong khai duoc chieu sap xep']
-  }
-
-  Note: '''
-    Step 3.5 Classification History Recording:
-      Khi classification thay doi, TU DONG ghi previousClassification,
-      newClassification, changedBy, changedAt va reason.
-    -> Ghi boi PATCH /api/vendors/{id}/classification. KHONG co API tao rieng.
-    -> Doc qua GET /api/vendors/{id}/classification-history.
-
-    BAN GHI BAT BIEN: chi co changedAt, KHONG co updatedAt hay deletedAt.
-    Khong co API sua hay xoa.
-
-    PDF chi khai HAI khoa ngoai: -> vendors va -> members.
-    KHONG co khoa ngoai toi classification_rules hay vendor_sources.
-  '''
+  vendorId int [ref: > vendors.id]
+  changedBy int [ref: > members.id]
+  previousClassification varchar
+  newClassification varchar
+  reason text
+  changedAt timestamp [default: `now()`]
 }
 
-// =============================================================================
-// 5. VENDOR_SUMMARIES
-// =============================================================================
-
+// 7. Tóm tắt AI/Manual
 Table vendor_summaries {
   id int [pk, increment]
-  vendorId int [not null]
-  summaryType summary_type_enum [not null]
-  content text [not null]
-  createdBy int [not null, note: 'Moi endpoint deu yeu cau JWT -> luon co member. Ghi AI TAO BAN GHI, khong phai ai viet noi dung']
-  createdAt timestamptz [not null, default: `now()`]
-
-  Indexes {
-    (vendorId, summaryType, createdAt) [name: 'vendor_summaries_vendorId_summaryType_createdAt_idx', note: 'Tien to vendorId phuc vu luon truy van liet ke theo vendor']
-  }
-
-  Note: '''
-    PDF chi liet ke 6 field - KHONG co updatedAt / deletedAt / version.
-    -> Ban tom tat BAT BIEN. Muon thay doi thi tao ban moi.
-    -> PDF Step 2 KHONG co API sua hay xoa summary.
-
-    Mot vendor duoc phep co nhieu summary cung summaryType.
-    Lay ban moi nhat bang createdAt.
-
-    LLM API (PDF Step 2, bat buoc lam it nhat 1 trong 3):
-      GET /api/vendors/{id}/summary -> luu vao day voi summaryType = LLM_SUMMARY
-    Step 3.7: ket qua LLM CHI la tham khao, phai duoc team review va giai thich
-    bang bang chung.
-  '''
+  vendorId int [ref: > vendors.id]
+  summaryType enum('PROFILE_SUMMARY', 'LLM_SUMMARY', 'MANUAL_NOTE')
+  content text
+  createdBy int [ref: > members.id]
+  createdAt timestamp [default: `now()`]
 }
-
-// =============================================================================
-// 6. MEMBERS
-// =============================================================================
-
-Table members {
-  id int [pk, increment]
-  email varchar(255) [not null, note: 'Dung de dang nhap POST /api/auth/login. UNIQUE khai o khoi Indexes']
-  password varchar(255) [not null, note: 'INV-8 luu HASH. Khong bao gio tra ve trong response']
-  name varchar(255) [not null]
-  role role_enum [not null, note: 'KHONG dat default - buoc seed phai khai tuong minh']
-  createdAt timestamptz [not null, default: `now()`]
-
-  Indexes {
-    email [unique, name: 'members_email_key']
-  }
-
-  Note: '''
-    PDF Step 2 Auth API:
-      POST /api/auth/login    Login - phat hanh JWT
-      POST /api/auth/logout   Logout
-
-    Step 3.1 Role-based access control:
-      ADMIN     toan quyen quan ly
-      DEVELOPER dang ky, cap nhat, tim kiem, phan loai va tom tat vendor
-      REVIEWER  chi doc du lieu vendor va ket qua phan loai
-
-    PDF KHONG co API tao member -> nap bang seed.
-    Neu team muon co default cho role thi chon REVIEWER (dac quyen toi thieu),
-    KHONG chon DEVELOPER vi vai tro do co quyen ghi.
-  '''
-}
-
-// =============================================================================
-// RELATIONSHIPS - dung 5 quan he, tat ca deu duoc PDF khai bang dau "->"
-// =============================================================================
-// Tat ca onDelete deu la RESTRICT.
-// Ly do: xoa cung KHONG phai co che xoa cua he thong nay. Soft delete tren vendors
-// la co che duy nhat. Restrict la hang rao chan xoa cung ngoai luong
-// (psql, seed, script) - dac biet de bao ve audit trail.
-// =============================================================================
-
-// R1  PDF: vendor_sources.vendorId -> vendors
-Ref: vendor_sources.vendorId > vendors.id [delete: restrict]
-
-// R2  PDF: classification_histories.vendorId -> vendors
-Ref: classification_histories.vendorId > vendors.id [delete: restrict]
-
-// R3  PDF: classification_histories.changedBy -> members
-Ref: classification_histories.changedBy > members.id [delete: restrict]
-
-// R4  PDF: vendor_summaries.vendorId -> vendors
-Ref: vendor_summaries.vendorId > vendors.id [delete: restrict]
-
-// R5  PDF: vendor_summaries.createdBy -> members
-Ref: vendor_summaries.createdBy > members.id [delete: restrict]
-
-// =============================================================================
-// CARDINALITY
-// =============================================================================
-// vendors                1 --- 0..N  vendor_sources           (R1)
-// vendors                1 --- 0..N  classification_histories (R2)
-// members                1 --- 0..N  classification_histories (R3)
-// vendors                1 --- 0..N  vendor_summaries         (R4)
-// members                1 --- 0..N  vendor_summaries         (R5)
-// classification_rules   doc lap - khong quan he
-//
-// Phia con cua ca 5 quan he deu THAM GIA TOAN PHAN (khoa ngoai NOT NULL).
-// Khong co chu trinh phu thuoc: vendors va members la goc, 3 bang con la la.
-//
-// vendors -> vendor_sources la 0..N chu KHONG phai 1..N:
-//   PDF tach POST /vendors va POST /vendors/{id}/sources thanh HAI loi goi HTTP,
-//   khong transaction nao boc duoc ca hai. Rang buoc Step 3.3 duoc thuc thi bang
-//   INV-4 tai POST /vendors thay vi bang cardinality.
-// =============================================================================
