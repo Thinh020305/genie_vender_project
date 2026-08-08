@@ -52,7 +52,8 @@ export const AnyNull = runtime.AnyNull
 
 export const ModelName = {
   User: 'User',
-  Post: 'Post'
+  Post: 'Post',
+  Vendor: 'Vendor'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -90,6 +91,19 @@ export const PostScalarFieldEnum = {
 } as const
 
 export type PostScalarFieldEnum = (typeof PostScalarFieldEnum)[keyof typeof PostScalarFieldEnum]
+
+
+export const VendorScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  description: 'description',
+  classification: 'classification',
+  deletedAt: 'deletedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type VendorScalarFieldEnum = (typeof VendorScalarFieldEnum)[keyof typeof VendorScalarFieldEnum]
 
 
 export const SortOrder = {

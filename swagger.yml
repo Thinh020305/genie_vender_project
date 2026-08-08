@@ -1,0 +1,1651 @@
+openapi: 3.0.3
+
+info:
+  title: Genie Vina - Vietnam IT Vendor Intelligence API
+  version: 1.0.0
+  description: |
+    Contract-first OpenAPI specification for the Genie Vina educational Demo MVP.
+
+    This specification follows the endpoint list and business rules in the project assignment:
+    - JWT authentication and role-based access control.
+    - Unified response format: { status, message, data }.
+    - Vendor registration, retrieval, search, filter, pagination, sorting, update and delete.
+    - Vendor source management.
+    - Classification rules, classification updates and classification history.
+    - Vendor statistics.
+    - All three LLM endpoint options are documented so the team can choose at least one to implement.
+
+    Important business constraints:
+    - LLM outputs are reference-only and must not be presented as partner recommendations or rankings.
+    - Classification must be evidence-based.
+    - Each vendor must have a public source URL or a clear demo-data/source-unverified note.
+    - Non-public company information, private documents and personal data are not allowed.
+
+servers:
+  - url: http://localhost:3000/api
+    description: Local development server
+
+security:
+  - bearerAuth: []
+
+tags:
+  - name: Auth
+    description: Authentication and JWT session endpoints.
+  - name: Vendors
+    description: Vendor registration, retrieval, search, filter, update and deletion.
+  - name: Sources
+    description: Public source and demo-data note management for vendors.
+  - name: Classification
+    description: Classification criteria, updates and change history.
+  - name: Statistics
+    description: Vendor aggregate statistics.
+  - name: LLM
+    description: LLM-assisted features. The assignment requires at least one of these endpoints to be implemented.
+
+paths:
+  /auth/login:
+    post:
+      tags: [Auth]
+      summary: Login
+      description: Authenticate a member and issue a JWT access token.
+      operationId: login
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: Login successful.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /auth/logout:
+    post:
+      tags: [Auth]
+      summary: Logout
+      description: |
+        Logout the authenticated member. The server may invalidate the token if a denylist/session strategy is used;
+        otherwise the client discards the current access token.
+      operationId: logout
+      x-roles: [ADMIN, DEVELOPER, REVIEWER]
+      responses:
+        '200':
+          description: Logout successful.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EmptySuccessResponse'
+              example:
+                status: 200
+                message: success
+                data: null
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /vendors:
+    post:
+      tags: [Vendors]
+      summary: Register vendor
+      description: |
+        Register a vendor together with an initial public source or demo-data note.
+        This contract requires the initial source because the assignment states that every vendor must include
+        a public source URL or a clear demo-data note.
+
+        website may be omitted only for educational demo data.
+      operationId: createVendor
+      x-roles: [ADMIN, DEVELOPER]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateVendorRequest'
+      responses:
+        '201':
+          description: Vendor registered successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateVendorResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/UnprocessableEntity'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    get:
+      tags: [Vendors]
+      summary: Get all vendors
+      description: |
+        Retrieve vendors with pagination, sorting, keyword search and composite filters.
+        Keyword search covers companyName, techStack, serviceType and industryExperience.
+        Filters include classification, location, technology stack and language capability.
+      operationId: getVendors
+      x-roles: [ADMIN, DEVELOPER, REVIEWER]
+      parameters:
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/Limit'
+        - $ref: '#/components/parameters/SortBy'
+        - $ref: '#/components/parameters/SortOrder'
+        - $ref: '#/components/parameters/Keyword'
+        - $ref: '#/components/parameters/ClassificationFilter'
+        - $ref: '#/components/parameters/LocationFilter'
+        - $ref: '#/components/parameters/TechStackFilter'
+        - $ref: '#/components/parameters/LanguageCapabilityFilter'
+        - $ref: '#/components/parameters/ServiceTypeFilter'
+      responses:
+        '200':
+          description: Vendor list retrieved successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VendorListResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /vendors/{id}:
+    parameters:
+      - $ref: '#/components/parameters/VendorId'
+
+    get:
+      tags: [Vendors]
+      summary: Get single vendor detail
+      description: Retrieve detailed information for one vendor.
+      operationId: getVendorById
+      x-roles: [ADMIN, DEVELOPER, REVIEWER]
+      responses:
+        '200':
+          description: Vendor retrieved successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VendorResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    patch:
+      tags: [Vendors]
+      summary: Update vendor information
+      description: |
+        Update general vendor information.
+        classification is intentionally excluded from this request and must be changed through
+        PATCH /vendors/{id}/classification so classification history is always recorded.
+      operationId: updateVendor
+      x-roles: [ADMIN, DEVELOPER]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateVendorRequest'
+      responses:
+        '200':
+          description: Vendor updated successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VendorResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/UnprocessableEntity'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    delete:
+      tags: [Vendors]
+      summary: Delete vendor
+      description: |
+        Delete a vendor. ADMIN only.
+        The recommended implementation for the Demo MVP is soft delete when the ERD contains a soft-delete field;
+        otherwise implement the deletion strategy agreed by the team without changing this HTTP contract.
+      operationId: deleteVendor
+      x-roles: [ADMIN]
+      responses:
+        '200':
+          description: Vendor deleted successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EmptySuccessResponse'
+              example:
+                status: 200
+                message: success
+                data: null
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /vendors/{id}/sources:
+    parameters:
+      - $ref: '#/components/parameters/VendorId'
+
+    post:
+      tags: [Sources]
+      summary: Add vendor source
+      description: Add a public source or a clear demo-data/source-unverified note for a vendor.
+      operationId: addVendorSource
+      x-roles: [ADMIN, DEVELOPER]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateSourceRequest'
+      responses:
+        '201':
+          description: Source added successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SourceResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/UnprocessableEntity'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    get:
+      tags: [Sources]
+      summary: Get vendor source list
+      description: Retrieve all registered sources for a vendor.
+      operationId: getVendorSources
+      x-roles: [ADMIN, DEVELOPER, REVIEWER]
+      responses:
+        '200':
+          description: Vendor source list retrieved successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SourceListResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /vendors/{id}/sources/{sourceId}:
+    parameters:
+      - $ref: '#/components/parameters/VendorId'
+      - $ref: '#/components/parameters/SourceId'
+
+    patch:
+      tags: [Sources]
+      summary: Update source information
+      description: Update source metadata, URL, checked timestamp or memo.
+      operationId: updateVendorSource
+      x-roles: [ADMIN, DEVELOPER]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateSourceRequest'
+      responses:
+        '200':
+          description: Source updated successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SourceResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/UnprocessableEntity'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /classification-rules:
+    get:
+      tags: [Classification]
+      summary: Get classification criteria
+      description: Retrieve the standard vendor classification criteria.
+      operationId: getClassificationRules
+      x-roles: [ADMIN, DEVELOPER, REVIEWER]
+      responses:
+        '200':
+          description: Classification rules retrieved successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClassificationRuleListResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /vendors/{id}/classification:
+    parameters:
+      - $ref: '#/components/parameters/VendorId'
+
+    patch:
+      tags: [Classification]
+      summary: Update vendor classification
+      description: |
+        Change a vendor classification based on visible evidence.
+        The service must automatically record previousClassification, newClassification,
+        changedBy, changedAt and reason in classification history.
+      operationId: updateVendorClassification
+      x-roles: [ADMIN, DEVELOPER]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateClassificationRequest'
+      responses:
+        '200':
+          description: Vendor classification updated and history recorded successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UpdateClassificationResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/UnprocessableEntity'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /vendors/{id}/classification-history:
+    parameters:
+      - $ref: '#/components/parameters/VendorId'
+
+    get:
+      tags: [Classification]
+      summary: Get classification change history
+      description: Retrieve all classification changes recorded for a vendor, newest first.
+      operationId: getVendorClassificationHistory
+      x-roles: [ADMIN, DEVELOPER, REVIEWER]
+      responses:
+        '200':
+          description: Classification history retrieved successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClassificationHistoryListResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /vendors/stats:
+    get:
+      tags: [Statistics]
+      summary: Get vendor statistics
+      description: Return vendor totals grouped by classification, location and service type.
+      operationId: getVendorStatistics
+      x-roles: [ADMIN, DEVELOPER, REVIEWER]
+      responses:
+        '200':
+          description: Vendor statistics retrieved successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VendorStatisticsResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /vendors/classify:
+    post:
+      tags: [LLM]
+      summary: Auto-suggest vendor classification
+      description: |
+        Ask the LLM to suggest a classification for an existing vendor using stored vendor data and visible evidence.
+        This is a reference-only suggestion. It does not update the vendor classification automatically and must not be
+        presented as a partner recommendation or ranking.
+      operationId: suggestVendorClassification
+      x-roles: [ADMIN, DEVELOPER]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ClassifyVendorRequest'
+      responses:
+        '200':
+          description: Classification suggestion generated successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClassifyVendorResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/UnprocessableEntity'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /vendors/{id}/summary:
+    parameters:
+      - $ref: '#/components/parameters/VendorId'
+
+    get:
+      tags: [LLM]
+      summary: Auto-generate vendor profile summary
+      description: |
+        Generate a concise 1-2 line vendor profile summary from allowed vendor information and public/demo sources.
+        The output is reference-only and is not a partner recommendation.
+      operationId: generateVendorSummary
+      x-roles: [ADMIN, DEVELOPER]
+      responses:
+        '200':
+          description: Vendor summary generated successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VendorSummaryResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/UnprocessableEntity'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /vendors/extract-fields:
+    post:
+      tags: [LLM]
+      summary: Extract structured vendor fields
+      description: |
+        Extract structured vendor fields from a company description.
+        The result is reference-only and must be reviewed before saving.
+      operationId: extractVendorFields
+      x-roles: [ADMIN, DEVELOPER]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExtractFieldsRequest'
+      responses:
+        '200':
+          description: Structured fields extracted successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExtractFieldsResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '422':
+          $ref: '#/components/responses/UnprocessableEntity'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: JWT access token returned by POST /auth/login.
+
+  parameters:
+    VendorId:
+      name: id
+      in: path
+      required: true
+      description: Vendor identifier. Keep this type aligned with the final ERD/Prisma schema.
+      schema:
+        type: string
+      example: vendor_001
+
+    SourceId:
+      name: sourceId
+      in: path
+      required: true
+      description: Vendor source identifier.
+      schema:
+        type: string
+      example: source_001
+
+    Page:
+      name: page
+      in: query
+      required: false
+      description: 1-based page number.
+      schema:
+        type: integer
+        minimum: 1
+        default: 1
+
+    Limit:
+      name: limit
+      in: query
+      required: false
+      description: Number of items per page.
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 20
+
+    SortBy:
+      name: sortBy
+      in: query
+      required: false
+      description: Field used for sorting.
+      schema:
+        type: string
+        enum:
+          - vendorCode
+          - companyName
+          - location
+          - companySize
+          - createdAt
+          - updatedAt
+        default: createdAt
+
+    SortOrder:
+      name: sortOrder
+      in: query
+      required: false
+      description: Sort direction.
+      schema:
+        type: string
+        enum: [asc, desc]
+        default: desc
+
+    Keyword:
+      name: keyword
+      in: query
+      required: false
+      description: Keyword search across companyName, techStack, serviceType and industryExperience.
+      schema:
+        type: string
+        minLength: 1
+      example: Java
+
+    ClassificationFilter:
+      name: classification
+      in: query
+      required: false
+      description: Filter by vendor classification.
+      schema:
+        $ref: '#/components/schemas/VendorClassification'
+
+    LocationFilter:
+      name: location
+      in: query
+      required: false
+      description: Filter by vendor location.
+      schema:
+        type: string
+      example: Hanoi
+
+    TechStackFilter:
+      name: techStack
+      in: query
+      required: false
+      description: Filter vendors whose technology stack contains this value.
+      schema:
+        type: string
+      example: NestJS
+
+    LanguageCapabilityFilter:
+      name: languageCapability
+      in: query
+      required: false
+      description: Filter vendors by language capability.
+      schema:
+        type: string
+      example: Korean
+
+    ServiceTypeFilter:
+      name: serviceType
+      in: query
+      required: false
+      description: Optional direct filter by service type.
+      schema:
+        $ref: '#/components/schemas/ServiceType'
+
+  responses:
+    BadRequest:
+      description: Invalid request syntax, path/query parameters or body format.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            status: 400
+            message: Bad request
+            data:
+              reason: Invalid request data
+
+    Unauthorized:
+      description: Missing, invalid or expired JWT access token.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            status: 401
+            message: Unauthorized
+            data: null
+
+    Forbidden:
+      description: Authenticated member does not have permission for this operation.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            status: 403
+            message: Forbidden
+            data: null
+
+    NotFound:
+      description: Requested resource was not found.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            status: 404
+            message: Resource not found
+            data: null
+
+    Conflict:
+      description: Request conflicts with an existing resource, such as duplicate vendorCode or email.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            status: 409
+            message: Conflict
+            data:
+              reason: Resource already exists
+
+    UnprocessableEntity:
+      description: Request is syntactically valid but violates business validation rules.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            status: 422
+            message: Validation failed
+            data:
+              reason: A public source URL or a clear demo-data note is required
+
+    InternalServerError:
+      description: Unexpected server error.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            status: 500
+            message: Internal server error
+            data: null
+
+  schemas:
+    Role:
+      type: string
+      enum:
+        - ADMIN
+        - DEVELOPER
+        - REVIEWER
+      example: DEVELOPER
+
+    ServiceType:
+      type: string
+      description: Service type defined by the assignment.
+      enum:
+        - OUTSOURCING
+        - SI
+        - PRODUCT
+        - CONSULTING
+        - SPECIALIZED_TECH
+      example: OUTSOURCING
+
+    SourceType:
+      type: string
+      enum:
+        - PUBLIC_WEBSITE
+        - DIRECTORY
+        - LINKEDIN
+        - ARTICLE
+        - DEMO_DATA
+      example: PUBLIC_WEBSITE
+
+    SummaryType:
+      type: string
+      enum:
+        - PROFILE_SUMMARY
+        - LLM_SUMMARY
+        - MANUAL_NOTE
+      example: LLM_SUMMARY
+
+    VendorClassification:
+      type: string
+      enum:
+        - OUTSOURCING_VENDOR
+        - SI_COMPANY
+        - PRODUCT_COMPANY
+        - CONSULTING_IT_SERVICE
+        - SPECIALIZED_TECH_VENDOR
+      example: OUTSOURCING_VENDOR
+
+    MemberSummary:
+      type: object
+      required: [id, email, name, role]
+      properties:
+        id:
+          type: string
+          example: member_001
+        email:
+          type: string
+          format: email
+          example: developer@example.com
+        name:
+          type: string
+          example: Developer A
+        role:
+          $ref: '#/components/schemas/Role'
+
+    LoginRequest:
+      type: object
+      additionalProperties: false
+      required: [email, password]
+      properties:
+        email:
+          type: string
+          format: email
+          example: developer@example.com
+        password:
+          type: string
+          format: password
+          minLength: 1
+          writeOnly: true
+          example: Password123!
+
+    LoginData:
+      type: object
+      required: [accessToken, tokenType, member]
+      properties:
+        accessToken:
+          type: string
+          description: JWT access token.
+          example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+        tokenType:
+          type: string
+          enum: [Bearer]
+          example: Bearer
+        member:
+          $ref: '#/components/schemas/MemberSummary'
+
+    LoginResponse:
+      type: object
+      required: [status, message, data]
+      properties:
+        status:
+          type: integer
+          example: 200
+        message:
+          type: string
+          example: success
+        data:
+          $ref: '#/components/schemas/LoginData'
+
+    VendorBase:
+      type: object
+      required:
+        - vendorCode
+        - companyName
+        - location
+        - serviceType
+        - techStack
+        - industryExperience
+        - languageCapability
+        - companySize
+        - classification
+        - note
+      properties:
+        vendorCode:
+          type: string
+          minLength: 1
+          example: VN-001
+        companyName:
+          type: string
+          minLength: 1
+          example: Example Vietnam Software Co., Ltd.
+        website:
+          type: string
+          format: uri
+          nullable: true
+          example: https://example-vendor.vn
+        location:
+          type: string
+          minLength: 1
+          example: Hanoi
+        serviceType:
+          $ref: '#/components/schemas/ServiceType'
+        techStack:
+          type: string
+          minLength: 1
+          description: Technology stack as stored by the agreed ERD.
+          example: Java, Spring Boot, React, AWS
+        industryExperience:
+          type: string
+          minLength: 1
+          example: Finance, E-commerce
+        languageCapability:
+          type: string
+          minLength: 1
+          example: English, Korean
+        companySize:
+          type: string
+          minLength: 1
+          example: 100-300 employees
+        classification:
+          $ref: '#/components/schemas/VendorClassification'
+        note:
+          type: string
+          minLength: 1
+          example: Public information collected for educational demo purposes.
+
+    Vendor:
+      allOf:
+        - type: object
+          required: [id]
+          properties:
+            id:
+              type: string
+              example: vendor_001
+        - $ref: '#/components/schemas/VendorBase'
+        - type: object
+          required: [createdAt, updatedAt]
+          properties:
+            createdAt:
+              type: string
+              format: date-time
+              example: '2026-08-07T02:00:00Z'
+            updatedAt:
+              type: string
+              format: date-time
+              example: '2026-08-07T02:00:00Z'
+
+    PublicSourceInput:
+      type: object
+      additionalProperties: false
+      required: [sourceType, sourceUrl]
+      properties:
+        sourceType:
+          type: string
+          enum:
+            - PUBLIC_WEBSITE
+            - DIRECTORY
+            - LINKEDIN
+            - ARTICLE
+          example: PUBLIC_WEBSITE
+        sourceUrl:
+          type: string
+          format: uri
+          example: https://example-vendor.vn/about
+        sourceTitle:
+          type: string
+          nullable: true
+          example: Company introduction
+        checkedAt:
+          type: string
+          format: date-time
+          nullable: true
+          description: When this source was checked. The server may default this to the current time.
+          example: '2026-08-07T02:00:00Z'
+        memo:
+          type: string
+          nullable: true
+          example: Public company profile page.
+
+    DemoDataSourceInput:
+      type: object
+      additionalProperties: false
+      required: [sourceType, memo]
+      properties:
+        sourceType:
+          type: string
+          enum: [DEMO_DATA]
+          example: DEMO_DATA
+        sourceUrl:
+          type: string
+          format: uri
+          nullable: true
+          description: Optional for educational demo data.
+        sourceTitle:
+          type: string
+          nullable: true
+          example: Educational demo data
+        checkedAt:
+          type: string
+          format: date-time
+          nullable: true
+        memo:
+          type: string
+          minLength: 1
+          description: Must clearly state "demo data" or "source unverified" when no source URL is available.
+          example: demo data - source unverified
+
+    InitialSourceInput:
+      description: Either a public source URL or an explicit demo-data/source-unverified note.
+      oneOf:
+        - $ref: '#/components/schemas/PublicSourceInput'
+        - $ref: '#/components/schemas/DemoDataSourceInput'
+
+    CreateVendorRequest:
+      allOf:
+        - $ref: '#/components/schemas/VendorBase'
+        - type: object
+          additionalProperties: false
+          required: [source]
+          properties:
+            source:
+              $ref: '#/components/schemas/InitialSourceInput'
+      example:
+        vendorCode: VN-001
+        companyName: Example Vietnam Software Co., Ltd.
+        website: https://example-vendor.vn
+        location: Hanoi
+        serviceType: OUTSOURCING
+        techStack: Java, Spring Boot, React, AWS
+        industryExperience: Finance, E-commerce
+        languageCapability: English, Korean
+        companySize: 100-300 employees
+        classification: OUTSOURCING_VENDOR
+        note: Public information collected for educational demo purposes.
+        source:
+          sourceType: PUBLIC_WEBSITE
+          sourceUrl: https://example-vendor.vn/about
+          sourceTitle: Company introduction
+
+    UpdateVendorRequest:
+      type: object
+      additionalProperties: false
+      minProperties: 1
+      description: General vendor fields only. Use the dedicated classification endpoint to change classification.
+      properties:
+        vendorCode:
+          type: string
+          minLength: 1
+          example: VN-001
+        companyName:
+          type: string
+          minLength: 1
+          example: Example Vietnam Software Co., Ltd.
+        website:
+          type: string
+          format: uri
+          nullable: true
+        location:
+          type: string
+          minLength: 1
+          example: Ho Chi Minh City
+        serviceType:
+          $ref: '#/components/schemas/ServiceType'
+        techStack:
+          type: string
+          minLength: 1
+          example: Java, NestJS, React, PostgreSQL
+        industryExperience:
+          type: string
+          minLength: 1
+          example: Finance, Retail
+        languageCapability:
+          type: string
+          minLength: 1
+          example: English, Korean
+        companySize:
+          type: string
+          minLength: 1
+          example: 300-500 employees
+        note:
+          type: string
+          minLength: 1
+          example: Updated from public company information.
+
+    VendorResponse:
+      type: object
+      required: [status, message, data]
+      properties:
+        status:
+          type: integer
+          example: 200
+        message:
+          type: string
+          example: success
+        data:
+          $ref: '#/components/schemas/Vendor'
+
+    CreatedVendorData:
+      type: object
+      required: [vendor, initialSource]
+      properties:
+        vendor:
+          $ref: '#/components/schemas/Vendor'
+        initialSource:
+          $ref: '#/components/schemas/VendorSource'
+
+    CreateVendorResponse:
+      type: object
+      required: [status, message, data]
+      properties:
+        status:
+          type: integer
+          example: 201
+        message:
+          type: string
+          example: success
+        data:
+          $ref: '#/components/schemas/CreatedVendorData'
+
+    PaginationMeta:
+      type: object
+      required: [page, limit, totalItems, totalPages]
+      properties:
+        page:
+          type: integer
+          example: 1
+        limit:
+          type: integer
+          example: 20
+        totalItems:
+          type: integer
+          minimum: 0
+          example: 48
+        totalPages:
+          type: integer
+          minimum: 0
+          example: 3
+
+    VendorListData:
+      type: object
+      required: [items, pagination]
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/Vendor'
+        pagination:
+          $ref: '#/components/schemas/PaginationMeta'
+
+    VendorListResponse:
+      type: object
+      required: [status, message, data]
+      properties:
+        status:
+          type: integer
+          example: 200
+        message:
+          type: string
+          example: success
+        data:
+          $ref: '#/components/schemas/VendorListData'
+
+    VendorSource:
+      type: object
+      required: [id, vendorId, sourceType, checkedAt]
+      properties:
+        id:
+          type: string
+          example: source_001
+        vendorId:
+          type: string
+          example: vendor_001
+        sourceType:
+          $ref: '#/components/schemas/SourceType'
+        sourceUrl:
+          type: string
+          format: uri
+          nullable: true
+          example: https://example-vendor.vn/about
+        sourceTitle:
+          type: string
+          nullable: true
+          example: Company introduction
+        checkedAt:
+          type: string
+          format: date-time
+          example: '2026-08-07T02:00:00Z'
+        memo:
+          type: string
+          nullable: true
+          example: Public company profile page.
+
+    CreateSourceRequest:
+      $ref: '#/components/schemas/InitialSourceInput'
+
+    UpdateSourceRequest:
+      type: object
+      additionalProperties: false
+      minProperties: 1
+      description: |
+        At least one field must be supplied. If sourceUrl becomes unavailable, memo must clearly state
+        "source unverified" or "demo data" according to the assignment's source rule.
+      properties:
+        sourceType:
+          $ref: '#/components/schemas/SourceType'
+        sourceUrl:
+          type: string
+          format: uri
+          nullable: true
+        sourceTitle:
+          type: string
+          nullable: true
+        checkedAt:
+          type: string
+          format: date-time
+          nullable: true
+        memo:
+          type: string
+          nullable: true
+          example: source unverified
+
+    SourceResponse:
+      type: object
+      required: [status, message, data]
+      properties:
+        status:
+          type: integer
+          example: 200
+        message:
+          type: string
+          example: success
+        data:
+          $ref: '#/components/schemas/VendorSource'
+
+    SourceListData:
+      type: object
+      required: [items]
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/VendorSource'
+
+    SourceListResponse:
+      type: object
+      required: [status, message, data]
+      properties:
+        status:
+          type: integer
+          example: 200
+        message:
+          type: string
+          example: success
+        data:
+          $ref: '#/components/schemas/SourceListData'
+
+    ClassificationRule:
+      type: object
+      required: [id, classificationName, description, judgmentCriteria, createdAt]
+      properties:
+        id:
+          type: string
+          example: rule_001
+        classificationName:
+          $ref: '#/components/schemas/VendorClassification'
+        description:
+          type: string
+          example: Software outsourcing or project-based development vendor.
+        judgmentCriteria:
+          type: string
+          example: Evidence of software outsourcing services or project-based development delivery.
+        createdAt:
+          type: string
+          format: date-time
+          example: '2026-08-07T02:00:00Z'
+
+    ClassificationRuleListData:
+      type: object
+      required: [items]
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/ClassificationRule'
+
+    ClassificationRuleListResponse:
+      type: object
+      required: [status, message, data]
+      properties:
+        status:
+          type: integer
+          example: 200
+        message:
+          type: string
+          example: success
+        data:
+          $ref: '#/components/schemas/ClassificationRuleListData'
+
+    UpdateClassificationRequest:
+      type: object
+      additionalProperties: false
+      required: [classification, reason]
+      properties:
+        classification:
+          $ref: '#/components/schemas/VendorClassification'
+        reason:
+          type: string
+          minLength: 1
+          description: Evidence-based reason for the classification change. Stored in classification_histories.reason.
+          example: Public service page shows project-based software outsourcing and dedicated development teams.
+
+    ClassificationHistory:
+      type: object
+      required:
+        - id
+        - vendorId
+        - changedBy
+        - previousClassification
+        - newClassification
+        - changedAt
+        - reason
+      properties:
+        id:
+          type: string
+          example: history_001
+        vendorId:
+          type: string
+          example: vendor_001
+        changedBy:
+          $ref: '#/components/schemas/MemberSummary'
+        previousClassification:
+          $ref: '#/components/schemas/VendorClassification'
+        newClassification:
+          $ref: '#/components/schemas/VendorClassification'
+        changedAt:
+          type: string
+          format: date-time
+          example: '2026-08-07T02:30:00Z'
+        reason:
+          type: string
+          example: Public service page shows project-based software outsourcing and dedicated development teams.
+
+    UpdateClassificationData:
+      type: object
+      required: [vendor, history]
+      properties:
+        vendor:
+          $ref: '#/components/schemas/Vendor'
+        history:
+          $ref: '#/components/schemas/ClassificationHistory'
+
+    UpdateClassificationResponse:
+      type: object
+      required: [status, message, data]
+      properties:
+        status:
+          type: integer
+          example: 200
+        message:
+          type: string
+          example: success
+        data:
+          $ref: '#/components/schemas/UpdateClassificationData'
+
+    ClassificationHistoryListData:
+      type: object
+      required: [items]
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/ClassificationHistory'
+
+    ClassificationHistoryListResponse:
+      type: object
+      required: [status, message, data]
+      properties:
+        status:
+          type: integer
+          example: 200
+        message:
+          type: string
+          example: success
+        data:
+          $ref: '#/components/schemas/ClassificationHistoryListData'
+
+    CountByClassification:
+      type: object
+      required: [classification, count]
+      properties:
+        classification:
+          $ref: '#/components/schemas/VendorClassification'
+        count:
+          type: integer
+          minimum: 0
+          example: 12
+
+    CountByLocation:
+      type: object
+      required: [location, count]
+      properties:
+        location:
+          type: string
+          example: Hanoi
+        count:
+          type: integer
+          minimum: 0
+          example: 18
+
+    CountByServiceType:
+      type: object
+      required: [serviceType, count]
+      properties:
+        serviceType:
+          $ref: '#/components/schemas/ServiceType'
+        count:
+          type: integer
+          minimum: 0
+          example: 20
+
+    VendorStatisticsData:
+      type: object
+      required: [total, byClassification, byLocation, byServiceType]
+      properties:
+        total:
+          type: integer
+          minimum: 0
+          example: 48
+        byClassification:
+          type: array
+          items:
+            $ref: '#/components/schemas/CountByClassification'
+        byLocation:
+          type: array
+          items:
+            $ref: '#/components/schemas/CountByLocation'
+        byServiceType:
+          type: array
+          items:
+            $ref: '#/components/schemas/CountByServiceType'
+
+    VendorStatisticsResponse:
+      type: object
+      required: [status, message, data]
+      properties:
+        status:
+          type: integer
+          example: 200
+        message:
+          type: string
+          example: success
+        data:
+          $ref: '#/components/schemas/VendorStatisticsData'
+
+    ClassifyVendorRequest:
+      type: object
+      additionalProperties: false
+      required: [vendorId]
+      properties:
+        vendorId:
+          type: string
+          description: Existing vendor whose stored fields and allowed sources are used as LLM input.
+          example: vendor_001
+
+    ClassificationSuggestionData:
+      type: object
+      required: [vendorId, suggestedClassification, rationale, evidence, disclaimer]
+      properties:
+        vendorId:
+          type: string
+          example: vendor_001
+        suggestedClassification:
+          $ref: '#/components/schemas/VendorClassification'
+        rationale:
+          type: string
+          example: The company publicly describes project-based software development and dedicated development teams.
+        evidence:
+          type: array
+          description: Visible evidence used by the LLM suggestion.
+          minItems: 1
+          items:
+            type: string
+          example:
+            - Service description includes software outsourcing.
+            - Technology stack and project portfolio are publicly visible.
+        disclaimer:
+          type: string
+          example: Reference-only AI suggestion. Team review is required. This is not a partner recommendation or ranking.
+
+    ClassifyVendorResponse:
+      type: object
+      required: [status, message, data]
+      properties:
+        status:
+          type: integer
+          example: 200
+        message:
+          type: string
+          example: success
+        data:
+          $ref: '#/components/schemas/ClassificationSuggestionData'
+
+    VendorSummaryData:
+      type: object
+      required: [vendorId, summaryType, content, generatedAt, disclaimer]
+      properties:
+        vendorId:
+          type: string
+          example: vendor_001
+        summaryType:
+          type: string
+          enum: [LLM_SUMMARY]
+          example: LLM_SUMMARY
+        content:
+          type: string
+          description: Concise 1-2 line profile summary.
+          example: Vietnam-based software vendor focused on project-based development with Java, React and cloud capabilities, serving finance and e-commerce clients.
+        generatedAt:
+          type: string
+          format: date-time
+          example: '2026-08-07T03:00:00Z'
+        disclaimer:
+          type: string
+          example: Reference-only AI-generated summary. This is not a partner recommendation or ranking.
+
+    VendorSummaryResponse:
+      type: object
+      required: [status, message, data]
+      properties:
+        status:
+          type: integer
+          example: 200
+        message:
+          type: string
+          example: success
+        data:
+          $ref: '#/components/schemas/VendorSummaryData'
+
+    ExtractFieldsRequest:
+      type: object
+      additionalProperties: false
+      required: [companyDescription]
+      properties:
+        companyDescription:
+          type: string
+          minLength: 1
+          description: Public or educational demo company description to structure.
+          example: We are a Hanoi-based software development company providing Java and cloud outsourcing services to finance clients. Our teams communicate in English and Korean.
+
+    ExtractedVendorFields:
+      type: object
+      description: Reference-only structured extraction. Missing/uncertain fields may be null and must be reviewed before saving.
+      properties:
+        companyName:
+          type: string
+          nullable: true
+          example: null
+        location:
+          type: string
+          nullable: true
+          example: Hanoi
+        serviceType:
+          allOf:
+            - $ref: '#/components/schemas/ServiceType'
+          nullable: true
+        techStack:
+          type: string
+          nullable: true
+          example: Java, Cloud
+        industryExperience:
+          type: string
+          nullable: true
+          example: Finance
+        languageCapability:
+          type: string
+          nullable: true
+          example: English, Korean
+        companySize:
+          type: string
+          nullable: true
+          example: null
+        note:
+          type: string
+          nullable: true
+          example: Extracted from provided company description; review required before saving.
+
+    ExtractFieldsData:
+      type: object
+      required: [fields, disclaimer]
+      properties:
+        fields:
+          $ref: '#/components/schemas/ExtractedVendorFields'
+        disclaimer:
+          type: string
+          example: Reference-only AI extraction. Human review is required before saving.
+
+    ExtractFieldsResponse:
+      type: object
+      required: [status, message, data]
+      properties:
+        status:
+          type: integer
+          example: 200
+        message:
+          type: string
+          example: success
+        data:
+          $ref: '#/components/schemas/ExtractFieldsData'
+
+    EmptySuccessResponse:
+      type: object
+      required: [status, message, data]
+      properties:
+        status:
+          type: integer
+          example: 200
+        message:
+          type: string
+          example: success
+        data:
+          nullable: true
+          example: null
+
+    ErrorResponse:
+      type: object
+      required: [status, message, data]
+      properties:
+        status:
+          type: integer
+          example: 400
+        message:
+          type: string
+          example: Bad request
+        data:
+          type: object
+          nullable: true
+          additionalProperties: true
+          example:
+            reason: Invalid request data

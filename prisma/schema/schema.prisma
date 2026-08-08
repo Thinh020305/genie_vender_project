@@ -13,7 +13,11 @@ model User {
   email String  @unique
   name  String?
   posts Post[]
+<<<<<<< HEAD
   role  Role   @default(DEVELOPER)
+=======
+  role  Role    @default(DEVELOPER)
+>>>>>>> origin/feature/doduccuong
 }
 
 model Post {
