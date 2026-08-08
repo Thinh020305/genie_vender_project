@@ -1,15 +1,21 @@
 model Vendor {
-  id             Int                  @id @default(autoincrement())
-  name           String               @db.VarChar(255)  
-  description    String?              @db.Text          
-  classification VendorClassification
+  id                 Int                  @id @default(autoincrement())
+  vendorCode         String               @unique @db.VarChar(50)
+  companyName        String               @db.VarChar(255)
+  website            String?              @db.VarChar(255)
+  location           String               @db.VarChar(255)
+  serviceType        ServiceType
+  techStack          String               @db.Text
+  industryExperience String               @db.Text
+  languageCapability String               @db.VarChar(255)
+  companySize        String               @db.VarChar(100)
+  classification     VendorClassification
+  note               String?              @db.Text
 
-  // Trường hỗ trợ xóa mềm & thời gian
-  deletedAt      DateTime?
-  createdAt      DateTime             @default(now())
-  updatedAt      DateTime             @updatedAt
+  createdAt          DateTime             @default(now())
+  updatedAt          DateTime             @updatedAt
 
-  // Mối quan hệ tới các bảng khác theo sơ đồ ERD mới (Mở lại comment khi đã có thông tin bảng)
+  // Mối quan hệ (tạm comment chờ My và Sơn push schema để tránh lỗi P1012)
   // sources                 VendorSource[]
   // classificationHistories ClassificationHistory[]
   // summaries               VendorSummary[]

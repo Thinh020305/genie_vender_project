@@ -95,10 +95,17 @@ export type PostScalarFieldEnum = (typeof PostScalarFieldEnum)[keyof typeof Post
 
 export const VendorScalarFieldEnum = {
   id: 'id',
-  name: 'name',
-  description: 'description',
+  vendorCode: 'vendorCode',
+  companyName: 'companyName',
+  website: 'website',
+  location: 'location',
+  serviceType: 'serviceType',
+  techStack: 'techStack',
+  industryExperience: 'industryExperience',
+  languageCapability: 'languageCapability',
+  companySize: 'companySize',
   classification: 'classification',
-  deletedAt: 'deletedAt',
+  note: 'note',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const

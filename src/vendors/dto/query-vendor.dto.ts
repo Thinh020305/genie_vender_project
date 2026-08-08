@@ -1,7 +1,9 @@
-// nhận và validate các tham số phân trang, tìm kiếm từ khóa và lọc tổng hợp
 import { IsOptional, IsString, IsEnum, IsInt, Min } from 'class-validator';
 import { Type } from 'class-transformer';
-import { VendorClassification } from '../../generated/prisma/client';
+import {
+  VendorClassification,
+  ServiceType,
+} from '../../generated/prisma/client';
 
 export class QueryVendorDto {
   @IsOptional()
@@ -23,6 +25,22 @@ export class QueryVendorDto {
   @IsOptional()
   @IsEnum(VendorClassification)
   classification?: VendorClassification;
+
+  @IsOptional()
+  @IsString()
+  location?: string;
+
+  @IsOptional()
+  @IsString()
+  techStack?: string;
+
+  @IsOptional()
+  @IsString()
+  languageCapability?: string;
+
+  @IsOptional()
+  @IsEnum(ServiceType)
+  serviceType?: ServiceType;
 
   @IsOptional()
   @IsString()
