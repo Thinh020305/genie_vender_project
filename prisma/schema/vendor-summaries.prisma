@@ -1,1 +1,13 @@
+model VendorSummary {
+  id          Int         @id @default(autoincrement())
+  vendorId    Int
+  vendor      Vendor      @relation(fields: [vendorId], references: [id], onDelete: Restrict)
+  summaryType SummaryType
+  content     String      @db.Text
+  createdBy   Int
+  author      Member      @relation(fields: [createdBy], references: [id], onDelete: Restrict)
+  createdAt   DateTime    @default(now()) @db.Timestamptz
 
+  @@index([vendorId, summaryType, createdAt])
+  @@map("vendor_summaries")
+}

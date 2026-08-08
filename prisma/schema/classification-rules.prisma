@@ -1,19 +1,14 @@
 model ClassificationRule {
-  id Int @id @default(autoincrement())
+  id                 Int                  @id @default(autoincrement())
+  classificationName VendorClassification @unique
+  description        String               @db.Text
+  judgmentCriteria   String               @db.Text
+  createdAt          DateTime             @default(now()) @db.Timestamptz
 
-  keyword              String               @db.VarChar(100)
-  targetClassification VendorClassification
+  vendors                 Vendor[]                @relation("VendorClassification")
+  previousClassifications ClassificationHistory[]  @relation("PreviousClassification")
+  newClassifications      ClassificationHistory[]  @relation("NewClassification")
 
-  priority Int @default(100)
-  weight   Int @default(1)
-
-  isActive  Boolean   @default(true)
-  deletedAt DateTime?
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@unique([keyword, targetClassification])
-  @@index([isActive, deletedAt])
-  @@index([targetClassification])
+  @@map("classification_rules")
 }
+

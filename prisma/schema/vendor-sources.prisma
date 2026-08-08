@@ -1,1 +1,15 @@
+model VendorSource {
+  id          Int        @id @default(autoincrement())
+  vendorId    Int
+  vendor      Vendor     @relation(fields: [vendorId], references: [id], onDelete: Restrict)
+  sourceType  SourceType
+  sourceUrl   String?    @db.VarChar(2048)
+  sourceTitle String?    @db.VarChar(255)
+  checkedAt   DateTime   @default(now()) @db.Timestamptz
+  memo        String?    @db.Text
+
+  @@index([vendorId])
+  @@map("vendor_sources")
+}
+
 
