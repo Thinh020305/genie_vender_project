@@ -1,4 +1,3 @@
-// Tiếp nhận các HTTP requests từ client, điều hướng dữ liệu qua DTO để kiểm tra tính hợp lệ và gọi Service tương ứng.
 import {
   Controller,
   Post,
@@ -19,7 +18,6 @@ import { UpdateVendorDto } from './dto/update-vendor.dto';
 export class VendorsController {
   constructor(private readonly vendorsService: VendorsService) {}
 
-  //Đăng ký vendor mới
   @Post()
   async create(@Body() createVendorDto: CreateVendorDto) {
     const data = await this.vendorsService.create(createVendorDto);
@@ -30,7 +28,6 @@ export class VendorsController {
     };
   }
 
-  // GET /api/vendors - Danh sách phân trang, tìm kiếm, lọc
   @Get()
   async findAll(@Query() query: QueryVendorDto) {
     const data = await this.vendorsService.findAll(query);
@@ -41,7 +38,6 @@ export class VendorsController {
     };
   }
 
-  //Lấy chi tiết một vendor
   @Get(':id')
   async findOne(@Param('id', ParseIntPipe) id: number) {
     const data = await this.vendorsService.findOne(id);
@@ -65,8 +61,6 @@ export class VendorsController {
     };
   }
 
-  // DELETE /api/vendors/:id - Xóa mềm vendor
-  // @Roles('ADMIN') <-- Mở comment dòng này và import từ phần của Thịnh nếu muốn chặn cứng quyền
   @Delete(':id')
   async remove(@Param('id', ParseIntPipe) id: number) {
     const data = await this.vendorsService.remove(id);
