@@ -1,94 +1,250 @@
-// 1. Quản lý người dùng & Phân quyền
-Table members {
-  id int [pk, increment]
-  email varchar [unique, not null]
-  password varchar [not null]
-  name varchar [not null]
-  role enum('ADMIN', 'DEVELOPER', 'REVIEWER') [not null]
-  createdAt timestamp [default: `now()`]
+Project genie_vina {
+  database_type: "PostgreSQL"
+  Note: "Genie Vina - Vietnam IT/SW Vendor Intelligence"
 }
 
-// 2. Danh mục (Catalogs) - Giúp dữ liệu chuẩn hóa
+// ============================================================
+// ENUMS
+// ============================================================
+
+Enum role_enum {
+  ADMIN
+  DEVELOPER
+  REVIEWER
+}
+
+Enum service_type_enum {
+  OUTSOURCING
+  SI
+  PRODUCT
+  CONSULTING
+  SPECIALIZED_TECH
+}
+
+Enum source_type_enum {
+  PUBLIC_WEBSITE
+  DIRECTORY
+  LINKEDIN
+  ARTICLE
+  DEMO_DATA
+}
+
+Enum summary_type_enum {
+  PROFILE_SUMMARY
+  LLM_SUMMARY
+  MANUAL_NOTE
+}
+
+Enum vendor_classification_enum {
+  OUTSOURCING_VENDOR
+  SI_COMPANY
+  PRODUCT_COMPANY
+  CONSULTING_IT_SERVICE
+  SPECIALIZED_TECH_VENDOR
+}
+
+// ============================================================
+// 1. CLASSIFICATION CATALOG
+// ============================================================
+
+Table classification_rules {
+  id int [pk, increment]
+  classificationName vendor_classification_enum [not null]
+  description text [not null]
+  judgmentCriteria text [not null]
+  createdAt timestamptz [not null, default: `now()`]
+
+  Indexes {
+    classificationName [unique]
+  }
+}
+
+// ============================================================
+// 2. MEMBERS
+// ============================================================
+
+Table members {
+  id int [pk, increment]
+  email varchar(255) [not null]
+  password varchar(255) [not null]
+  name varchar(255) [not null]
+  role role_enum [not null]
+  createdAt timestamptz [not null, default: `now()`]
+
+  Indexes {
+    email [unique]
+  }
+}
+
+// ============================================================
+// 3. CATALOGS
+// ============================================================
+
 Table locations {
   id int [pk, increment]
-  name varchar [unique, not null] // Hanoi, HCMC, Da Nang...
+  name varchar(255) [not null]
+  createdAt timestamptz [not null, default: `now()`]
+
+  Indexes {
+    name [unique]
+  }
 }
 
 Table technologies {
   id int [pk, increment]
-  name varchar [unique, not null] // React, Node.js, Java...
+  name varchar(100) [not null]
+  createdAt timestamptz [not null, default: `now()`]
+
+  Indexes {
+    name [unique]
+  }
 }
 
 Table languages {
   id int [pk, increment]
-  name varchar [unique, not null] // English, Korean, Japanese...
+  name varchar(100) [not null]
+  createdAt timestamptz [not null, default: `now()`]
+
+  Indexes {
+    name [unique]
+  }
 }
 
-// 3. Thực thể chính: Vendor
+// ============================================================
+// 4. VENDORS
+// ============================================================
+
 Table vendors {
   id int [pk, increment]
-  vendorCode varchar [unique, not null]
-  companyName varchar [not null]
-  website varchar
-  locationId int [ref: > locations.id]
-  serviceType enum('OUTSOURCING', 'SI', 'PRODUCT', 'CONSULTING', 'SPECIALIZED_TECH')
+  vendorCode varchar(50) [not null]
+  companyName varchar(255) [not null]
+  website varchar(2048)
+  locationId int [not null]
+  serviceType service_type_enum [not null]
   industryExperience text
-  companySize varchar
-  classificationId int [ref: > classification_rules.id] // Link trực tiếp tới tiêu chí
+  companySize varchar(50)
+  classificationId int [not null]
   note text
-  createdAt timestamp [default: `now()`]
-  updatedAt timestamp
-  deletedAt timestamp // Soft delete
+  createdAt timestamptz [not null, default: `now()`]
+  updatedAt timestamptz [not null]
+  deletedAt timestamptz
+
+  Indexes {
+    vendorCode [unique]
+    locationId
+    serviceType
+    classificationId
+  }
 }
 
-// 4. Các bảng quan hệ N:M (Junction Tables)
+// ============================================================
+// 5. VENDOR <-> TECHNOLOGY
+// ============================================================
+
 Table vendor_technologies {
-  vendorId int [ref: > vendors.id]
-  technologyId int [ref: > technologies.id]
-  primary key (vendorId, technologyId)
+  vendorId int [not null]
+  technologyId int [not null]
+
+  Indexes {
+    (vendorId, technologyId) [pk]
+    technologyId
+  }
 }
+
+// ============================================================
+// 6. VENDOR <-> LANGUAGE
+// ============================================================
 
 Table vendor_languages {
-  vendorId int [ref: > vendors.id]
-  languageId int [ref: > languages.id]
-  primary key (vendorId, languageId)
+  vendorId int [not null]
+  languageId int [not null]
+
+  Indexes {
+    (vendorId, languageId) [pk]
+    languageId
+  }
 }
 
-// 5. Nguồn bằng chứng (Evidence)
+// ============================================================
+// 7. VENDOR SOURCES / EVIDENCE
+// ============================================================
+
 Table vendor_sources {
   id int [pk, increment]
-  vendorId int [ref: > vendors.id]
-  sourceType enum('PUBLIC_WEBSITE', 'DIRECTORY', 'LINKEDIN', 'ARTICLE', 'DEMO_DATA')
-  sourceUrl varchar
-  sourceTitle varchar
-  checkedAt timestamp
+  vendorId int [not null]
+  sourceType source_type_enum [not null]
+  sourceUrl varchar(2048)
+  sourceTitle varchar(255)
+  checkedAt timestamptz [not null, default: `now()`]
   memo text
+
+  Indexes {
+    vendorId
+  }
 }
 
-// 6. Quy tắc & Lịch sử phân loại
-Table classification_rules {
-  id int [pk, increment]
-  classificationName varchar [unique] // Outsourcing Vendor, SI Company...
-  description text
-  judgmentCriteria text
-}
+// ============================================================
+// 8. CLASSIFICATION HISTORY
+// ============================================================
 
 Table classification_histories {
   id int [pk, increment]
-  vendorId int [ref: > vendors.id]
-  changedBy int [ref: > members.id]
-  previousClassification varchar
-  newClassification varchar
-  reason text
-  changedAt timestamp [default: `now()`]
+  vendorId int [not null]
+  changedBy int [not null]
+  previousClassificationId int
+  newClassificationId int [not null]
+  reason text [not null]
+  changedAt timestamptz [not null, default: `now()`]
+
+  Indexes {
+    (vendorId, changedAt)
+  }
 }
 
-// 7. Tóm tắt AI/Manual
+// ============================================================
+// 9. VENDOR SUMMARIES
+// ============================================================
+
 Table vendor_summaries {
   id int [pk, increment]
-  vendorId int [ref: > vendors.id]
-  summaryType enum('PROFILE_SUMMARY', 'LLM_SUMMARY', 'MANUAL_NOTE')
-  content text
-  createdBy int [ref: > members.id]
-  createdAt timestamp [default: `now()`]
+  vendorId int [not null]
+  summaryType summary_type_enum [not null]
+  content text [not null]
+  createdBy int [not null]
+  createdAt timestamptz [not null, default: `now()`]
+
+  Indexes {
+    (vendorId, summaryType, createdAt)
+  }
 }
+
+// ============================================================
+// RELATIONSHIPS
+// ============================================================
+
+// Classification
+Ref: vendors.classificationId > classification_rules.id
+Ref: classification_histories.previousClassificationId > classification_rules.id
+Ref: classification_histories.newClassificationId > classification_rules.id
+
+// Location
+Ref: vendors.locationId > locations.id
+
+// Vendor <-> Technology
+Ref: vendor_technologies.vendorId > vendors.id
+Ref: vendor_technologies.technologyId > technologies.id
+
+// Vendor <-> Language
+Ref: vendor_languages.vendorId > vendors.id
+Ref: vendor_languages.languageId > languages.id
+
+// Vendor sources
+Ref: vendor_sources.vendorId > vendors.id
+
+// Classification history
+Ref: classification_histories.vendorId > vendors.id
+Ref: classification_histories.changedBy > members.id
+
+// Vendor summaries
+Ref: vendor_summaries.vendorId > vendors.id
+Ref: vendor_summaries.createdBy > members.id
