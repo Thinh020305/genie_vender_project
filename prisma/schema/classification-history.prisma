@@ -1,1 +1,32 @@
+// Source: genie_topic.pdf, Step 1 ERD Design, table 4 (classification_histories)
+// Spec text (verbatim): "id, vendorId -> vendors, changedBy -> members,
+// previousClassification, newClassification, changedAt, reason"
 
+model ClassificationHistory {
+  // default schema.prisma uses Int @id @default(autoincrement()), members.prisma is currently empty
+  id String @id @default(uuid())    // -> CONFIRM WITH THỊNH AND CƯỜNG bcuz id using uuid
+
+  vendorId String   // -> need match with Vendor.id
+
+  // Relation field + model name "Vendor" — pdf only names the FK column ("vendorId -> vendors")
+  // onDelete: Restrict. Blocks a hard delete of any vendor/member that still has history rows.
+  vendor Vendor @relation(fields: [vendorId], references: [id], onDelete: Restrict)
+
+  // name in genie_topic.pdf file: "changedBy" --> "changedById"
+  changedById String    // Type (String) assumed to match Member.id -> CONFIRM WITH THỊNH
+
+  
+  changedBy Member @relation(fields: [changedById], references: [id], onDelete: Restrict)
+
+  previousClassification VendorClassification
+  newClassification      VendorClassification
+
+  changedAt DateTime @default(now())
+
+  reason String?    // Nullable (String?) (reason may need be mandatory --> non-null + enforced in DTO)
+
+  @@index([vendorId])   // API needs (lookup by vendor, ordering by date)
+  @@index([changedAt])
+
+  @@map("classification_histories")
+}
