@@ -1,1 +1,57 @@
+// Source: docs/erd.md, table vendor_summaries
+// Spec text (verbatim): "id, vendorId -> vendors, summaryType, content,
+// createdBy -> members, createdAt"
 
+model VendorSummary {
+  // [AI] BigInt autoincrement per docs/erd.md. See the same note in
+  // vendor-sources.prisma about the conflict with classification-history's
+  // uuid guess.
+  id BigInt @id @default(autoincrement())
+
+  // [AI] vendors.prisma is EMPTY — this relation will not validate until
+  // Cường writes it. Vendor needs the back-relation field:
+  //     summaries VendorSummary[]
+  vendorId BigInt
+  vendor   Vendor @relation(fields: [vendorId], references: [id], onDelete: Cascade)
+
+  // [AI] Enum instead of the ERD's literal `varchar`; SummaryType in
+  // enums.prisma already matches the ERD's inline note exactly
+  // ("PROFILE_SUMMARY / LLM_SUMMARY / MANUAL_NOTE").
+  summaryType SummaryType
+
+  // [AI] Nullable — the ERD writes `content text` with no [not null] marker,
+  // unlike the columns it does mark. @db.Text (not VarChar) because LLM
+  // summaries have no meaningful upper bound.
+  // -> MENTION TO TEAM: an empty summary row is arguably useless. The DTO
+  //    layer requires content on write (see CreateVendorSummaryDto); this
+  //    column stays nullable only to match the ERD.
+  content String? @db.Text
+
+  // [AI] The ERD names the column "createdBy"; renamed to createdById here so
+  // the relation field can be `createdBy`, matching how
+  // classification-history.prisma handled the identical "changedBy" case.
+  createdById BigInt
+
+  // [AI] onDelete: Restrict, unlike the vendor relation above. Deleting a
+  // member must not silently erase authorship of summaries they wrote —
+  // same reasoning classification-history.prisma used for changedBy.
+  // members.prisma is EMPTY, so this also blocks validation until Thịnh
+  // writes it. Member needs the back-relation field:
+  //     summaries VendorSummary[]
+  createdBy Member @relation(fields: [createdById], references: [id], onDelete: Restrict)
+
+  createdAt DateTime @default(now())
+
+  // [AI] No updatedAt — the ERD gives this table createdAt only. Read as
+  // intentional: a summary is an append-only record of what was written at a
+  // point in time (especially LLM_SUMMARY, where editing the text would
+  // misrepresent what the model actually produced). The service layer
+  // therefore exposes create/read/delete but NO update.
+  // -> MENTION TO TEAM: confirm MANUAL_NOTE is also meant to be immutable.
+
+  @@index([vendorId])
+  @@index([vendorId, summaryType])
+  @@index([createdById])
+  @@index([createdAt])
+  @@map("vendor_summaries")
+}

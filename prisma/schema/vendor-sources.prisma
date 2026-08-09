@@ -1,1 +1,57 @@
+// Source: docs/erd.md, table vendor_sources
+// Spec text (verbatim): "id, vendorId -> vendors, sourceType, sourceUrl,
+// sourceTitle, checkedAt, memo"
 
+model VendorSource {
+  // [AI] BigInt @default(autoincrement()) follows docs/erd.md literally
+  // ("id bigint [pk, increment]"). This CONFLICTS with the
+  // `String @id @default(uuid())` guess in classification-history.prisma —
+  // that file carries its own "-> CONFIRM WITH THỊNH AND CƯỜNG" note, so it
+  // was never settled. The ERD is the newer artifact, so it wins here.
+  // -> MENTION TO TEAM: whichever way Vendor.id goes, classification-history
+  //    and this file must end up with the SAME type or the FK won't compile.
+  id BigInt @id @default(autoincrement())
+
+  // [AI] Must match Vendor.id exactly. vendors.prisma is still EMPTY, so
+  // `prisma validate` / `prisma generate` will fail on the relation below
+  // until Cường writes it. Vendor also needs the back-relation field:
+  //     sources VendorSource[]
+  vendorId BigInt
+
+  // [AI] onDelete: Cascade (not Restrict like classification_histories).
+  // Reasoning: a source row is subordinate evidence describing a vendor —
+  // it has no audit/legal value once the vendor is gone, unlike a
+  // classification history row. Not spec text; the ERD only draws the Ref.
+  // -> MENTION TO TEAM if vendors are meant to be soft-deleted instead,
+  //    in which case this should be Restrict and a deletedAt filter used.
+  vendor Vendor @relation(fields: [vendorId], references: [id], onDelete: Cascade)
+
+  // [AI] The ERD notes the allowed values inline
+  // ("PUBLIC_WEBSITE / DIRECTORY / LINKEDIN / ARTICLE / DEMO_DATA") and the
+  // SourceType enum in enums.prisma already matches them 1:1, so this is
+  // typed as the enum rather than the ERD's literal `varchar`.
+  sourceType SourceType
+
+  // [AI] Nullable per the ERD (no [not null] marker). Necessary in practice:
+  // a DEMO_DATA source has no URL. Length caps below are invented — the ERD
+  // gives no lengths.
+  sourceUrl   String? @db.VarChar(2048)
+  sourceTitle String? @db.VarChar(500)
+
+  // [AI] Nullable per ERD: a source that has never been re-verified has no
+  // checkedAt. NOT defaulted to now() — "never checked" and "checked at
+  // creation time" are different facts.
+  checkedAt DateTime?
+
+  memo String? @db.VarChar(1000)
+
+  // [AI] The ERD gives vendor_sources NO createdAt/updatedAt columns, unlike
+  // vendors / classification_rules / vendor_summaries. Left absent to stay
+  // faithful to the ERD.
+  // -> MENTION TO TEAM: likely an ERD oversight rather than a decision. If
+  //    audit timestamps are wanted here, add them to docs/erd.md first.
+
+  @@index([vendorId])
+  @@index([sourceType])
+  @@map("vendor_sources")
+}

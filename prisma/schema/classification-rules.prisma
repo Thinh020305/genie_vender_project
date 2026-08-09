@@ -1,19 +1,75 @@
-model ClassificationRule {
-  id Int @id @default(autoincrement())
+// Source: docs/erd.md, table classification_rules
+// Spec text (verbatim): "id, classificationName, description,
+// judgmentCriteria, createdAt"
 
-  keyword              String               @db.VarChar(100)
+// [AI] This file already existed with a keyword-matching shape (keyword /
+// targetClassification / priority / weight) that rule-matcher.service.ts is
+// built around, and docs/erd.md describes a simpler catalog shape
+// (classificationName / description / judgmentCriteria). Those are two
+// different readings of the same table. Resolved as a SUPERSET rather than
+// picking one, so nothing already written breaks:
+//   - ERD "classificationName" -> realized as `targetClassification`, the
+//     VendorClassification enum. Same concept, but enum-typed instead of the
+//     ERD's `varchar`, so a rule can't name a classification that doesn't
+//     exist. NOT added as a second redundant column.
+//   - ERD "description"       -> added below, new.
+//   - ERD "judgmentCriteria"  -> added below, new. Human-readable prose
+//     explaining the rule; `keyword` stays as the machine-matchable form
+//     that rule-matcher.service.ts actually evaluates.
+// -> MENTION TO TEAM: if the ERD really meant this table to be a plain
+//    reference catalog with no automatic matching, then keyword/priority/
+//    weight and rule-matcher.service.ts are the parts to delete — but that
+//    would drop the auto-classification feature entirely.
+model ClassificationRule {
+  // [AI] Changed Int -> BigInt to follow docs/erd.md ("id bigint [pk,
+  // increment]") consistently with vendor_sources / vendor_summaries.
+  // Safe for rule-matcher.service.ts: MatchableRule declares its own
+  // `id: number` and does NOT import this model, so the coupling point is
+  // ClassificationRulesService.toMatchableRule(), which converts explicitly.
+  id BigInt @id @default(autoincrement())
+
+  // [AI] ERD "classificationName". Enum-typed — see the file header note.
   targetClassification VendorClassification
 
+  // [AI] Pre-existing field, not in the ERD. The token rule-matcher actually
+  // searches for (case-insensitive substring match against vendor text).
+  keyword String @db.VarChar(100)
+
+  // [AI] ERD "description" — what this rule is for, shown in admin UI.
+  description String? @db.VarChar(500)
+
+  // [AI] ERD "judgmentCriteria" — prose statement of how the rule decides,
+  // e.g. "Company describes itself as providing staff augmentation".
+  // Documentation for reviewers; `keyword` is what the matcher executes.
+  // -> MENTION TO TEAM: these two can drift apart. Nothing enforces that the
+  //    prose still describes what the keyword does.
+  judgmentCriteria String? @db.VarChar(1000)
+
+  // [AI] Pre-existing tie-break fields, not in the ERD. Kept — rule-matcher's
+  // compareRules() sorts on priority ASC, then weight DESC, then createdAt,
+  // then id. Removing them would make matches non-deterministic.
   priority Int @default(100)
   weight   Int @default(1)
 
+  // [AI] Pre-existing soft-delete/toggle fields, not in the ERD. Kept:
+  // deleting a rule that has already influenced classifications loses the
+  // audit trail, so the service soft-deletes (sets deletedAt) instead.
   isActive  Boolean   @default(true)
   deletedAt DateTime?
 
   createdAt DateTime @default(now())
+
+  // [AI] updatedAt is not in the ERD but is pre-existing here. Kept — unlike
+  // vendor_summaries, a rule genuinely is edited in place.
   updatedAt DateTime @updatedAt
 
+  // [AI] Pre-existing constraint. Note it is NOT filtered by deletedAt:
+  // Postgres unique indexes count soft-deleted rows, so recreating a rule
+  // with the same (keyword, targetClassification) pair after a soft delete
+  // will collide. ClassificationRulesService.create() handles this by
+  // reviving the soft-deleted row instead of inserting a duplicate.
   @@unique([keyword, targetClassification])
   @@index([isActive, deletedAt])
   @@index([targetClassification])
+  @@map("classification_rules")
 }
