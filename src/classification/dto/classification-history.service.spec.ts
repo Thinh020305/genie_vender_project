@@ -1,4 +1,3 @@
-// src/classification/classification-history.service.spec.ts
 describe('ClassificationHistoryService', () => {
   it('throws BadRequestException when new classification equals current', async () => {
     const mockPrisma = {
