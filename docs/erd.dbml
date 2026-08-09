@@ -1,250 +1,72 @@
-Project genie_vina {
-  database_type: "PostgreSQL"
-  Note: "Genie Vina - Vietnam IT/SW Vendor Intelligence"
-}
-
-// ============================================================
-// ENUMS
-// ============================================================
-
-Enum role_enum {
-  ADMIN
-  DEVELOPER
-  REVIEWER
-}
-
-Enum service_type_enum {
-  OUTSOURCING
-  SI
-  PRODUCT
-  CONSULTING
-  SPECIALIZED_TECH
-}
-
-Enum source_type_enum {
-  PUBLIC_WEBSITE
-  DIRECTORY
-  LINKEDIN
-  ARTICLE
-  DEMO_DATA
-}
-
-Enum summary_type_enum {
-  PROFILE_SUMMARY
-  LLM_SUMMARY
-  MANUAL_NOTE
-}
-
-Enum vendor_classification_enum {
-  OUTSOURCING_VENDOR
-  SI_COMPANY
-  PRODUCT_COMPANY
-  CONSULTING_IT_SERVICE
-  SPECIALIZED_TECH_VENDOR
-}
-
-// ============================================================
-// 1. CLASSIFICATION CATALOG
-// ============================================================
-
-Table classification_rules {
-  id int [pk, increment]
-  classificationName vendor_classification_enum [not null]
-  description text [not null]
-  judgmentCriteria text [not null]
-  createdAt timestamptz [not null, default: `now()`]
-
-  Indexes {
-    classificationName [unique]
-  }
-}
-
-// ============================================================
-// 2. MEMBERS
-// ============================================================
-
-Table members {
-  id int [pk, increment]
-  email varchar(255) [not null]
-  password varchar(255) [not null]
-  name varchar(255) [not null]
-  role role_enum [not null]
-  createdAt timestamptz [not null, default: `now()`]
-
-  Indexes {
-    email [unique]
-  }
-}
-
-// ============================================================
-// 3. CATALOGS
-// ============================================================
-
-Table locations {
-  id int [pk, increment]
-  name varchar(255) [not null]
-  createdAt timestamptz [not null, default: `now()`]
-
-  Indexes {
-    name [unique]
-  }
-}
-
-Table technologies {
-  id int [pk, increment]
-  name varchar(100) [not null]
-  createdAt timestamptz [not null, default: `now()`]
-
-  Indexes {
-    name [unique]
-  }
-}
-
-Table languages {
-  id int [pk, increment]
-  name varchar(100) [not null]
-  createdAt timestamptz [not null, default: `now()`]
-
-  Indexes {
-    name [unique]
-  }
-}
-
-// ============================================================
-// 4. VENDORS
-// ============================================================
+// Paste toàn bộ nội dung này vào https://dbdiagram.io
 
 Table vendors {
-  id int [pk, increment]
-  vendorCode varchar(50) [not null]
-  companyName varchar(255) [not null]
-  website varchar(2048)
-  locationId int [not null]
-  serviceType service_type_enum [not null]
-  industryExperience text
-  companySize varchar(50)
-  classificationId int [not null]
-  note text
-  createdAt timestamptz [not null, default: `now()`]
-  updatedAt timestamptz [not null]
-  deletedAt timestamptz
-
-  Indexes {
-    vendorCode [unique]
-    locationId
-    serviceType
-    classificationId
-  }
+  id bigint [pk, increment]
+  vendorCode varchar [unique, not null]
+  companyName varchar [not null]
+  website varchar
+  location varchar [not null]
+  serviceType varchar [not null, note: 'OUTSOURCING / SI / PRODUCT / CONSULTING / SPECIALIZED_TECH']
+  techStack varchar [not null]
+  industryExperience varchar
+  languageCapability varchar
+  companySize varchar
+  classification varchar
+  note varchar
+  createdAt timestamp [not null, default: `now()`]
+  updatedAt timestamp
 }
-
-// ============================================================
-// 5. VENDOR <-> TECHNOLOGY
-// ============================================================
-
-Table vendor_technologies {
-  vendorId int [not null]
-  technologyId int [not null]
-
-  Indexes {
-    (vendorId, technologyId) [pk]
-    technologyId
-  }
-}
-
-// ============================================================
-// 6. VENDOR <-> LANGUAGE
-// ============================================================
-
-Table vendor_languages {
-  vendorId int [not null]
-  languageId int [not null]
-
-  Indexes {
-    (vendorId, languageId) [pk]
-    languageId
-  }
-}
-
-// ============================================================
-// 7. VENDOR SOURCES / EVIDENCE
-// ============================================================
 
 Table vendor_sources {
-  id int [pk, increment]
-  vendorId int [not null]
-  sourceType source_type_enum [not null]
-  sourceUrl varchar(2048)
-  sourceTitle varchar(255)
-  checkedAt timestamptz [not null, default: `now()`]
-  memo text
-
-  Indexes {
-    vendorId
-  }
+  id bigint [pk, increment]
+  vendorId bigint [not null]
+  sourceType varchar [not null, note: 'PUBLIC_WEBSITE / DIRECTORY / LINKEDIN / ARTICLE / DEMO_DATA']
+  sourceUrl varchar
+  sourceTitle varchar
+  checkedAt timestamp
+  memo varchar
 }
 
-// ============================================================
-// 8. CLASSIFICATION HISTORY
-// ============================================================
+Table classification_rules {
+  id bigint [pk, increment]
+  classificationName varchar [not null]
+  description varchar
+  judgmentCriteria varchar
+  createdAt timestamp [not null, default: `now()`]
+}
 
 Table classification_histories {
-  id int [pk, increment]
-  vendorId int [not null]
-  changedBy int [not null]
-  previousClassificationId int
-  newClassificationId int [not null]
-  reason text [not null]
-  changedAt timestamptz [not null, default: `now()`]
-
-  Indexes {
-    (vendorId, changedAt)
-  }
+  id bigint [pk, increment]
+  vendorId bigint [not null]
+  changedBy bigint [not null]
+  previousClassification varchar
+  newClassification varchar [not null]
+  changedAt timestamp [not null, default: `now()`]
+  reason varchar
 }
-
-// ============================================================
-// 9. VENDOR SUMMARIES
-// ============================================================
 
 Table vendor_summaries {
-  id int [pk, increment]
-  vendorId int [not null]
-  summaryType summary_type_enum [not null]
-  content text [not null]
-  createdBy int [not null]
-  createdAt timestamptz [not null, default: `now()`]
-
-  Indexes {
-    (vendorId, summaryType, createdAt)
-  }
+  id bigint [pk, increment]
+  vendorId bigint [not null]
+  summaryType varchar [not null, note: 'PROFILE_SUMMARY / LLM_SUMMARY / MANUAL_NOTE']
+  content text
+  createdBy bigint [not null]
+  createdAt timestamp [not null, default: `now()`]
 }
 
-// ============================================================
-// RELATIONSHIPS
-// ============================================================
+Table members {
+  id bigint [pk, increment]
+  email varchar [unique, not null]
+  password varchar [not null]
+  name varchar [not null]
+  role varchar [not null, note: 'ADMIN / DEVELOPER / REVIEWER']
+  createdAt timestamp [not null, default: `now()`]
+}
 
-// Classification
-Ref: vendors.classificationId > classification_rules.id
-Ref: classification_histories.previousClassificationId > classification_rules.id
-Ref: classification_histories.newClassificationId > classification_rules.id
-
-// Location
-Ref: vendors.locationId > locations.id
-
-// Vendor <-> Technology
-Ref: vendor_technologies.vendorId > vendors.id
-Ref: vendor_technologies.technologyId > technologies.id
-
-// Vendor <-> Language
-Ref: vendor_languages.vendorId > vendors.id
-Ref: vendor_languages.languageId > languages.id
-
-// Vendor sources
+// Quan hệ
 Ref: vendor_sources.vendorId > vendors.id
-
-// Classification history
 Ref: classification_histories.vendorId > vendors.id
 Ref: classification_histories.changedBy > members.id
-
-// Vendor summaries
 Ref: vendor_summaries.vendorId > vendors.id
 Ref: vendor_summaries.createdBy > members.id
+
