@@ -12,16 +12,20 @@ import { JwtAuthGuard } from './common/guards/jwt-auth.guard';
 import { RolesGuard } from './common/guards/roles.guard';
 import { ResponseInterceptor } from './common/interceptors/response.interceptor';
 import { AuthModule } from './auth/auth.module';
+import { ClassificationModule } from './classification/classification.module';
+import { StatisticsModule } from './statistics/statistics.module';
+import { LlmModule } from './llm/llm.module';
+import { PrismaModule } from './prisma/prisma.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
     }),
-    AuthModule,
+    AuthModule,ClassificationModule, StatisticsModule, LlmModule
   ],
   controllers: [AppController],
-  providers: [AppService,
+  providers: [AppService,PrismaModule
     {
       provide: APP_FILTER,
       useClass: AllExceptionsFilter,
