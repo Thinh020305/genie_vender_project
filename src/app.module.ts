@@ -11,6 +11,9 @@ import { JwtAuthGuard } from './common/guards/jwt-auth.guard';
 import { RolesGuard } from './common/guards/roles.guard';
 import { ResponseInterceptor } from './common/interceptors/response.interceptor';
 import { LlmModule } from './llm/llm.module';
+import { VendorSourcesModule } from './vendor-sources/vendor-sources.module';
+import { VendorSummariesModule } from './vendor-summaries/vendor-summaries.module';
+
 
 @Module({
   imports: [
@@ -21,6 +24,9 @@ import { LlmModule } from './llm/llm.module';
     ClassificationModule,
     StatisticsModule,
     LlmModule,
+    VendorSourcesModule,
+    VendorSummariesModule,
+
   ],
   controllers: [AppController],
   providers: [
