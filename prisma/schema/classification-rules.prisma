@@ -1,79 +1,35 @@
-// Source: Genie Vina.pdf, Step 1 ERD Design, table 3 (classification_rules)
-// Spec text (verbatim): "id, classificationName, description,
-// judgmentCriteria, createdAt"
-
-// [AI] RESTRUCTURED after reading Genie Vina.pdf. The previous version of this
-// file was a keyword-matching table (@@unique([keyword, targetClassification]),
-// i.e. MANY rows per classification). The PDF settles that this is wrong:
-//   - Step 2 lists exactly one endpoint, "GET /api/classification-rules —
-//     Get classification criteria".
-//   - "[ Standard Classification Criteria ]" then lists exactly FIVE entries,
-//     each a name + a one-line description:
-//       Outsourcing Vendor  : software outsourcing or project-based development
-//       SI Company          : enterprise system implementation, integration...
-//       Product Company     : owns SaaS, platform, solution, or software product
-//       Consulting/IT Service : IT consulting, operation, project management...
-//       Specialized Tech Vendor : AI, Cloud, Data, Cybersecurity, Blockchain
-// That maps 1:1 onto (classificationName, description) — so this table is a
-// CATALOG with one row per classification, and classificationName is @unique.
-// A keyword-per-row design would have made GET /api/classification-rules
-// return dozens of keyword rows instead of the five documented criteria.
+/// Danh mục tiêu chí phân loại vendor — mỗi VendorClassification đúng một dòng,
+/// tương ứng năm tiêu chí chuẩn trong đề bài. Phục vụ
+/// GET /api/classification-rules ("Get classification criteria").
 model ClassificationRule {
-  // [AI] Int, consistent with vendor_sources / vendor_summaries and with the
-  // team's migrated Vendor.id / Member.id. This table has no FKs of its own, so
-  // the choice is about consistency rather than validation — but a schema with
-  // three different id types is exactly the kind of thing that breaks at merge.
   id Int @id @default(autoincrement())
 
-  // [AI] The ERD's "classificationName", kept under the spec's own name this
-  // time. Typed as the VendorClassification enum rather than the ERD's literal
-  // `varchar` — the five enum values in enums.prisma already match the five
-  // criteria in the PDF exactly, and an enum means a rule can't name a
-  // classification that vendors.classification could never hold.
-  // @unique enforces the "one row per criterion" reading above.
+  /// Dùng enum thay vì varchar để một tiêu chí không thể trỏ tới phân loại
+  /// không tồn tại trong Vendor.classification. @unique giữ đúng nguyên tắc
+  /// một dòng cho mỗi phân loại.
   classificationName VendorClassification @unique
 
-  // [AI] ERD "description" — the PDF's one-line summary of the criterion.
+  /// Mô tả ngắn gọn tiêu chí, ví dụ: "software outsourcing or project-based
+  /// development vendor".
   description String? @db.VarChar(500)
 
-  // [AI] ERD "judgmentCriteria" — prose stating what evidence justifies this
-  // classification. Backs Step 3.4: "Classification must be based on visible
-  // evidence such as service description, technology stack, industry
-  // experience, and company profile."
+  /// Diễn giải bằng lời: bằng chứng nào đủ để xếp vendor vào phân loại này.
+  /// Đây là phần reviewer trích dẫn khi giải thích một kết quả phân loại.
   judgmentCriteria String? @db.VarChar(1000)
 
-  // [AI] NOT in the ERD. The machine-readable form of judgmentCriteria: the
-  // tokens rule-matcher.service.ts actually searches for. Kept as a scalar
-  // list on the criterion row (rather than the previous one-row-per-keyword
-  // design) so the table still reads as the five-row catalog the PDF
-  // describes. ClassificationRulesService.match() expands each row into one
-  // MatchableRule per keyword before calling the matcher.
-  // -> MENTION TO TEAM: this is the one field here with no basis in the PDF or
-  //    the ERD. It exists to keep rule-matcher.service.ts (already written and
-  //    unit-tested by My) usable. Drop it and the auto-match endpoint goes too.
+  /// Dạng máy đọc được của judgmentCriteria — các từ khoá RuleMatcherService
+  /// thực sự tìm kiếm. Lưu thành mảng trên chính dòng tiêu chí để bảng vẫn giữ
+  /// đúng năm dòng; service tách mỗi từ khoá thành một MatchableRule khi khớp.
   keywords String[]
 
-  // [AI] NOT in the ERD either. Tie-break inputs for
-  // RuleMatcherService.compareRules(), which sorts priority ASC, then weight
-  // DESC, then createdAt, then id. Without them a vendor matching two criteria
-  // resolves non-deterministically, which Step 3.4's "must be based on visible
-  // evidence" cannot tolerate.
+  /// Dùng để phá hoà khi một vendor khớp nhiều tiêu chí: priority tăng dần,
+  /// rồi weight giảm dần, rồi createdAt, rồi id. Không có hai trường này thì
+  /// kết quả phân loại không tất định.
   priority Int @default(100)
   weight   Int @default(1)
 
   createdAt DateTime @default(now())
-
-  // [AI] NOT in the ERD (which gives this table createdAt only). Kept because
-  // a criterion genuinely is edited in place — unlike vendor_summaries, which
-  // is append-only for exactly that reason.
   updatedAt DateTime @updatedAt
-
-  // [AI] isActive / deletedAt from the earlier version were DROPPED. They only
-  // existed to soft-delete keyword rows; against a fixed five-row catalog
-  // keyed uniquely by classificationName, a deleted criterion is simply
-  // re-created with the same name, and the soft-delete-vs-unique-index
-  // conflict that needed a "revive" branch disappears entirely.
-  // -> MENTION TO TEAM: this means DELETE is a hard delete. It is ADMIN-only.
 
   @@index([priority])
   @@map("classification_rules")

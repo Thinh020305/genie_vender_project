@@ -20,27 +20,22 @@ import {
 const DEFAULT_PRIORITY = 100;
 const DEFAULT_WEIGHT = 1;
 
-// [AI] Duck-typed P2002 check. The proper form is
-// `err instanceof Prisma.PrismaClientKnownRequestError`, but that type lives in
-// src/generated/prisma, which currently only holds User and Post — importing
-// it would be a hard compile error today. Swap for the instanceof check once
-// `prisma generate` has run against the real schema.
+/**
+ * Nhận diện lỗi vi phạm ràng buộc duy nhất của Prisma. Dạng chuẩn là
+ * `err instanceof Prisma.PrismaClientKnownRequestError`, nhưng type đó nằm
+ * trong client được sinh ra, chưa dùng được cho tới khi schema đủ model.
+ */
 const isUniqueConstraintError = (error: unknown): boolean =>
   typeof error === 'object' &&
   error !== null &&
   (error as { code?: unknown }).code === 'P2002';
 
-// [AI] Expands ONE catalog row into one MatchableRule per keyword, because
-// rule-matcher.service.ts models a rule as a single keyword
-// (`MatchableRule.keyword: string`) while the table stores the criterion with a
-// keyword list. Every expanded entry keeps the criterion's own id, so the
-// matcher's reason string still names the criterion that won.
-//
-// The id passes through untouched. An earlier version wrapped it in Number()
-// because the column was BigInt while MatchableRule declares `id: number` —
-// that conversion silently lost precision past 2^53 and made the ids echoed
-// back by /match disagree with the ids returned by every other endpoint. Both
-// problems are gone now that the column is Int.
+/**
+ * Tách một dòng tiêu chí thành nhiều MatchableRule, mỗi từ khoá một cái, vì
+ * RuleMatcherService mô hình hoá một rule là một từ khoá đơn. Mọi bản tách đều
+ * giữ id của tiêu chí gốc nên phần giải thích kết quả vẫn gọi đúng tên tiêu chí
+ * đã thắng.
+ */
 const toMatchableRules = (model: ClassificationRuleModel): MatchableRule[] =>
   model.keywords.map((keyword) => ({
     id: model.id,
@@ -58,29 +53,25 @@ export class ClassificationRulesService {
     private readonly ruleMatcher: RuleMatcherService,
   ) {}
 
-  // [AI] this.prisma.classificationRule — the delegate does not exist in the
-  // generated client yet. Unlike the vendor-facing services, this one is NOT
-  // blocked on Cường's vendors.prisma: classification_rules has no foreign
-  // keys, so it becomes runnable as soon as `prisma generate` reruns.
-
-  // [AI] Serves the spec's only Classification-rules endpoint:
-  // "GET /api/classification-rules — Get classification criteria".
-  // Returns a PLAIN ARRAY, not a paginated envelope: the catalog holds one row
-  // per VendorClassification, so it can never exceed five rows and paging it
-  // would be noise. This differs deliberately from the vendor-sources and
-  // vendor-summaries list endpoints, which are unbounded and do paginate.
+  /**
+   * Phục vụ GET /api/classification-rules.
+   *
+   * Trả về MẢNG THUẦN, không bọc phân trang: danh mục có đúng một dòng cho mỗi
+   * VendorClassification nên không bao giờ vượt năm dòng, phân trang chỉ gây
+   * nhiễu. Khác với vendor-sources và vendor-summaries là hai danh sách không
+   * chặn trên nên có phân trang.
+   */
   async findAll(): Promise<ClassificationRuleEntity[]> {
-    const rules = (await this.prisma.classificationRule.findMany({
-      // [AI] Same order RuleMatcherService.compareRules() resolves ties in
-      // (priority ASC, weight DESC, createdAt ASC, id ASC), so the list reads
-      // top-down as "which criterion wins first".
+    const rules = await this.prisma.classificationRule.findMany({
+      // Cùng thứ tự mà RuleMatcherService dùng để phá hoà, nên danh sách đọc
+      // từ trên xuống chính là "tiêu chí nào thắng trước".
       orderBy: [
         { priority: 'asc' },
         { weight: 'desc' },
         { createdAt: 'asc' },
         { id: 'asc' },
       ],
-    })) as ClassificationRuleModel[];
+    });
 
     return ClassificationRuleEntity.fromModels(rules);
   }
@@ -92,10 +83,7 @@ export class ClassificationRulesService {
   async create(
     dto: CreateClassificationRuleDto,
   ): Promise<ClassificationRuleEntity> {
-    // [AI] Checked explicitly rather than relying on the unique index, so the
-    // conflict message can name the classification. classificationName is
-    // @unique because the PDF documents exactly one criterion per
-    // classification.
+    // Kiểm trước để thông báo xung đột nêu được tên phân loại và id dòng cũ.
     const existing = await this.prisma.classificationRule.findUnique({
       where: { classificationName: dto.classificationName },
       select: { id: true },
@@ -131,13 +119,9 @@ export class ClassificationRulesService {
       const updated = await this.prisma.classificationRule.update({
         where: { id },
         data: {
-          // [AI] All `undefined` on omission — Prisma skips undefined keys, so
-          // PATCH stays a partial update instead of blanking every field the
-          // client did not resend.
-          // -> KNOWN LIMITATION: a nullable field therefore cannot be cleared
-          //    back to NULL through this route, because JSON `null` and
-          //    "absent" both arrive as absent after validation. Clearing
-          //    `keywords` DOES work, since an explicit [] is not undefined.
+          // Để undefined khi client không gửi — Prisma bỏ qua khoá undefined
+          // nên PATCH vẫn là cập nhật một phần thay vì xoá trắng mọi trường
+          // client không gửi lại. Riêng keywords vẫn xoá được bằng mảng rỗng.
           description: dto.description,
           judgmentCriteria: dto.judgmentCriteria,
           keywords: dto.keywords,
@@ -148,11 +132,9 @@ export class ClassificationRulesService {
 
       return ClassificationRuleEntity.fromModel(updated);
     } catch (error) {
-      // [AI] Defensive: UpdateClassificationRuleDto omits classificationName,
-      // so the unique index should be unreachable from here. Kept so that if
-      // someone later adds that field back, the failure surfaces as 409 rather
-      // than as a bare 500 (AllExceptionsFilter only special-cases
-      // HttpException).
+      // Phòng thủ: DTO đã bỏ classificationName nên về lý thuyết không chạm
+      // được ràng buộc duy nhất. Giữ lại để nếu sau này ai đó thêm trường đó
+      // trở lại thì lỗi hiện ra dưới dạng 409 chứ không phải 500 trống trơn.
       if (isUniqueConstraintError(error)) {
         throw new ConflictException(
           'Another rule already describes this classification',
@@ -163,13 +145,12 @@ export class ClassificationRulesService {
     }
   }
 
-  // [AI] HARD delete. The earlier soft-delete design was dropped along with the
-  // keyword-per-row schema: against a catalog keyed uniquely by
-  // classificationName, "deleting" a criterion and re-creating it under the
-  // same name is the normal correction path, and a soft-deleted row would
-  // block that re-create on the unique index forever.
-  // Restricted to ADMIN at the controller — removing a criterion changes how
-  // every vendor is judged.
+  /**
+   * Xoá cứng. Với danh mục khoá theo classificationName, cách sửa sai thông
+   * thường là xoá rồi tạo lại cùng tên — một dòng xoá mềm sẽ chặn vĩnh viễn
+   * thao tác tạo lại đó vì vướng ràng buộc duy nhất. Route giới hạn cho ADMIN
+   * vì bỏ một tiêu chí làm thay đổi cách đánh giá mọi vendor.
+   */
   async remove(id: number): Promise<{ id: number; deleted: true }> {
     await this.findOrThrow(id);
 
@@ -178,24 +159,21 @@ export class ClassificationRulesService {
     return { id, deleted: true };
   }
 
-  // [AI] Bridge to rule-matcher.service.ts, which was written and unit-tested
-  // but registered in no module, so nothing could call it. Loads the catalog,
-  // expands it to one MatchableRule per keyword, and delegates the decision —
-  // the sorting/tie-break logic and its 16 tests stay in that file untouched.
-  //
-  // PREVIEW ONLY. This never writes vendor.classification or a
-  // classification_histories row: Step 3.5 requires a classification change to
-  // record previousClassification/newClassification/changedBy/changedAt/reason,
-  // which is what PATCH /api/vendors/{id}/classification already does. Routing
-  // an automatic match around that would bypass the history requirement.
-  //
-  // -> KNOWN LIMITATION: loads the whole catalog on every call. Trivial at five
-  //    rows; if it ever grows, this wants a cache, since the catalog changes
-  //    far less often than it is read.
+  /**
+   * Nạp danh mục, tách thành từng từ khoá rồi giao việc quyết định cho
+   * RuleMatcherService.
+   *
+   * CHỈ XEM TRƯỚC. Hàm này không bao giờ ghi vendor.classification hay một dòng
+   * classification_histories: mọi thay đổi phân loại phải ghi lại
+   * previousClassification / newClassification / changedBy / changedAt / reason,
+   * và đó là việc của PATCH /api/vendors/{id}/classification.
+   *
+   * Giới hạn đã biết: nạp toàn bộ danh mục mỗi lần gọi. Không đáng kể với năm
+   * dòng; nếu danh mục lớn lên thì nên cache vì nó thay đổi ít hơn nhiều so với
+   * số lần đọc.
+   */
   async match(text: string): Promise<RuleMatchResult> {
-    const rules = (await this.prisma.classificationRule.findMany(
-      {},
-    )) as ClassificationRuleModel[];
+    const rules = await this.prisma.classificationRule.findMany({});
 
     return this.ruleMatcher.match(rules.flatMap(toMatchableRules), text);
   }

@@ -2,11 +2,10 @@ import { ApiProperty } from '@nestjs/swagger';
 
 import { SummaryType } from '../../generated/prisma/enums';
 
-// [AI] Hand-written mirror of the VendorSummary model in
-// prisma/schema/vendor-summaries.prisma — same reason as
-// vendor-sources/entities/vendor-source.entity.ts: the generated client only
-// contains User and Post today, so the real type cannot be imported yet.
-// Replace with the generated type once vendors.prisma + members.prisma land.
+/**
+ * Hình dạng dòng vendor_summaries. Khai tại chỗ thay vì import từ Prisma
+ * Client vì client chỉ được sinh sau khi Vendor và Member có mặt trong schema.
+ */
 export interface VendorSummaryModel {
   id: number;
   vendorId: number;
@@ -16,9 +15,7 @@ export interface VendorSummaryModel {
   createdAt: Date;
 }
 
-// [AI] Optional author block, populated only when the caller asked for it
-// (findAll/findOne use a Prisma `include`). Typed separately so the entity can
-// represent both the plain row and the joined row.
+/** Khối tác giả, chỉ có khi truy vấn dùng `include`. */
 export interface VendorSummaryAuthorModel {
   id: number;
   name: string;
@@ -36,8 +33,6 @@ export class VendorSummaryAuthorEntity {
   email!: string;
 }
 
-// [AI] ids are plain JSON numbers now that the columns are Int — see the note
-// in vendor-source.entity.ts.
 export class VendorSummaryEntity {
   @ApiProperty({ example: 1 })
   id!: number;
@@ -73,10 +68,8 @@ export class VendorSummaryEntity {
     entity.createdAt = model.createdAt;
 
     if (model.createdBy) {
-      // [AI] Only id/name/email are surfaced. Member.password must never
-      // reach a response, so the service pins an explicit `select` on the
-      // include rather than pulling the whole member row — this mapper is the
-      // second line of defence, not the first.
+      // Chỉ lộ id/name/email. Service đã ghim `select` tường minh ở tầng truy
+      // vấn; chỗ này là lớp phòng thủ thứ hai cho Member.password.
       entity.createdBy = {
         id: model.createdBy.id,
         name: model.createdBy.name,

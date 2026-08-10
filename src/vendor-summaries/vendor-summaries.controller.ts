@@ -14,29 +14,25 @@ import { CurrentUser } from '../common/decorators/current-user.decorator';
 import { Roles } from '../common/decorators/roles.decorator';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
 import { RolesGuard } from '../common/guards/roles.guard';
-// [AI] `import type`, not a value import. JwtPayload appears in a decorated
-// parameter signature, and with isolatedModules + emitDecoratorMetadata both on
-// (tsconfig.json), TypeScript raises TS1272 for a plain import there.
+// `import type` chứ không phải import thường: JwtPayload xuất hiện trong chữ ký
+// tham số có decorator, mà với isolatedModules + emitDecoratorMetadata cùng bật
+// thì TypeScript báo TS1272 nếu import theo kiểu giá trị.
 import type { JwtPayload } from '../common/interfaces/jwt-payload.interface';
 import { Role } from '../generated/prisma/enums';
 import { CreateVendorSummaryDto } from './dto/create-vendor-summary.dto';
 import { QueryVendorSummariesDto } from './dto/query-vendor-summaries.dto';
 import { VendorSummariesService } from './vendor-summaries.service';
 
-// [AI] BEYOND SPEC as a whole. Genie Vina.pdf defines the vendor_summaries
-// TABLE (ERD table 5) but its endpoint list contains no CRUD for it — the only
-// summary route is "GET /api/vendors/{id}/summary", an LLM feature in Sơn's
-// module. Without the routes below, MANUAL_NOTE and PROFILE_SUMMARY rows have
-// no way in or out and the table is unreachable.
-//
-// [AI] PATH COLLISION CHECK, worth stating explicitly: this controller binds
-// "api/vendors/:vendorId/summaries" (PLURAL) while the PDF's LLM route is
-// "/api/vendors/{id}/summary" (SINGULAR). Different literal segments, so they
-// cannot shadow each other in any registration order.
-// -> MENTION TO SƠN: if his LLM endpoint persists its output, it should write
-//    through VendorSummariesService (exported from this module) with
-//    summaryType LLM_SUMMARY, rather than calling prisma.vendorSummary
-//    directly — that keeps the vendor check and author attribution in one place.
+/**
+ * CRUD cho vendor_summaries, lồng dưới vendor. Không có route PATCH vì bảng
+ * chỉ ghi thêm.
+ *
+ * Lưu ý đường dẫn: controller này dùng "summaries" (số nhiều), còn route sinh
+ * tóm tắt bằng LLM dùng "summary" (số ít) — hai đoạn khác nhau nên không thể
+ * che nhau ở bất kỳ thứ tự đăng ký nào. Nếu endpoint LLM cần lưu kết quả, nên
+ * ghi qua VendorSummariesService (đã export từ module này) với summaryType
+ * LLM_SUMMARY để giữ phần kiểm tra vendor và quy trách nhiệm tác giả ở một chỗ.
+ */
 @Controller('api/vendors/:vendorId/summaries')
 @UseGuards(JwtAuthGuard, RolesGuard)
 export class VendorSummariesController {
@@ -44,29 +40,20 @@ export class VendorSummariesController {
     private readonly vendorSummariesService: VendorSummariesService,
   ) {}
 
-  // [AI] There is no @Patch route. vendor_summaries is append-only — see the
-  // note at the top of VendorSummariesService.
-
-  // [AI] ADMIN + DEVELOPER per Step 3.1, which lists "summarize vendors" among
-  // DEVELOPER's abilities.
   @Post()
   @Roles(Role.ADMIN, Role.DEVELOPER)
   create(
     @Param('vendorId', ParseIntPipe) vendorId: number,
     @Body() dto: CreateVendorSummaryDto,
-    // [AI] `user.sub` is passed straight through. It used to be wrapped in
-    // BigInt() because createdById was a BigInt column while JwtPayload.sub is
-    // declared `number` — that conversion, and the precision hazard it carried,
-    // are both gone now that Member.id and createdById are Int on every side.
     @CurrentUser() user: JwtPayload,
   ) {
     return this.vendorSummariesService.create(vendorId, dto, user.sub);
   }
 
-  // [AI] Read routes carry no @Roles(): RolesGuard's documented fallback lets
-  // any authenticated user through when no roles metadata is set, which is what
-  // implements Step 3.1's "REVIEWER: read-only access to vendor data and
-  // classification results".
+  /**
+   * Route đọc không gắn @Roles(): RolesGuard cho qua mọi vai trò đã xác thực
+   * khi route không khai metadata, đó là cách REVIEWER có quyền chỉ đọc.
+   */
   @Get()
   findAll(
     @Param('vendorId', ParseIntPipe) vendorId: number,
@@ -83,9 +70,11 @@ export class VendorSummariesController {
     return this.vendorSummariesService.findOne(vendorId, summaryId);
   }
 
-  // [AI] DEVELOPER passes the guard, but the service additionally requires that
-  // a DEVELOPER own the row (ADMIN may delete any). RolesGuard cannot express
-  // that on its own — it never sees the record.
+  /**
+   * DEVELOPER qua được guard, nhưng service còn đòi hỏi phải là tác giả của
+   * dòng đó (ADMIN thì xoá được mọi dòng). RolesGuard không diễn đạt được điều
+   * này vì nó không nhìn thấy bản ghi.
+   */
   @Delete(':summaryId')
   @Roles(Role.ADMIN, Role.DEVELOPER)
   remove(

@@ -21,9 +21,6 @@ import { CreateClassificationRuleDto } from './dto/create-classification-rule.dt
 import { MatchClassificationRulesDto } from './dto/match-classification-rules.dto';
 import { UpdateClassificationRuleDto } from './dto/update-classification-rule.dto';
 
-// [AI] "api/classification-rules" is the exact path from the PDF's
-// Classification API table, and it is its own top-level prefix, so it has no
-// route-collision exposure with the controllers sharing "api/vendors".
 @Controller('api/classification-rules')
 @UseGuards(JwtAuthGuard, RolesGuard)
 export class ClassificationRulesController {
@@ -31,42 +28,33 @@ export class ClassificationRulesController {
     private readonly classificationRulesService: ClassificationRulesService,
   ) {}
 
-  // [AI] THE spec endpoint: "GET /api/classification-rules — Get
-  // classification criteria". No @Roles(), which relies on RolesGuard's
-  // documented fallback (no roles metadata => any authenticated role passes).
-  // That is what gives REVIEWER access, per Step 3.1: "REVIEWER: read-only
-  // access to vendor data and classification results" — the criteria are what
-  // makes a classification result explainable, so read access is required.
+  /**
+   * GET /api/classification-rules — đọc danh mục tiêu chí phân loại.
+   *
+   * Không gắn @Roles(): RolesGuard cho qua mọi vai trò đã xác thực khi route
+   * không khai metadata. REVIEWER cần quyền đọc ở đây vì chính các tiêu chí này
+   * làm cho một kết quả phân loại giải thích được.
+   */
   @Get()
   findAll() {
     return this.classificationRulesService.findAll();
   }
 
-  // [AI] Declared BEFORE @Get(':id')/@Patch(':id'). Express matches in
-  // registration order, so with ':id' first a request to
-  // /api/classification-rules/match would bind "match" as the :id param and
-  // ParseIntPipe would reject it as a 400 instead of routing here. This is
-  // the same static-vs-dynamic hazard statistics.controller.ts documents
-  // across controllers; within one controller, ordering fixes it.
+  /**
+   * Khai TRƯỚC @Get(':id') và @Patch(':id'). Express khớp route theo thứ tự
+   * đăng ký, nên nếu ':id' đứng trước thì request tới
+   * /api/classification-rules/match sẽ gán "match" vào tham số :id và
+   * ParseIntPipe từ chối bằng 400 thay vì vào đúng handler này.
+   */
   @Post('match')
-  // [AI] 200, not the 201 Nest defaults to for @Post. This route creates
-  // nothing — it is a POST only because the text to match against is too large
-  // for a query string.
+  // 200 chứ không phải 201 mặc định của @Post: route này không tạo gì cả, chỉ
+  // dùng POST vì đoạn text cần khớp quá dài để đưa vào query string.
   @HttpCode(HttpStatus.OK)
   @Roles(Role.ADMIN, Role.DEVELOPER)
   match(@Body() dto: MatchClassificationRulesDto) {
-    // [AI] BEYOND SPEC — the PDF's Classification API table lists only the GET
-    // above. Added because rule-matcher.service.ts was already written and
-    // unit-tested but registered nowhere, so nothing could reach it, and
-    // because Step 3.4 requires classification to be evidence-based: this
-    // returns which criteria matched and why.
-    //
-    // PREVIEW ONLY, never writes. Applying a result stays a deliberate
-    // PATCH /api/vendors/{id}/classification, which is what records the
-    // history row Step 3.5 requires. Same separation llm.controller.ts keeps
-    // for Step 3.7 ("LLM output is a reference only").
-    // -> MENTION TO TEAM: drop this endpoint if the team wants to stay
-    //    strictly inside the documented endpoint list.
+    // Chỉ xem trước, không ghi gì. Muốn áp dụng kết quả thì phải gọi
+    // PATCH /api/vendors/{id}/classification — đó mới là nơi ghi lịch sử thay
+    // đổi phân loại.
     return this.classificationRulesService.match(dto.text);
   }
 
@@ -75,14 +63,11 @@ export class ClassificationRulesController {
     return this.classificationRulesService.findOne(id);
   }
 
-  // [AI] BEYOND SPEC, and ADMIN-only. The PDF documents no write endpoint for
-  // this table, but the five criteria have to reach the database somehow and
-  // prisma/seed.ts is outside this task's scope. Step 3.1 puts system config
-  // under ADMIN ("ADMIN: full management access"), and a criterion changes how
-  // EVERY vendor is judged — so DEVELOPER is excluded here even though it may
-  // "classify" vendors.
-  // -> MENTION TO TEAM: if the team would rather seed these five rows from
-  //    prisma/seed.ts, these three routes can be deleted outright.
+  /**
+   * Ba route ghi dưới đây giới hạn cho ADMIN: một tiêu chí là cấu hình hệ
+   * thống, nó đổi cách đánh giá MỌI vendor chứ không riêng một bản ghi. Chúng
+   * cũng là đường duy nhất để đưa năm tiêu chí vào cơ sở dữ liệu.
+   */
   @Post()
   @Roles(Role.ADMIN)
   create(@Body() dto: CreateClassificationRuleDto) {

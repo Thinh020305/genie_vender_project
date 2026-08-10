@@ -2,11 +2,10 @@ import { ApiProperty } from '@nestjs/swagger';
 
 import { VendorClassification } from '../../generated/prisma/enums';
 
-// [AI] Hand-written mirror of the ClassificationRule model in
-// prisma/schema/classification-rules.prisma. NOT imported from
-// src/generated/prisma — that client currently only generates User and Post,
-// so importing the real type is a hard "no exported member" error today.
-// Delete this and import the generated type once `prisma generate` reruns.
+/**
+ * Hình dạng dòng classification_rules. Khai tại chỗ thay vì import từ Prisma
+ * Client vì client chỉ được sinh sau khi schema đủ model.
+ */
 export interface ClassificationRuleModel {
   id: number;
   classificationName: VendorClassification;
@@ -19,10 +18,6 @@ export interface ClassificationRuleModel {
   updatedAt: Date;
 }
 
-// [AI] id is a plain JSON number, which also makes it match
-// RuleMatcherService's `MatchableRule.id: number` exactly. The previous
-// string-serialized BigInt version disagreed with the ids echoed back inside
-// POST /api/classification-rules/match, so a client could not correlate the two.
 export class ClassificationRuleEntity {
   @ApiProperty({ example: 1 })
   id!: number;
@@ -43,10 +38,12 @@ export class ClassificationRuleEntity {
   @ApiProperty({ type: [String] })
   keywords!: string[];
 
-  @ApiProperty({ description: 'lower wins when a vendor matches two criteria' })
+  @ApiProperty({
+    description: 'nhỏ hơn thì thắng khi vendor khớp nhiều tiêu chí',
+  })
   priority!: number;
 
-  @ApiProperty({ description: 'higher wins when priority ties' })
+  @ApiProperty({ description: 'lớn hơn thì thắng khi priority bằng nhau' })
   weight!: number;
 
   @ApiProperty()
