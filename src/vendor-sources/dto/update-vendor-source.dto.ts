@@ -1,13 +1,13 @@
-import { OmitType, PartialType } from '@nestjs/swagger';
+import { PartialType } from '@nestjs/swagger';
 
 import { CreateVendorSourceDto } from './create-vendor-source.dto';
 
-// [AI] vendorId is omitted, not just made optional: moving an existing source
-// row to a different vendor via PATCH would silently rewrite that vendor's
-// evidence trail. Re-parenting should be a delete + create so it is visible.
-// Not spec text — docs/erd.md says nothing about update semantics.
-// -> MENTION TO TEAM if the UI actually needs a "move to another vendor"
-//    action.
-export class UpdateVendorSourceDto extends PartialType(
-  OmitType(CreateVendorSourceDto, ['vendorId'] as const),
-) {}
+// [AI] Every field optional. There is no vendorId to omit any more — the
+// vendor comes from the path on every Source API route, so a source can never
+// be re-parented to a different vendor through this DTO.
+//
+// Backs "PATCH /api/vendors/{id}/sources/{sourceId} — Update source
+// information". Note the service re-checks the Step 3.3 evidence rule against
+// the MERGED row, not against this body: clearing a memo on a source that has
+// no URL would otherwise leave a row with neither a URL nor a demo-data note.
+export class UpdateVendorSourceDto extends PartialType(CreateVendorSourceDto) {}
