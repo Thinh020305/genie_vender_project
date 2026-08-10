@@ -2,11 +2,8 @@ import { ApiProperty } from '@nestjs/swagger';
 
 import { SourceType } from '../../generated/prisma/enums';
 
-/**
- * Hình dạng dòng vendor_sources. Khai tại chỗ thay vì import từ Prisma Client
- * vì client chỉ được sinh sau khi model Vendor có mặt trong schema; đổi sang
- * type sinh tự động khi điều đó xảy ra.
- */
+// Khai tại chỗ thay vì import từ Prisma Client: client chỉ sinh được sau khi
+// model Vendor có mặt trong schema.
 export interface VendorSourceModel {
   id: number;
   vendorId: number;

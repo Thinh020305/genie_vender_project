@@ -1,24 +1,17 @@
-/// Nguồn thông tin công khai của một vendor: website, thư mục doanh nghiệp,
-/// LinkedIn, bài báo, hoặc ghi chú dữ liệu demo.
 model VendorSource {
   id Int @id @default(autoincrement())
 
   vendorId Int
-  /// Cascade: một dòng nguồn chỉ là bằng chứng phụ thuộc vào vendor, không có
-  /// giá trị lưu vết khi vendor đã bị xoá. Khác với classification_histories
-  /// dùng Restrict vì lịch sử phân loại cần giữ lại để giải trình.
-  vendor Vendor @relation(fields: [vendorId], references: [id], onDelete: Cascade)
+  vendor   Vendor @relation(fields: [vendorId], references: [id], onDelete: Cascade)
 
   sourceType SourceType
 
-  /// sourceUrl và memo đều nullable, nhưng mỗi dòng phải có ít nhất một trong
-  /// hai. Ràng buộc này được kiểm ở tầng service (assertSourceEvidence) vì
-  /// Prisma không biểu diễn được điều kiện liên cột.
+  // Mỗi dòng phải có sourceUrl hoặc ghi chú demo trong memo.
+  // Kiểm ở VendorSourcesService.assertSourceEvidence().
   sourceUrl   String? @db.VarChar(2048)
   sourceTitle String? @db.VarChar(500)
 
-  /// Null nghĩa là chưa từng đối chiếu lại. Cố ý không đặt @default(now()):
-  /// "chưa kiểm tra" và "kiểm tra lúc tạo" là hai trạng thái khác nhau.
+  // Null = chưa đối chiếu lại lần nào.
   checkedAt DateTime?
 
   memo String? @db.VarChar(1000)

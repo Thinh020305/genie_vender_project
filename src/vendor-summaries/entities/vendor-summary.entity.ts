@@ -2,10 +2,8 @@ import { ApiProperty } from '@nestjs/swagger';
 
 import { SummaryType } from '../../generated/prisma/enums';
 
-/**
- * Hình dạng dòng vendor_summaries. Khai tại chỗ thay vì import từ Prisma
- * Client vì client chỉ được sinh sau khi Vendor và Member có mặt trong schema.
- */
+// Khai tại chỗ thay vì import từ Prisma Client: client chỉ sinh được sau khi
+// Vendor và Member có mặt trong schema.
 export interface VendorSummaryModel {
   id: number;
   vendorId: number;
@@ -15,7 +13,6 @@ export interface VendorSummaryModel {
   createdAt: Date;
 }
 
-/** Khối tác giả, chỉ có khi truy vấn dùng `include`. */
 export interface VendorSummaryAuthorModel {
   id: number;
   name: string;
@@ -68,8 +65,6 @@ export class VendorSummaryEntity {
     entity.createdAt = model.createdAt;
 
     if (model.createdBy) {
-      // Chỉ lộ id/name/email. Service đã ghim `select` tường minh ở tầng truy
-      // vấn; chỗ này là lớp phòng thủ thứ hai cho Member.password.
       entity.createdBy = {
         id: model.createdBy.id,
         name: model.createdBy.name,

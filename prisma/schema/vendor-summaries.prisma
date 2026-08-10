@@ -1,6 +1,4 @@
-/// Bản tóm tắt hồ sơ vendor: do người viết tay, do LLM sinh, hoặc ghi chú nội bộ.
-/// Bảng chỉ ghi thêm — không có updatedAt và service không expose route sửa,
-/// vì sửa nội dung một LLM_SUMMARY sẽ làm sai lệch thứ mô hình thực sự trả về.
+// Bảng chỉ ghi thêm: không có updatedAt, service không expose route sửa.
 model VendorSummary {
   id Int @id @default(autoincrement())
 
@@ -9,14 +7,10 @@ model VendorSummary {
 
   summaryType SummaryType
 
-  /// @db.Text vì tóm tắt do LLM sinh không có giới hạn độ dài hợp lý.
-  /// Cột nullable ở DB nhưng DTO bắt buộc phải có nội dung khi ghi.
   content String? @db.Text
 
   createdById Int
-  /// Restrict, khác với quan hệ vendor ở trên: xoá một member không được phép
-  /// xoá luôn dấu vết ai là người viết bản tóm tắt.
-  createdBy Member @relation(fields: [createdById], references: [id], onDelete: Restrict)
+  createdBy   Member @relation(fields: [createdById], references: [id], onDelete: Restrict)
 
   createdAt DateTime @default(now())
 

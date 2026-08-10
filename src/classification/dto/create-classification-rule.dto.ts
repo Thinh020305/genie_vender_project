@@ -16,7 +16,6 @@ import {
 import { VendorClassification } from '../../generated/prisma/enums';
 
 export class CreateClassificationRuleDto {
-  /** Duy nhất theo phân loại — tạo tiêu chí thứ hai cho cùng phân loại trả 409. */
   @ApiProperty({ enum: VendorClassification })
   @IsEnum(VendorClassification, {
     message: `classificationName must be one of: ${Object.values(VendorClassification).join(', ')}`,
@@ -32,19 +31,14 @@ export class CreateClassificationRuleDto {
   @MaxLength(500)
   description?: string;
 
-  /** Diễn giải bằng lời — thứ reviewer trích dẫn khi giải thích kết quả phân loại. */
   @ApiPropertyOptional({ maxLength: 1000 })
   @IsOptional()
   @IsString()
   @MaxLength(1000)
   judgmentCriteria?: string;
 
-  /**
-   * Cắt khoảng trắng, hạ chữ thường và khử trùng lặp khi nhận vào.
-   * RuleMatcherService hạ chữ thường cả hai vế trước khi so, nên lưu chữ hoa
-   * chỉ tạo ra các từ khoá khác nhau trong DB mà hành xử y hệt lúc khớp. Chuỗi
-   * rỗng bị loại vì nó là chuỗi con của mọi văn bản và sẽ khớp tất cả.
-   */
+  // Hạ chữ thường và khử trùng lặp vì RuleMatcherService so sánh sau khi hạ
+  // chữ thường cả hai vế; chuỗi rỗng bị loại vì nó khớp mọi văn bản.
   @ApiPropertyOptional({
     type: [String],
     example: ['outsourcing', 'staff augmentation', 'offshore development'],
@@ -73,28 +67,14 @@ export class CreateClassificationRuleDto {
   @MaxLength(100, { each: true })
   keywords?: string[];
 
-  /**
-   * Chặn trên/dưới để một lỗi gõ nhầm không đẩy tiêu chí ra xa tới mức thứ tự
-   * phá hoà của RuleMatcherService mất ý nghĩa.
-   */
-  @ApiPropertyOptional({
-    minimum: 0,
-    maximum: 1000,
-    default: 100,
-    description: 'nhỏ hơn thì thắng khi vendor khớp nhiều tiêu chí',
-  })
+  @ApiPropertyOptional({ minimum: 0, maximum: 1000, default: 100 })
   @IsOptional()
   @IsInt()
   @Min(0)
   @Max(1000)
   priority?: number;
 
-  @ApiPropertyOptional({
-    minimum: 1,
-    maximum: 1000,
-    default: 1,
-    description: 'lớn hơn thì thắng khi priority bằng nhau',
-  })
+  @ApiPropertyOptional({ minimum: 1, maximum: 1000, default: 1 })
   @IsOptional()
   @IsInt()
   @Min(1)

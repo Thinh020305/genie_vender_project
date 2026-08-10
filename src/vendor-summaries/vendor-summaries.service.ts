@@ -17,6 +17,11 @@ import {
 const DEFAULT_PAGE = 1;
 const DEFAULT_LIMIT = 20;
 
+// Không bao giờ lấy Member.password. Gom thành hằng để mọi query dùng chung.
+const AUTHOR_SELECT = {
+  select: { id: true, name: true, email: true },
+} as const;
+
 export interface PaginatedSummaries {
   items: VendorSummaryEntity[];
   total: number;
@@ -29,28 +34,11 @@ type VendorSummaryRow = VendorSummaryModel & {
   createdBy?: VendorSummaryAuthorModel;
 };
 
-/**
- * Chỉ lấy id/name/email. Member.password không được phép rời khỏi tầng dữ
- * liệu. Gom thành hằng số để mọi truy vấn trong file dùng chung một phép chiếu
- * và không ai vô tình viết `include: { createdBy: true }`.
- */
-const AUTHOR_SELECT = {
-  select: { id: true, name: true, email: true },
-} as const;
-
+// Bảng chỉ ghi thêm nên không có update(); sửa = xoá rồi tạo bản mới.
 @Injectable()
 export class VendorSummariesService {
   constructor(private readonly prisma: PrismaService) {}
 
-  /**
-   * Bảng chỉ ghi thêm nên service cố ý KHÔNG có update(): sửa nội dung một
-   * LLM_SUMMARY tại chỗ sẽ làm sai lệch thứ mô hình thực sự trả về. Muốn sửa
-   * thì xoá rồi tạo bản mới.
-   *
-   * Mọi phương thức nhận vendorId vì route lồng dưới vendor; findOneForVendor()
-   * giới hạn truy vấn theo cả hai id nên /api/vendors/1/summaries/99 không với
-   * tới bản tóm tắt của vendor 2.
-   */
   async create(
     vendorId: number,
     dto: CreateVendorSummaryDto,
@@ -75,15 +63,11 @@ export class VendorSummariesService {
     vendorId: number,
     query: QueryVendorSummariesDto,
   ): Promise<PaginatedSummaries> {
-    // Trả 404 khi vendor không tồn tại thay vì trang rỗng: danh sách rỗng mang
-    // nghĩa "vendor này chưa có bản tóm tắt nào", khác với "không có vendor".
     await this.assertVendorExists(vendorId);
 
     const page = query.page ?? DEFAULT_PAGE;
     const limit = query.limit ?? DEFAULT_LIMIT;
 
-    // Để undefined khi không lọc — Prisma bỏ qua khoá undefined, còn null sẽ
-    // lọc theo cột IS NULL.
     const where = {
       vendorId,
       summaryType: query.summaryType,
@@ -95,9 +79,7 @@ export class VendorSummariesService {
       this.prisma.vendorSummary.findMany({
         where,
         include: { createdBy: AUTHOR_SELECT },
-        // Mới nhất trước, rồi id để phá hoà: riêng createdAt không phải khoá
-        // sắp xếp ổn định vì hai bản ghi cùng transaction trùng timestamp và
-        // sẽ phân trang không nhất quán.
+        // Thêm id để phá hoà: hai bản ghi cùng transaction trùng createdAt.
         orderBy: [{ createdAt: 'desc' }, { id: 'desc' }],
         skip: (page - 1) * limit,
         take: limit,
@@ -122,13 +104,8 @@ export class VendorSummariesService {
     );
   }
 
-  /**
-   * Quy tắc sở hữu: DEVELOPER chỉ xoá được bản tóm tắt do chính mình viết,
-   * ADMIN xoá được mọi bản. Khoá ngoại createdBy tồn tại để quy trách nhiệm
-   * tác giả, nên cho một developer xoá ghi chú của người khác sẽ làm điều đó
-   * vô nghĩa. Kiểm ở đây chứ không ở RolesGuard vì guard chỉ thấy danh sách
-   * vai trò của route, không thấy bản ghi.
-   */
+  // DEVELOPER chỉ xoá được bản của mình; ADMIN xoá được mọi bản. RolesGuard
+  // không kiểm được vì nó không thấy bản ghi.
   async remove(
     vendorId: number,
     summaryId: number,
@@ -148,11 +125,7 @@ export class VendorSummariesService {
     return { id: summaryId, deleted: true };
   }
 
-  /**
-   * findFirst theo CẢ HAI id chứ không findUnique theo mình summaryId — đây là
-   * thứ khiến đoạn {id} trong đường dẫn có tác dụng thật. Cặp id không khớp trả
-   * 404 thay vì lặng lẽ thao tác lên dòng của vendor khác.
-   */
+  // Lọc theo cả hai id để /vendors/1/summaries/99 không chạm dòng của vendor 2.
   private async findOneForVendor(
     vendorId: number,
     summaryId: number,
@@ -173,9 +146,8 @@ export class VendorSummariesService {
     return summary;
   }
 
+  // Kiểm trước để vendorId sai trả 404 thay vì P2003 bị filter biến thành 500.
   private async assertVendorExists(vendorId: number): Promise<void> {
-    // Kiểm tường minh để vendorId sai trả 404, thay vì để Prisma ném vi phạm
-    // khoá ngoại P2003 rồi bị AllExceptionsFilter biến thành 500 trống trơn.
     const vendor = await this.prisma.vendor.findUnique({
       where: { id: vendorId },
       select: { id: true },

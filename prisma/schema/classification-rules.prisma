@@ -1,30 +1,16 @@
-/// Danh mục tiêu chí phân loại vendor — mỗi VendorClassification đúng một dòng,
-/// tương ứng năm tiêu chí chuẩn trong đề bài. Phục vụ
-/// GET /api/classification-rules ("Get classification criteria").
+// Danh mục tiêu chí phân loại, mỗi VendorClassification một dòng.
 model ClassificationRule {
   id Int @id @default(autoincrement())
 
-  /// Dùng enum thay vì varchar để một tiêu chí không thể trỏ tới phân loại
-  /// không tồn tại trong Vendor.classification. @unique giữ đúng nguyên tắc
-  /// một dòng cho mỗi phân loại.
   classificationName VendorClassification @unique
 
-  /// Mô tả ngắn gọn tiêu chí, ví dụ: "software outsourcing or project-based
-  /// development vendor".
-  description String? @db.VarChar(500)
-
-  /// Diễn giải bằng lời: bằng chứng nào đủ để xếp vendor vào phân loại này.
-  /// Đây là phần reviewer trích dẫn khi giải thích một kết quả phân loại.
+  description      String? @db.VarChar(500)
   judgmentCriteria String? @db.VarChar(1000)
 
-  /// Dạng máy đọc được của judgmentCriteria — các từ khoá RuleMatcherService
-  /// thực sự tìm kiếm. Lưu thành mảng trên chính dòng tiêu chí để bảng vẫn giữ
-  /// đúng năm dòng; service tách mỗi từ khoá thành một MatchableRule khi khớp.
+  // Dạng máy đọc được của judgmentCriteria, dùng cho RuleMatcherService.
   keywords String[]
 
-  /// Dùng để phá hoà khi một vendor khớp nhiều tiêu chí: priority tăng dần,
-  /// rồi weight giảm dần, rồi createdAt, rồi id. Không có hai trường này thì
-  /// kết quả phân loại không tất định.
+  // Phá hoà khi vendor khớp nhiều tiêu chí: priority tăng, weight giảm.
   priority Int @default(100)
   weight   Int @default(1)
 

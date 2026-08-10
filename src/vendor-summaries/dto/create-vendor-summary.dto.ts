@@ -3,11 +3,7 @@ import { IsEnum, IsString, MaxLength, MinLength } from 'class-validator';
 
 import { SummaryType } from '../../generated/prisma/enums';
 
-/**
- * Không có trường vendorId: route lồng dưới vendor nên vendor lấy từ đường dẫn.
- * Cũng không có createdById — tác giả lấy từ JWT ở controller, nhận từ body sẽ
- * cho phép bất kỳ ai gán bản tóm tắt cho người khác.
- */
+// Không có vendorId (lấy từ đường dẫn) và không có createdById (lấy từ JWT).
 export class CreateVendorSummaryDto {
   @ApiProperty({ enum: SummaryType })
   @IsEnum(SummaryType, {
@@ -15,10 +11,7 @@ export class CreateVendorSummaryDto {
   })
   summaryType!: SummaryType;
 
-  /**
-   * Bắt buộc ở tầng DTO dù cột cho phép NULL: một bản tóm tắt rỗng không mang
-   * thông tin gì. Trần 20000 ký tự để một request không phình bảng dữ liệu.
-   */
+  // Bắt buộc dù cột cho phép NULL.
   @ApiProperty({ minLength: 1, maxLength: 20000 })
   @IsString()
   @MinLength(1)

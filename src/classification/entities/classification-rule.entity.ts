@@ -2,10 +2,7 @@ import { ApiProperty } from '@nestjs/swagger';
 
 import { VendorClassification } from '../../generated/prisma/enums';
 
-/**
- * Hình dạng dòng classification_rules. Khai tại chỗ thay vì import từ Prisma
- * Client vì client chỉ được sinh sau khi schema đủ model.
- */
+// Khai tại chỗ thay vì import từ Prisma Client: client chưa sinh được.
 export interface ClassificationRuleModel {
   id: number;
   classificationName: VendorClassification;
@@ -38,12 +35,10 @@ export class ClassificationRuleEntity {
   @ApiProperty({ type: [String] })
   keywords!: string[];
 
-  @ApiProperty({
-    description: 'nhỏ hơn thì thắng khi vendor khớp nhiều tiêu chí',
-  })
+  @ApiProperty()
   priority!: number;
 
-  @ApiProperty({ description: 'lớn hơn thì thắng khi priority bằng nhau' })
+  @ApiProperty()
   weight!: number;
 
   @ApiProperty()
