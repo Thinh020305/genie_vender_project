@@ -24,6 +24,13 @@ import { PrismaModule } from './prisma/prisma.module';
     }),
     AuthModule,ClassificationModule, StatisticsModule, LlmModule
   ],
+import { PrismaService } from '../prisma/prisma.service';
+import { ClassificationModule } from './classification/classification.module';
+import { StatisticsModule } from './statistics/statistics.module';
+import { LlmModule } from './llm/llm.module';
+
+@Module({
+  imports: [ClassificationModule, StatisticsModule, LlmModule],
   controllers: [AppController],
   providers: [AppService,PrismaModule
     {
