@@ -51,8 +51,14 @@ export const AnyNull = runtime.AnyNull
 
 
 export const ModelName = {
+<<<<<<< HEAD
   User: 'User',
-  Post: 'Post'
+  Post: 'Post',
+  Vendor: 'Vendor'
+=======
+  Member: 'Member',
+  RevokedToken: 'RevokedToken'
+>>>>>>> origin/develop
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -71,25 +77,45 @@ export const TransactionIsolationLevel = runtime.makeStrictEnum({
 export type TransactionIsolationLevel = (typeof TransactionIsolationLevel)[keyof typeof TransactionIsolationLevel]
 
 
-export const UserScalarFieldEnum = {
+export const MemberScalarFieldEnum = {
   id: 'id',
   email: 'email',
+  passwordHash: 'passwordHash',
   name: 'name',
-  role: 'role'
+  role: 'role',
+  createdAt: 'createdAt'
 } as const
 
-export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum]
+export type MemberScalarFieldEnum = (typeof MemberScalarFieldEnum)[keyof typeof MemberScalarFieldEnum]
 
 
-export const PostScalarFieldEnum = {
+export const RevokedTokenScalarFieldEnum = {
+  jti: 'jti',
+  expiresAt: 'expiresAt',
+  createdAt: 'createdAt'
+} as const
+
+export type RevokedTokenScalarFieldEnum = (typeof RevokedTokenScalarFieldEnum)[keyof typeof RevokedTokenScalarFieldEnum]
+
+
+export const VendorScalarFieldEnum = {
   id: 'id',
-  title: 'title',
-  content: 'content',
-  published: 'published',
-  authorId: 'authorId'
+  vendorCode: 'vendorCode',
+  companyName: 'companyName',
+  website: 'website',
+  location: 'location',
+  serviceType: 'serviceType',
+  techStack: 'techStack',
+  industryExperience: 'industryExperience',
+  languageCapability: 'languageCapability',
+  companySize: 'companySize',
+  classification: 'classification',
+  note: 'note',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
 } as const
 
-export type PostScalarFieldEnum = (typeof PostScalarFieldEnum)[keyof typeof PostScalarFieldEnum]
+export type VendorScalarFieldEnum = (typeof VendorScalarFieldEnum)[keyof typeof VendorScalarFieldEnum]
 
 
 export const SortOrder = {
@@ -106,12 +132,4 @@ export const QueryMode = {
 } as const
 
 export type QueryMode = (typeof QueryMode)[keyof typeof QueryMode]
-
-
-export const NullsOrder = {
-  first: 'first',
-  last: 'last'
-} as const
-
-export type NullsOrder = (typeof NullsOrder)[keyof typeof NullsOrder]
 
