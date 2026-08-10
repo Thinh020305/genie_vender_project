@@ -15,6 +15,9 @@ import { AuthModule } from './auth/auth.module';
 import { ClassificationModule } from './classification/classification.module';
 import { StatisticsModule } from './statistics/statistics.module';
 import { LlmModule } from './llm/llm.module';
+import { VendorSourcesModule } from './vendor-sources/vendor-sources.module';
+import { VendorSummariesModule } from './vendor-summaries/vendor-summaries.module';
+
 
 @Module({
   imports: [
@@ -25,6 +28,9 @@ import { LlmModule } from './llm/llm.module';
     ClassificationModule,
     StatisticsModule,
     LlmModule,
+    VendorSourcesModule,
+    VendorSummariesModule,
+
   ],
   controllers: [AppController],
   providers: [
