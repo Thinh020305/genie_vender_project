@@ -1,1 +1,19 @@
+model ClassificationRule {
+  id Int @id @default(autoincrement())
 
+  keyword              String               @db.VarChar(100)
+  targetClassification VendorClassification
+
+  priority Int @default(100)
+  weight   Int @default(1)
+
+  isActive  Boolean   @default(true)
+  deletedAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([keyword, targetClassification])
+  @@index([isActive, deletedAt])
+  @@index([targetClassification])
+}

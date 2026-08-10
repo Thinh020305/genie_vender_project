@@ -15,6 +15,7 @@ export class PrismaService
     super({ adapter });
   }
 
+<<<<<<< HEAD
   async onModuleInit() {
     await this.$connect();
   }
@@ -23,3 +24,13 @@ export class PrismaService
     await this.$disconnect();
   }
 }
+=======
+  async onModuleInit(): Promise<void> {
+    await this.$connect();
+  }
+
+  async onModuleDestroy(): Promise<void> {
+    await this.$disconnect();
+  }
+}
+>>>>>>> origin/develop
