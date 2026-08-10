@@ -5,7 +5,6 @@ import {
 } from '@nestjs/common';
 
 import { PrismaService } from '../../prisma/prisma.service';
-import { PaginatedResult } from '../common/interfaces/paginated-result.interface';
 import { Role } from '../generated/prisma/enums';
 import { CreateVendorSummaryDto } from './dto/create-vendor-summary.dto';
 import { QueryVendorSummariesDto } from './dto/query-vendor-summaries.dto';
@@ -17,6 +16,16 @@ import {
 
 const DEFAULT_PAGE = 1;
 const DEFAULT_LIMIT = 20;
+
+// [AI] Declared locally rather than shared from common/ — see the matching note
+// in vendor-sources.service.ts for why this module keeps its own envelope type.
+export interface PaginatedSummaries {
+  items: VendorSummaryEntity[];
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+}
 
 type VendorSummaryRow = VendorSummaryModel & {
   createdBy?: VendorSummaryAuthorModel;
@@ -52,9 +61,9 @@ export class VendorSummariesService {
   //    not, that needs an updatedAt column in the ERD first.
 
   async create(
-    vendorId: bigint,
+    vendorId: number,
     dto: CreateVendorSummaryDto,
-    createdById: bigint,
+    createdById: number,
   ): Promise<VendorSummaryEntity> {
     await this.assertVendorExists(vendorId);
 
@@ -72,9 +81,9 @@ export class VendorSummariesService {
   }
 
   async findAllForVendor(
-    vendorId: bigint,
+    vendorId: number,
     query: QueryVendorSummariesDto,
-  ): Promise<PaginatedResult<VendorSummaryEntity>> {
+  ): Promise<PaginatedSummaries> {
     // [AI] 404s on an unknown vendor rather than returning an empty page — an
     // empty list would claim "this vendor has no summaries", a different and
     // misleading answer when the vendor does not exist.
@@ -88,7 +97,7 @@ export class VendorSummariesService {
     const where = {
       vendorId,
       summaryType: query.summaryType,
-      createdById: query.createdById ? BigInt(query.createdById) : undefined,
+      createdById: query.createdById ? Number(query.createdById) : undefined,
     };
 
     const [total, rows] = await this.prisma.$transaction([
@@ -115,8 +124,8 @@ export class VendorSummariesService {
   }
 
   async findOne(
-    vendorId: bigint,
-    summaryId: bigint,
+    vendorId: number,
+    summaryId: number,
   ): Promise<VendorSummaryEntity> {
     return VendorSummaryEntity.fromModel(
       await this.findOneForVendor(vendorId, summaryId),
@@ -132,11 +141,11 @@ export class VendorSummariesService {
   // route's role list, never the row being touched.
   // -> MENTION TO TEAM: this is a policy decision, not spec text.
   async remove(
-    vendorId: bigint,
-    summaryId: bigint,
-    requesterId: bigint,
+    vendorId: number,
+    summaryId: number,
+    requesterId: number,
     requesterRole: Role,
-  ): Promise<{ id: string; deleted: true }> {
+  ): Promise<{ id: number; deleted: true }> {
     const summary = await this.findOneForVendor(vendorId, summaryId);
 
     if (requesterRole !== Role.ADMIN && summary.createdById !== requesterId) {
@@ -147,7 +156,7 @@ export class VendorSummariesService {
 
     await this.prisma.vendorSummary.delete({ where: { id: summaryId } });
 
-    return { id: summaryId.toString(), deleted: true };
+    return { id: summaryId, deleted: true };
   }
 
   // [AI] findFirst scoped to BOTH ids, not findUnique on summaryId alone —
@@ -155,8 +164,8 @@ export class VendorSummariesService {
   // decorative. A mismatched pair 404s instead of quietly operating on another
   // vendor's row.
   private async findOneForVendor(
-    vendorId: bigint,
-    summaryId: bigint,
+    vendorId: number,
+    summaryId: number,
   ): Promise<VendorSummaryRow> {
     await this.assertVendorExists(vendorId);
 
@@ -174,7 +183,7 @@ export class VendorSummariesService {
     return summary;
   }
 
-  private async assertVendorExists(vendorId: bigint): Promise<void> {
+  private async assertVendorExists(vendorId: number): Promise<void> {
     // [AI] Explicit check so a bad vendorId reads as 404 rather than a raw
     // Prisma P2003 FK violation, which AllExceptionsFilter would flatten into
     // a bare 500. Same approach as VendorSourcesService.

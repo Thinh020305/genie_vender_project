@@ -3,15 +3,15 @@
 // createdBy -> members, createdAt"
 
 model VendorSummary {
-  // [AI] BigInt autoincrement per docs/erd.md. See the same note in
-  // vendor-sources.prisma about the conflict with classification-history's
-  // uuid guess.
-  id BigInt @id @default(autoincrement())
+  // [AI] Int, not the ERD's `bigint` — must match Vendor.id and Member.id,
+  // which the team has already migrated as SERIAL/Int. See the fuller note in
+  // vendor-sources.prisma.
+  id Int @id @default(autoincrement())
 
   // [AI] vendors.prisma is EMPTY — this relation will not validate until
   // Cường writes it. Vendor needs the back-relation field:
   //     summaries VendorSummary[]
-  vendorId BigInt
+  vendorId Int
   vendor   Vendor @relation(fields: [vendorId], references: [id], onDelete: Cascade)
 
   // [AI] Enum instead of the ERD's literal `varchar`; SummaryType in
@@ -30,7 +30,7 @@ model VendorSummary {
   // [AI] The ERD names the column "createdBy"; renamed to createdById here so
   // the relation field can be `createdBy`, matching how
   // classification-history.prisma handled the identical "changedBy" case.
-  createdById BigInt
+  createdById Int
 
   // [AI] onDelete: Restrict, unlike the vendor relation above. Deleting a
   // member must not silently erase authorship of summaries they wrote —

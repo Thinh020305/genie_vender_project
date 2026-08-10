@@ -6,6 +6,7 @@ import {
   HttpCode,
   HttpStatus,
   Param,
+  ParseIntPipe,
   Patch,
   Post,
   UseGuards,
@@ -14,7 +15,6 @@ import {
 import { Roles } from '../common/decorators/roles.decorator';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
 import { RolesGuard } from '../common/guards/roles.guard';
-import { ParseBigIntPipe } from '../common/pipes/parse-bigint.pipe';
 import { Role } from '../generated/prisma/enums';
 import { ClassificationRulesService } from './classification-rules.service';
 import { CreateClassificationRuleDto } from './dto/create-classification-rule.dto';
@@ -45,7 +45,7 @@ export class ClassificationRulesController {
   // [AI] Declared BEFORE @Get(':id')/@Patch(':id'). Express matches in
   // registration order, so with ':id' first a request to
   // /api/classification-rules/match would bind "match" as the :id param and
-  // ParseBigIntPipe would reject it as a 400 instead of routing here. This is
+  // ParseIntPipe would reject it as a 400 instead of routing here. This is
   // the same static-vs-dynamic hazard statistics.controller.ts documents
   // across controllers; within one controller, ordering fixes it.
   @Post('match')
@@ -71,7 +71,7 @@ export class ClassificationRulesController {
   }
 
   @Get(':id')
-  findOne(@Param('id', ParseBigIntPipe) id: bigint) {
+  findOne(@Param('id', ParseIntPipe) id: number) {
     return this.classificationRulesService.findOne(id);
   }
 
@@ -92,7 +92,7 @@ export class ClassificationRulesController {
   @Patch(':id')
   @Roles(Role.ADMIN)
   update(
-    @Param('id', ParseBigIntPipe) id: bigint,
+    @Param('id', ParseIntPipe) id: number,
     @Body() dto: UpdateClassificationRuleDto,
   ) {
     return this.classificationRulesService.update(id, dto);
@@ -100,7 +100,7 @@ export class ClassificationRulesController {
 
   @Delete(':id')
   @Roles(Role.ADMIN)
-  remove(@Param('id', ParseBigIntPipe) id: bigint) {
+  remove(@Param('id', ParseIntPipe) id: number) {
     return this.classificationRulesService.remove(id);
   }
 }

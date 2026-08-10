@@ -4,6 +4,7 @@ import {
   Delete,
   Get,
   Param,
+  ParseIntPipe,
   Post,
   Query,
   UseGuards,
@@ -13,7 +14,6 @@ import { CurrentUser } from '../common/decorators/current-user.decorator';
 import { Roles } from '../common/decorators/roles.decorator';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
 import { RolesGuard } from '../common/guards/roles.guard';
-import { ParseBigIntPipe } from '../common/pipes/parse-bigint.pipe';
 // [AI] `import type`, not a value import. JwtPayload appears in a decorated
 // parameter signature, and with isolatedModules + emitDecoratorMetadata both on
 // (tsconfig.json), TypeScript raises TS1272 for a plain import there.
@@ -52,19 +52,15 @@ export class VendorSummariesController {
   @Post()
   @Roles(Role.ADMIN, Role.DEVELOPER)
   create(
-    @Param('vendorId', ParseBigIntPipe) vendorId: bigint,
+    @Param('vendorId', ParseIntPipe) vendorId: number,
     @Body() dto: CreateVendorSummaryDto,
-    // [AI] TYPE HAZARD, the same one flagged in
-    // classification-history.controller.ts: JwtPayload.sub is declared `number`
-    // while Member.id is a bigint per the ERD. The conversion below is explicit
-    // so the mismatch is handled rather than silently passed to Prisma — but if
-    // a member id ever exceeds 2^53, the JWT payload has already lost precision
-    // by this point and BigInt() cannot recover it.
-    // -> MUST CONFIRM WITH THỊNH: JwtPayload.sub should become `string` once
-    //    Member.id's real type is settled, and auth should sign it as a string.
+    // [AI] `user.sub` is passed straight through. It used to be wrapped in
+    // BigInt() because createdById was a BigInt column while JwtPayload.sub is
+    // declared `number` — that conversion, and the precision hazard it carried,
+    // are both gone now that Member.id and createdById are Int on every side.
     @CurrentUser() user: JwtPayload,
   ) {
-    return this.vendorSummariesService.create(vendorId, dto, BigInt(user.sub));
+    return this.vendorSummariesService.create(vendorId, dto, user.sub);
   }
 
   // [AI] Read routes carry no @Roles(): RolesGuard's documented fallback lets
@@ -73,7 +69,7 @@ export class VendorSummariesController {
   // classification results".
   @Get()
   findAll(
-    @Param('vendorId', ParseBigIntPipe) vendorId: bigint,
+    @Param('vendorId', ParseIntPipe) vendorId: number,
     @Query() query: QueryVendorSummariesDto,
   ) {
     return this.vendorSummariesService.findAllForVendor(vendorId, query);
@@ -81,8 +77,8 @@ export class VendorSummariesController {
 
   @Get(':summaryId')
   findOne(
-    @Param('vendorId', ParseBigIntPipe) vendorId: bigint,
-    @Param('summaryId', ParseBigIntPipe) summaryId: bigint,
+    @Param('vendorId', ParseIntPipe) vendorId: number,
+    @Param('summaryId', ParseIntPipe) summaryId: number,
   ) {
     return this.vendorSummariesService.findOne(vendorId, summaryId);
   }
@@ -93,14 +89,14 @@ export class VendorSummariesController {
   @Delete(':summaryId')
   @Roles(Role.ADMIN, Role.DEVELOPER)
   remove(
-    @Param('vendorId', ParseBigIntPipe) vendorId: bigint,
-    @Param('summaryId', ParseBigIntPipe) summaryId: bigint,
+    @Param('vendorId', ParseIntPipe) vendorId: number,
+    @Param('summaryId', ParseIntPipe) summaryId: number,
     @CurrentUser() user: JwtPayload,
   ) {
     return this.vendorSummariesService.remove(
       vendorId,
       summaryId,
-      BigInt(user.sub),
+      user.sub,
       user.role,
     );
   }

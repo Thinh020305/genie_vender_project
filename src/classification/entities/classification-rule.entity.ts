@@ -8,7 +8,7 @@ import { VendorClassification } from '../../generated/prisma/enums';
 // so importing the real type is a hard "no exported member" error today.
 // Delete this and import the generated type once `prisma generate` reruns.
 export interface ClassificationRuleModel {
-  id: bigint;
+  id: number;
   classificationName: VendorClassification;
   description: string | null;
   judgmentCriteria: string | null;
@@ -19,12 +19,13 @@ export interface ClassificationRuleModel {
   updatedAt: Date;
 }
 
-// [AI] bigint id serialized as a string — JSON.stringify() throws on a raw
-// bigint, and JSON numbers lose precision past 2^53. See the fuller note in
-// vendor-sources/entities/vendor-source.entity.ts.
+// [AI] id is a plain JSON number, which also makes it match
+// RuleMatcherService's `MatchableRule.id: number` exactly. The previous
+// string-serialized BigInt version disagreed with the ids echoed back inside
+// POST /api/classification-rules/match, so a client could not correlate the two.
 export class ClassificationRuleEntity {
-  @ApiProperty({ example: '1', description: 'bigint id serialized as string' })
-  id!: string;
+  @ApiProperty({ example: 1 })
+  id!: number;
 
   @ApiProperty({ enum: VendorClassification })
   classificationName!: VendorClassification;
@@ -57,7 +58,7 @@ export class ClassificationRuleEntity {
   static fromModel(model: ClassificationRuleModel): ClassificationRuleEntity {
     const entity = new ClassificationRuleEntity();
 
-    entity.id = model.id.toString();
+    entity.id = model.id;
     entity.classificationName = model.classificationName;
     entity.description = model.description;
     entity.judgmentCriteria = model.judgmentCriteria;

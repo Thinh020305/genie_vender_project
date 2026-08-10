@@ -8,11 +8,11 @@ import { SummaryType } from '../../generated/prisma/enums';
 // contains User and Post today, so the real type cannot be imported yet.
 // Replace with the generated type once vendors.prisma + members.prisma land.
 export interface VendorSummaryModel {
-  id: bigint;
-  vendorId: bigint;
+  id: number;
+  vendorId: number;
   summaryType: SummaryType;
   content: string | null;
-  createdById: bigint;
+  createdById: number;
   createdAt: Date;
 }
 
@@ -20,14 +20,14 @@ export interface VendorSummaryModel {
 // (findAll/findOne use a Prisma `include`). Typed separately so the entity can
 // represent both the plain row and the joined row.
 export interface VendorSummaryAuthorModel {
-  id: bigint;
+  id: number;
   name: string;
   email: string;
 }
 
 export class VendorSummaryAuthorEntity {
-  @ApiProperty({ example: '7' })
-  id!: string;
+  @ApiProperty({ example: 7 })
+  id!: number;
 
   @ApiProperty()
   name!: string;
@@ -36,15 +36,14 @@ export class VendorSummaryAuthorEntity {
   email!: string;
 }
 
-// [AI] bigint ids serialized as strings — see the long note in
-// vendor-source.entity.ts for why (JSON.stringify throws on bigint, and
-// numbers lose precision past 2^53).
+// [AI] ids are plain JSON numbers now that the columns are Int — see the note
+// in vendor-source.entity.ts.
 export class VendorSummaryEntity {
-  @ApiProperty({ example: '1', description: 'bigint id serialized as string' })
-  id!: string;
+  @ApiProperty({ example: 1 })
+  id!: number;
 
-  @ApiProperty({ example: '42', description: 'bigint id serialized as string' })
-  vendorId!: string;
+  @ApiProperty({ example: 42 })
+  vendorId!: number;
 
   @ApiProperty({ enum: SummaryType })
   summaryType!: SummaryType;
@@ -52,8 +51,8 @@ export class VendorSummaryEntity {
   @ApiProperty({ nullable: true, type: String })
   content!: string | null;
 
-  @ApiProperty({ example: '7', description: 'bigint id serialized as string' })
-  createdById!: string;
+  @ApiProperty({ example: 7 })
+  createdById!: number;
 
   @ApiProperty({ required: false, type: VendorSummaryAuthorEntity })
   createdBy?: VendorSummaryAuthorEntity;
@@ -66,11 +65,11 @@ export class VendorSummaryEntity {
   ): VendorSummaryEntity {
     const entity = new VendorSummaryEntity();
 
-    entity.id = model.id.toString();
-    entity.vendorId = model.vendorId.toString();
+    entity.id = model.id;
+    entity.vendorId = model.vendorId;
     entity.summaryType = model.summaryType;
     entity.content = model.content;
-    entity.createdById = model.createdById.toString();
+    entity.createdById = model.createdById;
     entity.createdAt = model.createdAt;
 
     if (model.createdBy) {
@@ -79,7 +78,7 @@ export class VendorSummaryEntity {
       // include rather than pulling the whole member row — this mapper is the
       // second line of defence, not the first.
       entity.createdBy = {
-        id: model.createdBy.id.toString(),
+        id: model.createdBy.id,
         name: model.createdBy.name,
         email: model.createdBy.email,
       };

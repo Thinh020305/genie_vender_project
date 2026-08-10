@@ -36,14 +36,14 @@ const isUniqueConstraintError = (error: unknown): boolean =>
 // keyword list. Every expanded entry keeps the criterion's own id, so the
 // matcher's reason string still names the criterion that won.
 //
-// Number(model.id) is the one lossy conversion here: MatchableRule declares
-// `id: number` and rule-matcher.service.ts is not a file this task may modify.
-// Harmless in practice — a five-row catalog will not reach 2^53.
-// -> MENTION TO TEAM: if MatchableRule.id is ever widened to bigint, this
-//    function is the only thing that needs to change.
+// The id passes through untouched. An earlier version wrapped it in Number()
+// because the column was BigInt while MatchableRule declares `id: number` —
+// that conversion silently lost precision past 2^53 and made the ids echoed
+// back by /match disagree with the ids returned by every other endpoint. Both
+// problems are gone now that the column is Int.
 const toMatchableRules = (model: ClassificationRuleModel): MatchableRule[] =>
   model.keywords.map((keyword) => ({
-    id: Number(model.id),
+    id: model.id,
     keyword,
     targetClassification: model.classificationName,
     priority: model.priority,
@@ -85,7 +85,7 @@ export class ClassificationRulesService {
     return ClassificationRuleEntity.fromModels(rules);
   }
 
-  async findOne(id: bigint): Promise<ClassificationRuleEntity> {
+  async findOne(id: number): Promise<ClassificationRuleEntity> {
     return ClassificationRuleEntity.fromModel(await this.findOrThrow(id));
   }
 
@@ -122,7 +122,7 @@ export class ClassificationRulesService {
   }
 
   async update(
-    id: bigint,
+    id: number,
     dto: UpdateClassificationRuleDto,
   ): Promise<ClassificationRuleEntity> {
     await this.findOrThrow(id);
@@ -170,12 +170,12 @@ export class ClassificationRulesService {
   // block that re-create on the unique index forever.
   // Restricted to ADMIN at the controller — removing a criterion changes how
   // every vendor is judged.
-  async remove(id: bigint): Promise<{ id: string; deleted: true }> {
+  async remove(id: number): Promise<{ id: number; deleted: true }> {
     await this.findOrThrow(id);
 
     await this.prisma.classificationRule.delete({ where: { id } });
 
-    return { id: id.toString(), deleted: true };
+    return { id, deleted: true };
   }
 
   // [AI] Bridge to rule-matcher.service.ts, which was written and unit-tested
@@ -200,7 +200,7 @@ export class ClassificationRulesService {
     return this.ruleMatcher.match(rules.flatMap(toMatchableRules), text);
   }
 
-  private async findOrThrow(id: bigint): Promise<ClassificationRuleModel> {
+  private async findOrThrow(id: number): Promise<ClassificationRuleModel> {
     const rule = await this.prisma.classificationRule.findUnique({
       where: { id },
     });

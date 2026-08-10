@@ -12,8 +12,8 @@ import { SourceType } from '../../generated/prisma/enums';
 // -> MENTION TO TEAM: this must be kept in sync with the .prisma file by hand
 //    until then.
 export interface VendorSourceModel {
-  id: bigint;
-  vendorId: bigint;
+  id: number;
+  vendorId: number;
   sourceType: SourceType;
   sourceUrl: string | null;
   sourceTitle: string | null;
@@ -21,22 +21,17 @@ export interface VendorSourceModel {
   memo: string | null;
 }
 
-// [AI] ids are exposed as STRINGS, not numbers. Two reasons, neither of them
-// spec text:
-//   1. JSON.stringify() throws "Do not know how to serialize a BigInt" on a
-//      raw bigint, so returning the Prisma row directly would 500 every
-//      response once vendor ids are bigints.
-//   2. bigint exceeds JS Number.MAX_SAFE_INTEGER, so JSON numbers would
-//      silently round on the client at large values.
-// -> MENTION TO TEAM: every module that touches a bigint id needs this same
-//    treatment. The alternative is one global BigInt.prototype.toJSON patch
-//    in main.ts, which is less code but mutates a global builtin.
+// [AI] ids are plain JSON numbers. An earlier version serialized them as
+// strings because the columns were BigInt and JSON.stringify() throws on a raw
+// bigint. Now that the ids are Int — matching Vendor.id and Member.id — that
+// problem disappears, along with the string/number inconsistency it created
+// against RuleMatcherService, which has always typed its rule id as `number`.
 export class VendorSourceEntity {
-  @ApiProperty({ example: '1', description: 'bigint id serialized as string' })
-  id!: string;
+  @ApiProperty({ example: 1 })
+  id!: number;
 
-  @ApiProperty({ example: '42', description: 'bigint id serialized as string' })
-  vendorId!: string;
+  @ApiProperty({ example: 42 })
+  vendorId!: number;
 
   @ApiProperty({ enum: SourceType })
   sourceType!: SourceType;
@@ -56,8 +51,8 @@ export class VendorSourceEntity {
   static fromModel(model: VendorSourceModel): VendorSourceEntity {
     const entity = new VendorSourceEntity();
 
-    entity.id = model.id.toString();
-    entity.vendorId = model.vendorId.toString();
+    entity.id = model.id;
+    entity.vendorId = model.vendorId;
     entity.sourceType = model.sourceType;
     entity.sourceUrl = model.sourceUrl;
     entity.sourceTitle = model.sourceTitle;

@@ -3,20 +3,24 @@
 // sourceTitle, checkedAt, memo"
 
 model VendorSource {
-  // [AI] BigInt @default(autoincrement()) follows docs/erd.md literally
-  // ("id bigint [pk, increment]"). This CONFLICTS with the
-  // `String @id @default(uuid())` guess in classification-history.prisma —
-  // that file carries its own "-> CONFIRM WITH THỊNH AND CƯỜNG" note, so it
-  // was never settled. The ERD is the newer artifact, so it wins here.
-  // -> MENTION TO TEAM: whichever way Vendor.id goes, classification-history
-  //    and this file must end up with the SAME type or the FK won't compile.
-  id BigInt @id @default(autoincrement())
+  // [AI] Int, NOT the `bigint` docs/erd.md asks for. The ERD was a draft; the
+  // team has since implemented and MIGRATED Int on both sides of every FK this
+  // table touches:
+  //     Vendor.id  Int  (feature/doduccuong, migration create_vendor_table, SERIAL)
+  //     Member.id  Int  (feature/{Thinh},   migration remove_user_post,     SERIAL)
+  // Prisma requires an FK column to match the referenced column exactly, so
+  // BigInt here fails validation with "The type of the field `vendorId` ... is
+  // not matching the type of the referenced field `id` in model `Vendor`".
+  // -> docs/erd.md still says bigint and needs updating to match the migrations.
+  // -> classification-history.prisma still uses String @default(uuid()) and has
+  //    the same clash to resolve (Sơn's file).
+  id Int @id @default(autoincrement())
 
   // [AI] Must match Vendor.id exactly. vendors.prisma is still EMPTY, so
   // `prisma validate` / `prisma generate` will fail on the relation below
   // until Cường writes it. Vendor also needs the back-relation field:
   //     sources VendorSource[]
-  vendorId BigInt
+  vendorId Int
 
   // [AI] onDelete: Cascade (not Restrict like classification_histories).
   // Reasoning: a source row is subordinate evidence describing a vendor —

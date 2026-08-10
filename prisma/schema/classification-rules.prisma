@@ -19,9 +19,11 @@
 // A keyword-per-row design would have made GET /api/classification-rules
 // return dozens of keyword rows instead of the five documented criteria.
 model ClassificationRule {
-  // [AI] BigInt autoincrement per the ERD ("id bigint [pk, increment]"),
-  // consistent with vendor_sources / vendor_summaries.
-  id BigInt @id @default(autoincrement())
+  // [AI] Int, consistent with vendor_sources / vendor_summaries and with the
+  // team's migrated Vendor.id / Member.id. This table has no FKs of its own, so
+  // the choice is about consistency rather than validation — but a schema with
+  // three different id types is exactly the kind of thing that breaks at merge.
+  id Int @id @default(autoincrement())
 
   // [AI] The ERD's "classificationName", kept under the spec's own name this
   // time. Typed as the VendorClassification enum rather than the ERD's literal

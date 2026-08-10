@@ -5,7 +5,6 @@ import {
 } from '@nestjs/common';
 
 import { PrismaService } from '../../prisma/prisma.service';
-import { PaginatedResult } from '../common/interfaces/paginated-result.interface';
 import { SourceType } from '../generated/prisma/enums';
 import { CreateVendorSourceDto } from './dto/create-vendor-source.dto';
 import { QueryVendorSourcesDto } from './dto/query-vendor-sources.dto';
@@ -17,6 +16,20 @@ import {
 
 const DEFAULT_PAGE = 1;
 const DEFAULT_LIMIT = 20;
+
+// [AI] Declared here rather than in a shared common/ file. The envelope is
+// invented (the PDF specifies pagination for GET /api/vendors only), and only
+// two services in this module use it, so a shared interface under common/ was
+// more coupling than it bought — common/ is Thịnh's area and a file there
+// forces every teammate to pull it before this module compiles.
+// -> If a third consumer appears, promote it to common/ then, not before.
+export interface PaginatedSources {
+  items: VendorSourceEntity[];
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+}
 
 // [AI] Verbatim from Genie Vina.pdf Step 3.2: 'If source is unavailable, note
 // must include "source unverified" or "demo data"'. Matched case-insensitively
@@ -43,7 +56,7 @@ export class VendorSourcesService {
   // authenticated user could walk the whole table by id.
 
   async create(
-    vendorId: bigint,
+    vendorId: number,
     dto: CreateVendorSourceDto,
   ): Promise<VendorSourceEntity> {
     // [AI] Explicit existence check rather than letting the FK constraint
@@ -74,9 +87,9 @@ export class VendorSourcesService {
   }
 
   async findAllForVendor(
-    vendorId: bigint,
+    vendorId: number,
     query: QueryVendorSourcesDto,
-  ): Promise<PaginatedResult<VendorSourceEntity>> {
+  ): Promise<PaginatedSources> {
     // [AI] 404s on an unknown vendor instead of returning an empty page. An
     // empty list would say "this vendor has no sources", which is a different
     // and misleading answer when the vendor does not exist at all.
@@ -116,8 +129,8 @@ export class VendorSourcesService {
   }
 
   async findOne(
-    vendorId: bigint,
-    sourceId: bigint,
+    vendorId: number,
+    sourceId: number,
   ): Promise<VendorSourceEntity> {
     return VendorSourceEntity.fromModel(
       await this.findOneForVendor(vendorId, sourceId),
@@ -125,8 +138,8 @@ export class VendorSourcesService {
   }
 
   async update(
-    vendorId: bigint,
-    sourceId: bigint,
+    vendorId: number,
+    sourceId: number,
     dto: UpdateVendorSourceDto,
   ): Promise<VendorSourceEntity> {
     const existing = await this.findOneForVendor(vendorId, sourceId);
@@ -172,14 +185,14 @@ export class VendorSourcesService {
   // -> MENTION TO TEAM: delete this route if the team wants to stay strictly
   //    inside the documented endpoint list.
   async remove(
-    vendorId: bigint,
-    sourceId: bigint,
-  ): Promise<{ id: string; deleted: true }> {
+    vendorId: number,
+    sourceId: number,
+  ): Promise<{ id: number; deleted: true }> {
     await this.findOneForVendor(vendorId, sourceId);
 
     await this.prisma.vendorSource.delete({ where: { id: sourceId } });
 
-    return { id: sourceId.toString(), deleted: true };
+    return { id: sourceId, deleted: true };
   }
 
   // [AI] Enforces Genie Vina.pdf Step 3.3 ("Each vendor must include a public
@@ -236,8 +249,8 @@ export class VendorSourcesService {
   // load-bearing: a mismatched pair 404s rather than quietly operating on
   // another vendor's row.
   private async findOneForVendor(
-    vendorId: bigint,
-    sourceId: bigint,
+    vendorId: number,
+    sourceId: number,
   ): Promise<VendorSourceModel> {
     await this.assertVendorExists(vendorId);
 
@@ -254,7 +267,7 @@ export class VendorSourcesService {
     return source;
   }
 
-  private async assertVendorExists(vendorId: bigint): Promise<void> {
+  private async assertVendorExists(vendorId: number): Promise<void> {
     const vendor = await this.prisma.vendor.findUnique({
       where: { id: vendorId },
       select: { id: true },

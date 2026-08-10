@@ -4,6 +4,7 @@ import {
   Delete,
   Get,
   Param,
+  ParseIntPipe,
   Patch,
   Post,
   Query,
@@ -13,7 +14,6 @@ import {
 import { Roles } from '../common/decorators/roles.decorator';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
 import { RolesGuard } from '../common/guards/roles.guard';
-import { ParseBigIntPipe } from '../common/pipes/parse-bigint.pipe';
 import { Role } from '../generated/prisma/enums';
 import { CreateVendorSourceDto } from './dto/create-vendor-source.dto';
 import { QueryVendorSourcesDto } from './dto/query-vendor-sources.dto';
@@ -49,7 +49,7 @@ export class VendorSourcesController {
   @Post()
   @Roles(Role.ADMIN, Role.DEVELOPER)
   create(
-    @Param('vendorId', ParseBigIntPipe) vendorId: bigint,
+    @Param('vendorId', ParseIntPipe) vendorId: number,
     @Body() dto: CreateVendorSourceDto,
   ) {
     return this.vendorSourcesService.create(vendorId, dto);
@@ -57,7 +57,7 @@ export class VendorSourcesController {
 
   @Get()
   findAll(
-    @Param('vendorId', ParseBigIntPipe) vendorId: bigint,
+    @Param('vendorId', ParseIntPipe) vendorId: number,
     @Query() query: QueryVendorSourcesDto,
   ) {
     return this.vendorSourcesService.findAllForVendor(vendorId, query);
@@ -68,8 +68,8 @@ export class VendorSourcesController {
   // can edit a source has no documented way to read it back on its own.
   @Get(':sourceId')
   findOne(
-    @Param('vendorId', ParseBigIntPipe) vendorId: bigint,
-    @Param('sourceId', ParseBigIntPipe) sourceId: bigint,
+    @Param('vendorId', ParseIntPipe) vendorId: number,
+    @Param('sourceId', ParseIntPipe) sourceId: number,
   ) {
     return this.vendorSourcesService.findOne(vendorId, sourceId);
   }
@@ -77,8 +77,8 @@ export class VendorSourcesController {
   @Patch(':sourceId')
   @Roles(Role.ADMIN, Role.DEVELOPER)
   update(
-    @Param('vendorId', ParseBigIntPipe) vendorId: bigint,
-    @Param('sourceId', ParseBigIntPipe) sourceId: bigint,
+    @Param('vendorId', ParseIntPipe) vendorId: number,
+    @Param('sourceId', ParseIntPipe) sourceId: number,
     @Body() dto: UpdateVendorSourceDto,
   ) {
     return this.vendorSourcesService.update(vendorId, sourceId, dto);
@@ -90,8 +90,8 @@ export class VendorSourcesController {
   @Delete(':sourceId')
   @Roles(Role.ADMIN)
   remove(
-    @Param('vendorId', ParseBigIntPipe) vendorId: bigint,
-    @Param('sourceId', ParseBigIntPipe) sourceId: bigint,
+    @Param('vendorId', ParseIntPipe) vendorId: number,
+    @Param('sourceId', ParseIntPipe) sourceId: number,
   ) {
     return this.vendorSourcesService.remove(vendorId, sourceId);
   }
