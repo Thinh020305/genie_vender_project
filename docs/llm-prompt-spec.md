@@ -204,4 +204,3 @@ LLM suggestion or apply one.
 - [ ] Confirm `confidence` as low/medium/high vs. a numeric score
 - [ ] Confirm REVIEWER exclusion from this endpoint is correct (currently inferred, not explicit in the PDF)
 - [ ] Confirm error status for a failed upstream LLM call (currently 500 — 502 may read better)
-- [ ] Confirm `LLM_API_KEY` / `LLM_MODEL` env var ownership and add to `.env.example`

@@ -18,6 +18,16 @@ export { Prisma }
 export * as $Enums from './enums.js'
 export * from './enums.js';
 /**
+ * Model ClassificationHistory
+ * 
+ */
+export type ClassificationHistory = Prisma.ClassificationHistoryModel
+/**
+ * Model ClassificationRule
+ * 
+ */
+export type ClassificationRule = Prisma.ClassificationRuleModel
+/**
  * Model Member
  * 
  */
@@ -27,3 +37,8 @@ export type Member = Prisma.MemberModel
  * 
  */
 export type RevokedToken = Prisma.RevokedTokenModel
+/**
+ * Model Vendor
+ * 
+ */
+export type Vendor = Prisma.VendorModel

@@ -10,7 +10,7 @@ export class UpdateClassificationDto {
   @IsEnum(VendorClassification, {
     message: 'newClassification must be a valid VendorClassification value',
   })
-  newClassification: VendorClassification;
+  newClassification!: VendorClassification;
 
   @ApiProperty({ required: false, minLength: 3 }) // optional
   @IsOptional()

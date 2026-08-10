@@ -13,7 +13,7 @@ export class ClassificationHistoryService {
   async updateClassification(
     vendorId: string,
     dto: UpdateClassificationDto,
-    changedById: string,
+    changedById: number,
   ) {
     // this.prisma.vendor / this.prisma.classificationHistory will not run until vendors.prisma lands and `prisma generate` reruns.
     const vendor = await this.prisma.vendor.findUnique({

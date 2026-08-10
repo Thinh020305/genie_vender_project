@@ -1,6 +1,11 @@
 // src/statistics/statistics.controller.ts
 import { Controller, Get, UseGuards } from '@nestjs/common';
-import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiOperation,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
 import { RolesGuard } from '../common/guards/roles.guard';
 import { StatisticsService } from './statistics.service';
@@ -17,7 +22,8 @@ export class StatisticsController {
   @Get('stats')
   @ApiOperation({
     summary: 'Get vendor statistics',
-    description: 'Total count plus breakdowns by classification, location, and serviceType. Open to all authenticated roles, including REVIEWER.',
+    description:
+      'Total count plus breakdowns by classification, location, and serviceType. Open to all authenticated roles, including REVIEWER.',
   })
   @ApiResponse({ status: 200, type: VendorStatsResponseDto })
   getVendorStats() {

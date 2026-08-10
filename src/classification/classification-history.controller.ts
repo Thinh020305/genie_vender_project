@@ -34,13 +34,16 @@ export class ClassificationHistoryController {
   @Patch(':id/classification')
   @Roles(Role.ADMIN, Role.DEVELOPER)
   @ApiOperation({
-    summary: 'Update a vendor\'s classification and record the change',
+    summary: "Update a vendor's classification and record the change",
     description:
       'Requires ADMIN or DEVELOPER. Writes vendor.classification and a classification_histories row in a single transaction.',
   })
   @ApiParam({ name: 'id', description: 'Vendor UUID' })
   @ApiResponse({ status: 200, description: 'Classification updated' })
-  @ApiResponse({ status: 400, description: 'New value equals current value, or fails DTO validation' })
+  @ApiResponse({
+    status: 400,
+    description: 'New value equals current value, or fails DTO validation',
+  })
   @ApiResponse({ status: 403, description: 'REVIEWER role forbidden' })
   @ApiResponse({ status: 404, description: 'Vendor not found' })
   updateClassification(
@@ -61,7 +64,10 @@ export class ClassificationHistoryController {
     description: 'Open to all authenticated roles, including REVIEWER.',
   })
   @ApiParam({ name: 'id', description: 'Vendor UUID' })
-  @ApiResponse({ status: 200, description: 'History rows, ordered by changedAt descending' })
+  @ApiResponse({
+    status: 200,
+    description: 'History rows, ordered by changedAt descending',
+  })
   getHistory(@Param('id') id: string) {
     return this.classificationHistoryService.getHistory(id);
   }

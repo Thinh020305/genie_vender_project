@@ -49,7 +49,6 @@ export class AllExceptionsFilter implements ExceptionFilter {
     });
   }
 
-
   private getStatus(exception: unknown): number {
     if (exception instanceof HttpException) {
       return exception.getStatus();
@@ -69,8 +68,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
       return exceptionResponse;
     }
 
-    const responseObject =
-      exceptionResponse as NestExceptionResponse;
+    const responseObject = exceptionResponse as NestExceptionResponse;
 
     return responseObject.message ?? exception.message;
   }

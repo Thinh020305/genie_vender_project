@@ -2,7 +2,6 @@ import { Injectable } from '@nestjs/common';
 
 import { VendorClassification } from '../generated/prisma/enums';
 
-
 export interface MatchableRule {
   id: number;
   keyword: string;
@@ -17,7 +16,6 @@ export interface RuleMatchResult {
   result: VendorClassification | null;
   reason: string;
 }
-
 
 const compareRules = (a: MatchableRule, b: MatchableRule): number => {
   if (a.priority !== b.priority) {
@@ -39,7 +37,6 @@ const compareRules = (a: MatchableRule, b: MatchableRule): number => {
 
 @Injectable()
 export class RuleMatcherService {
-  
   match(rules: MatchableRule[], text: string): RuleMatchResult {
     const normalizedText = text.toLowerCase();
 

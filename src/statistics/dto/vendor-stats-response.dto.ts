@@ -23,7 +23,9 @@ class ServiceTypeCountDto {
 
 export class VendorStatsResponseDto {
   @ApiProperty() total: number;
-  @ApiProperty({ type: [ClassificationCountDto] }) byClassification: ClassificationCountDto[];
+  @ApiProperty({ type: [ClassificationCountDto] })
+  byClassification: ClassificationCountDto[];
   @ApiProperty({ type: [LocationCountDto] }) byLocation: LocationCountDto[];
-  @ApiProperty({ type: [ServiceTypeCountDto] }) byServiceType: ServiceTypeCountDto[];
+  @ApiProperty({ type: [ServiceTypeCountDto] })
+  byServiceType: ServiceTypeCountDto[];
 }
