@@ -15,24 +15,20 @@ import { AuthModule } from './auth/auth.module';
 import { ClassificationModule } from './classification/classification.module';
 import { StatisticsModule } from './statistics/statistics.module';
 import { LlmModule } from './llm/llm.module';
-import { PrismaModule } from './prisma/prisma.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
     }),
-    AuthModule,ClassificationModule, StatisticsModule, LlmModule
+    AuthModule,
+    ClassificationModule,
+    StatisticsModule,
+    LlmModule,
   ],
-import { PrismaService } from '../prisma/prisma.service';
-import { ClassificationModule } from './classification/classification.module';
-import { StatisticsModule } from './statistics/statistics.module';
-import { LlmModule } from './llm/llm.module';
-
-@Module({
-  imports: [ClassificationModule, StatisticsModule, LlmModule],
   controllers: [AppController],
-  providers: [AppService,PrismaModule
+  providers: [
+    AppService,
     {
       provide: APP_FILTER,
       useClass: AllExceptionsFilter,
