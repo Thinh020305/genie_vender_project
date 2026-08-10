@@ -1,4 +1,12 @@
+// src/classification/classification-history.controller.ts
 import { Body, Controller, Get, Param, Patch, UseGuards } from '@nestjs/common';
+import {
+  ApiBearerAuth,
+  ApiOperation,
+  ApiParam,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
 import { RolesGuard } from '../common/guards/roles.guard';
 import { Roles } from '../common/decorators/roles.decorator';
@@ -7,13 +15,15 @@ import { Role } from '../generated/prisma/enums';
 import { ClassificationHistoryService } from './classification-history.service';
 import { UpdateClassificationDto } from './dto/update-classification.dto';
 
-// [AI] Base path "api/vendors" — spec gives the full route strings but
-// never says which controller file/class each route lives in. Cường's
-// VendorsController will very likely also use "api/vendors" as its prefix
-// for CRUD. NestJS allows two controllers to share a prefix as long as no
-// exact method+path collides, but this needs a quick sanity check once
-// both controllers exist side by side.
-// -> MENTION TO TEAM
+// [AI] Base path "api/vendors" — same collision caveat as before, unchanged
+// by adding Swagger. Not re-flagging in full here, see earlier writeup.
+@ApiTags('vendors')
+// [AI] ApiBearerAuth() references a security scheme name that must match
+// whatever Thịnh registers via DocumentBuilder().addBearerAuth() in
+// main.ts. Using the implicit default here — if he names the scheme
+// something else (e.g. 'jwt' or 'access-token'), this needs to match.
+// -> CONFIRM WITH THỊNH
+@ApiBearerAuth()
 @Controller('api/vendors')
 @UseGuards(JwtAuthGuard, RolesGuard)
 export class ClassificationHistoryController {
@@ -23,17 +33,22 @@ export class ClassificationHistoryController {
 
   @Patch(':id/classification')
   @Roles(Role.ADMIN, Role.DEVELOPER)
+  @ApiOperation({
+    summary: "Update a vendor's classification and record the change",
+    description:
+      'Requires ADMIN or DEVELOPER. Writes vendor.classification and a classification_histories row in a single transaction.',
+  })
+  @ApiParam({ name: 'id', description: 'Vendor UUID' })
+  @ApiResponse({ status: 200, description: 'Classification updated' })
+  @ApiResponse({
+    status: 400,
+    description: 'New value equals current value, or fails DTO validation',
+  })
+  @ApiResponse({ status: 403, description: 'REVIEWER role forbidden' })
+  @ApiResponse({ status: 404, description: 'Vendor not found' })
   updateClassification(
     @Param('id') id: string,
     @Body() dto: UpdateClassificationDto,
-    // [AI] JwtPayload.sub is typed `number` in
-    // common/interfaces/jwt-payload.interface.ts, but this file assumes
-    // changedById is a String (matching the uuid Member.id assumption from
-    // classification-history.prisma). TypeScript won't necessarily flag
-    // this at compile time — CurrentUser's decorator loses that type
-    // checking — but at runtime this would insert a number where Prisma
-    // expects a String once Member.id's real type is settled.
-    // -> MUST CONFIRM WITH THỊNH before this is safe to run
     @CurrentUser('sub') changedById: string,
   ) {
     return this.classificationHistoryService.updateClassification(
@@ -44,10 +59,15 @@ export class ClassificationHistoryController {
   }
 
   @Get(':id/classification-history')
-  // [AI] No @Roles() decorator here is intentional — RolesGuard treats
-  // "no roles metadata" as "allow any authenticated role," which is what
-  // makes REVIEWER's read access work. That fallback behavior lives inside
-  // roles.guard.ts's own logic, not stated anywhere in the spec text.
+  @ApiOperation({
+    summary: 'Get the classification change history for a vendor',
+    description: 'Open to all authenticated roles, including REVIEWER.',
+  })
+  @ApiParam({ name: 'id', description: 'Vendor UUID' })
+  @ApiResponse({
+    status: 200,
+    description: 'History rows, ordered by changedAt descending',
+  })
   getHistory(@Param('id') id: string) {
     return this.classificationHistoryService.getHistory(id);
   }

@@ -24,12 +24,11 @@ export class RevokedTokenService {
   }
 
   async isRevoked(jti: string): Promise<boolean> {
-    const revokedToken =
-      await this.prisma.revokedToken.findUnique({
-        where: {
-          jti,
-        },
-      });
+    const revokedToken = await this.prisma.revokedToken.findUnique({
+      where: {
+        jti,
+      },
+    });
 
     return revokedToken !== null;
   }

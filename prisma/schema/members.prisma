@@ -6,6 +6,7 @@ model Member {
   role         Role
   createdAt    DateTime @default(now())
 
+  classificationHistories ClassificationHistory[]
 
   @@map("members")
 }

@@ -13,7 +13,7 @@ model ClassificationHistory {
   vendor Vendor @relation(fields: [vendorId], references: [id], onDelete: Restrict)
 
   // name in genie_topic.pdf file: "changedBy" --> "changedById"
-  changedById String    // Type (String) assumed to match Member.id -> CONFIRM WITH THỊNH
+  changedById Int
 
   
   changedBy Member @relation(fields: [changedById], references: [id], onDelete: Restrict)

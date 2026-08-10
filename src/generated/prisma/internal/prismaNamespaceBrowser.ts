@@ -51,8 +51,11 @@ export const AnyNull = runtime.AnyNull
 
 
 export const ModelName = {
+  ClassificationHistory: 'ClassificationHistory',
+  ClassificationRule: 'ClassificationRule',
   Member: 'Member',
-  RevokedToken: 'RevokedToken'
+  RevokedToken: 'RevokedToken',
+  Vendor: 'Vendor'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -69,6 +72,34 @@ export const TransactionIsolationLevel = runtime.makeStrictEnum({
 } as const)
 
 export type TransactionIsolationLevel = (typeof TransactionIsolationLevel)[keyof typeof TransactionIsolationLevel]
+
+
+export const ClassificationHistoryScalarFieldEnum = {
+  id: 'id',
+  vendorId: 'vendorId',
+  changedById: 'changedById',
+  previousClassification: 'previousClassification',
+  newClassification: 'newClassification',
+  changedAt: 'changedAt',
+  reason: 'reason'
+} as const
+
+export type ClassificationHistoryScalarFieldEnum = (typeof ClassificationHistoryScalarFieldEnum)[keyof typeof ClassificationHistoryScalarFieldEnum]
+
+
+export const ClassificationRuleScalarFieldEnum = {
+  id: 'id',
+  keyword: 'keyword',
+  targetClassification: 'targetClassification',
+  priority: 'priority',
+  weight: 'weight',
+  isActive: 'isActive',
+  deletedAt: 'deletedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type ClassificationRuleScalarFieldEnum = (typeof ClassificationRuleScalarFieldEnum)[keyof typeof ClassificationRuleScalarFieldEnum]
 
 
 export const MemberScalarFieldEnum = {
@@ -92,6 +123,22 @@ export const RevokedTokenScalarFieldEnum = {
 export type RevokedTokenScalarFieldEnum = (typeof RevokedTokenScalarFieldEnum)[keyof typeof RevokedTokenScalarFieldEnum]
 
 
+export const VendorScalarFieldEnum = {
+  id: 'id',
+  companyName: 'companyName',
+  serviceType: 'serviceType',
+  techStack: 'techStack',
+  industryExperience: 'industryExperience',
+  note: 'note',
+  location: 'location',
+  classification: 'classification',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type VendorScalarFieldEnum = (typeof VendorScalarFieldEnum)[keyof typeof VendorScalarFieldEnum]
+
+
 export const SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -106,4 +153,12 @@ export const QueryMode = {
 } as const
 
 export type QueryMode = (typeof QueryMode)[keyof typeof QueryMode]
+
+
+export const NullsOrder = {
+  first: 'first',
+  last: 'last'
+} as const
+
+export type NullsOrder = (typeof NullsOrder)[keyof typeof NullsOrder]
 

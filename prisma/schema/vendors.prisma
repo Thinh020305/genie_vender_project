@@ -1,1 +1,17 @@
 
+model Vendor {
+  id                 String                  @id @default(uuid())
+  companyName        String
+  serviceType        ServiceType
+  techStack          String
+  industryExperience String
+  note               String?
+  location           String
+  classification     VendorClassification
+  createdAt          DateTime                @default(now())
+  updatedAt          DateTime                @updatedAt
+
+  classificationHistories ClassificationHistory[]
+
+  @@map("vendors")
+}

@@ -13,12 +13,9 @@ export class ClassificationHistoryService {
   async updateClassification(
     vendorId: string,
     dto: UpdateClassificationDto,
-    changedById: string,
+    changedById: number,
   ) {
-    // [AI] this.prisma.vendor / this.prisma.classificationHistory — neither
-    // delegate exists in the generated Prisma client yet (only User/Post
-    // are generated as of the last uploaded repo state). This entire method
-    // will not run until vendors.prisma lands and `prisma generate` reruns.
+    // this.prisma.vendor / this.prisma.classificationHistory will not run until vendors.prisma lands and `prisma generate` reruns.
     const vendor = await this.prisma.vendor.findUnique({
       where: { id: vendorId },
     });
@@ -62,10 +59,8 @@ export class ClassificationHistoryService {
   }
 
   async getHistory(vendorId: string) {
-    // [AI] No 404 check if vendorId doesn't exist — returns an empty array
-    // instead. Spec doesn't specify this. Worth matching whatever behavior
-    // Cường's GET /api/vendors/{id} uses, for consistency.
-    // -> MENTION TO TEAM
+    // No 404 check if vendorId doesn't exist --> returns an empty array
+    // instead. Worth matching whatever behavior Cường's GET /api/vendors/{id} uses, for consistency.
     return this.prisma.classificationHistory.findMany({
       where: { vendorId },
       orderBy: { changedAt: 'desc' },
