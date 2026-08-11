@@ -49,7 +49,7 @@ export class ClassificationHistoryController {
   updateClassification(
     @Param('id') id: string,
     @Body() dto: UpdateClassificationDto,
-    @CurrentUser('sub') changedById: string,
+    @CurrentUser('sub') changedById: number,
   ) {
     return this.classificationHistoryService.updateClassification(
       id,

@@ -14,5 +14,5 @@ export class ClassifyVendorDto {
   // -> MENTION TO TEAM
   @ApiProperty({ format: 'uuid' })
   @IsUUID()
-  vendorId: string;
+  vendorId!: string;
 }

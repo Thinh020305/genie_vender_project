@@ -9,19 +9,19 @@ import { VendorClassification } from '../../generated/prisma/enums';
 
 export class ClassificationSuggestion {
   @ApiProperty({ enum: VendorClassification })
-  suggestedClassification: VendorClassification;
+  suggestedClassification!: VendorClassification;
 
   @ApiProperty({ enum: ['low', 'medium', 'high'] })
-  confidence: 'low' | 'medium' | 'high';
+  confidence!: 'low' | 'medium' | 'high';
 
   @ApiProperty()
-  reasoning: string;
+  reasoning!: string;
 
   @ApiProperty({ type: [String] })
-  evidenceUsed: string[];
+  evidenceUsed!: string[];
 
   // [AI] Not requested from the LLM — appended server-side after parsing.
   // See docs/llm-prompt-spec.md §7 for the distinction.
   @ApiProperty()
-  disclaimer: string;
+  disclaimer!: string;
 }

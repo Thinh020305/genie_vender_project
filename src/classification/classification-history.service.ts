@@ -61,7 +61,7 @@ export class ClassificationHistoryService {
   async getHistory(vendorId: string) {
     // No 404 check if vendorId doesn't exist --> returns an empty array
     // instead. Worth matching whatever behavior Cường's GET /api/vendors/{id} uses, for consistency.
-    return this.prisma.classificationHistory.findMany({
+    return await this.prisma.classificationHistory.findMany({
       where: { vendorId },
       orderBy: { changedAt: 'desc' },
     });

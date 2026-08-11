@@ -70,7 +70,7 @@ export class LlmController {
 
     let parsed: ClassificationSuggestion;
     try {
-      parsed = JSON.parse(rawResponse);
+      parsed = JSON.parse(rawResponse) as ClassificationSuggestion;
     } catch {
       throw new BadRequestException('LLM did not return valid JSON');
     }

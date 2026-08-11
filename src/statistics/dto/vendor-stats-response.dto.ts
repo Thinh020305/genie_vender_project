@@ -7,25 +7,25 @@
 import { ApiProperty } from '@nestjs/swagger';
 
 class ClassificationCountDto {
-  @ApiProperty() classification: string;
-  @ApiProperty() count: number;
+  @ApiProperty() classification!: string;
+  @ApiProperty() count!: number;
 }
 
 class LocationCountDto {
-  @ApiProperty() location: string;
-  @ApiProperty() count: number;
+  @ApiProperty() location!: string;
+  @ApiProperty() count!: number;
 }
 
 class ServiceTypeCountDto {
-  @ApiProperty() serviceType: string;
-  @ApiProperty() count: number;
+  @ApiProperty() serviceType!: string;
+  @ApiProperty() count!: number;
 }
 
 export class VendorStatsResponseDto {
-  @ApiProperty() total: number;
+  @ApiProperty() total!: number;
   @ApiProperty({ type: [ClassificationCountDto] })
-  byClassification: ClassificationCountDto[];
-  @ApiProperty({ type: [LocationCountDto] }) byLocation: LocationCountDto[];
+  byClassification!: ClassificationCountDto[];
+  @ApiProperty({ type: [LocationCountDto] }) byLocation!: LocationCountDto[];
   @ApiProperty({ type: [ServiceTypeCountDto] })
-  byServiceType: ServiceTypeCountDto[];
+  byServiceType!: ServiceTypeCountDto[];
 }
