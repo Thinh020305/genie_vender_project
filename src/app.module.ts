@@ -10,14 +10,12 @@ import { JwtAuthGuard } from './common/guards/jwt-auth.guard';
 import { RolesGuard } from './common/guards/roles.guard';
 import { ResponseInterceptor } from './common/interceptors/response.interceptor';
 import { LlmModule } from './llm/llm.module';
-import { StatisticsModule } from './statistics/statistics.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
     }),
-    PrismaModule,
     AuthModule,
     ClassificationModule,
     StatisticsModule,
