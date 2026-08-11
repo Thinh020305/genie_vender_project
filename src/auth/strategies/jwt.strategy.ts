@@ -18,24 +18,15 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     });
   }
 
-  async validate(
-    payload: JwtPayload,
-  ): Promise<JwtPayload> {
+  async validate(payload: JwtPayload): Promise<JwtPayload> {
     if (!payload.jti) {
-      throw new UnauthorizedException(
-        'Invalid access token',
-      );
+      throw new UnauthorizedException('Invalid access token');
     }
 
-    const isRevoked =
-      await this.revokedTokenService.isRevoked(
-        payload.jti,
-      );
+    const isRevoked = await this.revokedTokenService.isRevoked(payload.jti);
 
     if (isRevoked) {
-      throw new UnauthorizedException(
-        'Access token has been revoked',
-      );
+      throw new UnauthorizedException('Access token has been revoked');
     }
 
     return payload;

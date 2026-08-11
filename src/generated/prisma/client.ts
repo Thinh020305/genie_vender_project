@@ -29,8 +29,8 @@ export * from "./enums.js"
  * const prisma = new PrismaClient({
  *   adapter: new PrismaPg({ connectionString: process.env.DATABASE_URL })
  * })
- * // Fetch zero or more Members
- * const members = await prisma.member.findMany()
+ * // Fetch zero or more ClassificationHistories
+ * const classificationHistories = await prisma.classificationHistory.findMany()
  * ```
  * 
  * Read more in our [docs](https://pris.ly/d/client).
@@ -40,6 +40,16 @@ export type PrismaClient<LogOpts extends Prisma.LogLevel = never, OmitOpts exten
 export { Prisma }
 
 /**
+ * Model ClassificationHistory
+ * 
+ */
+export type ClassificationHistory = Prisma.ClassificationHistoryModel
+/**
+ * Model ClassificationRule
+ * 
+ */
+export type ClassificationRule = Prisma.ClassificationRuleModel
+/**
  * Model Member
  * 
  */
@@ -48,13 +58,29 @@ export type Member = Prisma.MemberModel
  * Model RevokedToken
  * 
  */
-<<<<<<< HEAD
+export type RevokedToken = Prisma.RevokedTokenModel
+/**
+ * Model User
+ * 
+ */
+export type User = Prisma.UserModel
+/**
+ * Model Post
+ * 
+ */
 export type Post = Prisma.PostModel
+/**
+ * Model VendorSource
+ * 
+ */
+export type VendorSource = Prisma.VendorSourceModel
+/**
+ * Model VendorSummary
+ * 
+ */
+export type VendorSummary = Prisma.VendorSummaryModel
 /**
  * Model Vendor
  * 
  */
 export type Vendor = Prisma.VendorModel
-=======
-export type RevokedToken = Prisma.RevokedTokenModel
->>>>>>> origin/develop

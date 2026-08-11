@@ -288,6 +288,9 @@ export type VendorWhereInput = {
   note?: Prisma.StringNullableFilter<"Vendor"> | string | null
   createdAt?: Prisma.DateTimeFilter<"Vendor"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Vendor"> | Date | string
+  classificationHistories?: Prisma.ClassificationHistoryListRelationFilter
+  sources?: Prisma.VendorSourceListRelationFilter
+  summaries?: Prisma.VendorSummaryListRelationFilter
 }
 
 export type VendorOrderByWithRelationInput = {
@@ -305,6 +308,9 @@ export type VendorOrderByWithRelationInput = {
   note?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  classificationHistories?: Prisma.ClassificationHistoryOrderByRelationAggregateInput
+  sources?: Prisma.VendorSourceOrderByRelationAggregateInput
+  summaries?: Prisma.VendorSummaryOrderByRelationAggregateInput
 }
 
 export type VendorWhereUniqueInput = Prisma.AtLeast<{
@@ -325,6 +331,9 @@ export type VendorWhereUniqueInput = Prisma.AtLeast<{
   note?: Prisma.StringNullableFilter<"Vendor"> | string | null
   createdAt?: Prisma.DateTimeFilter<"Vendor"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Vendor"> | Date | string
+  classificationHistories?: Prisma.ClassificationHistoryListRelationFilter
+  sources?: Prisma.VendorSourceListRelationFilter
+  summaries?: Prisma.VendorSummaryListRelationFilter
 }, "id" | "vendorCode">
 
 export type VendorOrderByWithAggregationInput = {
@@ -383,6 +392,9 @@ export type VendorCreateInput = {
   note?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  classificationHistories?: Prisma.ClassificationHistoryCreateNestedManyWithoutVendorInput
+  sources?: Prisma.VendorSourceCreateNestedManyWithoutVendorInput
+  summaries?: Prisma.VendorSummaryCreateNestedManyWithoutVendorInput
 }
 
 export type VendorUncheckedCreateInput = {
@@ -400,6 +412,9 @@ export type VendorUncheckedCreateInput = {
   note?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  classificationHistories?: Prisma.ClassificationHistoryUncheckedCreateNestedManyWithoutVendorInput
+  sources?: Prisma.VendorSourceUncheckedCreateNestedManyWithoutVendorInput
+  summaries?: Prisma.VendorSummaryUncheckedCreateNestedManyWithoutVendorInput
 }
 
 export type VendorUpdateInput = {
@@ -416,6 +431,9 @@ export type VendorUpdateInput = {
   note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  classificationHistories?: Prisma.ClassificationHistoryUpdateManyWithoutVendorNestedInput
+  sources?: Prisma.VendorSourceUpdateManyWithoutVendorNestedInput
+  summaries?: Prisma.VendorSummaryUpdateManyWithoutVendorNestedInput
 }
 
 export type VendorUncheckedUpdateInput = {
@@ -433,6 +451,9 @@ export type VendorUncheckedUpdateInput = {
   note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  classificationHistories?: Prisma.ClassificationHistoryUncheckedUpdateManyWithoutVendorNestedInput
+  sources?: Prisma.VendorSourceUncheckedUpdateManyWithoutVendorNestedInput
+  summaries?: Prisma.VendorSummaryUncheckedUpdateManyWithoutVendorNestedInput
 }
 
 export type VendorCreateManyInput = {
@@ -483,6 +504,11 @@ export type VendorUncheckedUpdateManyInput = {
   note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type VendorScalarRelationFilter = {
+  is?: Prisma.VendorWhereInput
+  isNot?: Prisma.VendorWhereInput
 }
 
 export type VendorCountOrderByAggregateInput = {
@@ -544,18 +570,369 @@ export type VendorSumOrderByAggregateInput = {
   id?: Prisma.SortOrder
 }
 
+export type VendorCreateNestedOneWithoutClassificationHistoriesInput = {
+  create?: Prisma.XOR<Prisma.VendorCreateWithoutClassificationHistoriesInput, Prisma.VendorUncheckedCreateWithoutClassificationHistoriesInput>
+  connectOrCreate?: Prisma.VendorCreateOrConnectWithoutClassificationHistoriesInput
+  connect?: Prisma.VendorWhereUniqueInput
+}
+
+export type VendorUpdateOneRequiredWithoutClassificationHistoriesNestedInput = {
+  create?: Prisma.XOR<Prisma.VendorCreateWithoutClassificationHistoriesInput, Prisma.VendorUncheckedCreateWithoutClassificationHistoriesInput>
+  connectOrCreate?: Prisma.VendorCreateOrConnectWithoutClassificationHistoriesInput
+  upsert?: Prisma.VendorUpsertWithoutClassificationHistoriesInput
+  connect?: Prisma.VendorWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.VendorUpdateToOneWithWhereWithoutClassificationHistoriesInput, Prisma.VendorUpdateWithoutClassificationHistoriesInput>, Prisma.VendorUncheckedUpdateWithoutClassificationHistoriesInput>
+}
+
+export type VendorCreateNestedOneWithoutSourcesInput = {
+  create?: Prisma.XOR<Prisma.VendorCreateWithoutSourcesInput, Prisma.VendorUncheckedCreateWithoutSourcesInput>
+  connectOrCreate?: Prisma.VendorCreateOrConnectWithoutSourcesInput
+  connect?: Prisma.VendorWhereUniqueInput
+}
+
+export type VendorUpdateOneRequiredWithoutSourcesNestedInput = {
+  create?: Prisma.XOR<Prisma.VendorCreateWithoutSourcesInput, Prisma.VendorUncheckedCreateWithoutSourcesInput>
+  connectOrCreate?: Prisma.VendorCreateOrConnectWithoutSourcesInput
+  upsert?: Prisma.VendorUpsertWithoutSourcesInput
+  connect?: Prisma.VendorWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.VendorUpdateToOneWithWhereWithoutSourcesInput, Prisma.VendorUpdateWithoutSourcesInput>, Prisma.VendorUncheckedUpdateWithoutSourcesInput>
+}
+
+export type VendorCreateNestedOneWithoutSummariesInput = {
+  create?: Prisma.XOR<Prisma.VendorCreateWithoutSummariesInput, Prisma.VendorUncheckedCreateWithoutSummariesInput>
+  connectOrCreate?: Prisma.VendorCreateOrConnectWithoutSummariesInput
+  connect?: Prisma.VendorWhereUniqueInput
+}
+
+export type VendorUpdateOneRequiredWithoutSummariesNestedInput = {
+  create?: Prisma.XOR<Prisma.VendorCreateWithoutSummariesInput, Prisma.VendorUncheckedCreateWithoutSummariesInput>
+  connectOrCreate?: Prisma.VendorCreateOrConnectWithoutSummariesInput
+  upsert?: Prisma.VendorUpsertWithoutSummariesInput
+  connect?: Prisma.VendorWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.VendorUpdateToOneWithWhereWithoutSummariesInput, Prisma.VendorUpdateWithoutSummariesInput>, Prisma.VendorUncheckedUpdateWithoutSummariesInput>
+}
+
 export type EnumServiceTypeFieldUpdateOperationsInput = {
   set?: $Enums.ServiceType
 }
 
-export type EnumVendorClassificationFieldUpdateOperationsInput = {
-  set?: $Enums.VendorClassification
+export type VendorCreateWithoutClassificationHistoriesInput = {
+  vendorCode: string
+  companyName: string
+  website?: string | null
+  location: string
+  serviceType: $Enums.ServiceType
+  techStack: string
+  industryExperience: string
+  languageCapability: string
+  companySize: string
+  classification: $Enums.VendorClassification
+  note?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  sources?: Prisma.VendorSourceCreateNestedManyWithoutVendorInput
+  summaries?: Prisma.VendorSummaryCreateNestedManyWithoutVendorInput
 }
 
-export type DateTimeFieldUpdateOperationsInput = {
-  set?: Date | string
+export type VendorUncheckedCreateWithoutClassificationHistoriesInput = {
+  id?: number
+  vendorCode: string
+  companyName: string
+  website?: string | null
+  location: string
+  serviceType: $Enums.ServiceType
+  techStack: string
+  industryExperience: string
+  languageCapability: string
+  companySize: string
+  classification: $Enums.VendorClassification
+  note?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  sources?: Prisma.VendorSourceUncheckedCreateNestedManyWithoutVendorInput
+  summaries?: Prisma.VendorSummaryUncheckedCreateNestedManyWithoutVendorInput
 }
 
+export type VendorCreateOrConnectWithoutClassificationHistoriesInput = {
+  where: Prisma.VendorWhereUniqueInput
+  create: Prisma.XOR<Prisma.VendorCreateWithoutClassificationHistoriesInput, Prisma.VendorUncheckedCreateWithoutClassificationHistoriesInput>
+}
+
+export type VendorUpsertWithoutClassificationHistoriesInput = {
+  update: Prisma.XOR<Prisma.VendorUpdateWithoutClassificationHistoriesInput, Prisma.VendorUncheckedUpdateWithoutClassificationHistoriesInput>
+  create: Prisma.XOR<Prisma.VendorCreateWithoutClassificationHistoriesInput, Prisma.VendorUncheckedCreateWithoutClassificationHistoriesInput>
+  where?: Prisma.VendorWhereInput
+}
+
+export type VendorUpdateToOneWithWhereWithoutClassificationHistoriesInput = {
+  where?: Prisma.VendorWhereInput
+  data: Prisma.XOR<Prisma.VendorUpdateWithoutClassificationHistoriesInput, Prisma.VendorUncheckedUpdateWithoutClassificationHistoriesInput>
+}
+
+export type VendorUpdateWithoutClassificationHistoriesInput = {
+  vendorCode?: Prisma.StringFieldUpdateOperationsInput | string
+  companyName?: Prisma.StringFieldUpdateOperationsInput | string
+  website?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  location?: Prisma.StringFieldUpdateOperationsInput | string
+  serviceType?: Prisma.EnumServiceTypeFieldUpdateOperationsInput | $Enums.ServiceType
+  techStack?: Prisma.StringFieldUpdateOperationsInput | string
+  industryExperience?: Prisma.StringFieldUpdateOperationsInput | string
+  languageCapability?: Prisma.StringFieldUpdateOperationsInput | string
+  companySize?: Prisma.StringFieldUpdateOperationsInput | string
+  classification?: Prisma.EnumVendorClassificationFieldUpdateOperationsInput | $Enums.VendorClassification
+  note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  sources?: Prisma.VendorSourceUpdateManyWithoutVendorNestedInput
+  summaries?: Prisma.VendorSummaryUpdateManyWithoutVendorNestedInput
+}
+
+export type VendorUncheckedUpdateWithoutClassificationHistoriesInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  vendorCode?: Prisma.StringFieldUpdateOperationsInput | string
+  companyName?: Prisma.StringFieldUpdateOperationsInput | string
+  website?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  location?: Prisma.StringFieldUpdateOperationsInput | string
+  serviceType?: Prisma.EnumServiceTypeFieldUpdateOperationsInput | $Enums.ServiceType
+  techStack?: Prisma.StringFieldUpdateOperationsInput | string
+  industryExperience?: Prisma.StringFieldUpdateOperationsInput | string
+  languageCapability?: Prisma.StringFieldUpdateOperationsInput | string
+  companySize?: Prisma.StringFieldUpdateOperationsInput | string
+  classification?: Prisma.EnumVendorClassificationFieldUpdateOperationsInput | $Enums.VendorClassification
+  note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  sources?: Prisma.VendorSourceUncheckedUpdateManyWithoutVendorNestedInput
+  summaries?: Prisma.VendorSummaryUncheckedUpdateManyWithoutVendorNestedInput
+}
+
+export type VendorCreateWithoutSourcesInput = {
+  vendorCode: string
+  companyName: string
+  website?: string | null
+  location: string
+  serviceType: $Enums.ServiceType
+  techStack: string
+  industryExperience: string
+  languageCapability: string
+  companySize: string
+  classification: $Enums.VendorClassification
+  note?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  classificationHistories?: Prisma.ClassificationHistoryCreateNestedManyWithoutVendorInput
+  summaries?: Prisma.VendorSummaryCreateNestedManyWithoutVendorInput
+}
+
+export type VendorUncheckedCreateWithoutSourcesInput = {
+  id?: number
+  vendorCode: string
+  companyName: string
+  website?: string | null
+  location: string
+  serviceType: $Enums.ServiceType
+  techStack: string
+  industryExperience: string
+  languageCapability: string
+  companySize: string
+  classification: $Enums.VendorClassification
+  note?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  classificationHistories?: Prisma.ClassificationHistoryUncheckedCreateNestedManyWithoutVendorInput
+  summaries?: Prisma.VendorSummaryUncheckedCreateNestedManyWithoutVendorInput
+}
+
+export type VendorCreateOrConnectWithoutSourcesInput = {
+  where: Prisma.VendorWhereUniqueInput
+  create: Prisma.XOR<Prisma.VendorCreateWithoutSourcesInput, Prisma.VendorUncheckedCreateWithoutSourcesInput>
+}
+
+export type VendorUpsertWithoutSourcesInput = {
+  update: Prisma.XOR<Prisma.VendorUpdateWithoutSourcesInput, Prisma.VendorUncheckedUpdateWithoutSourcesInput>
+  create: Prisma.XOR<Prisma.VendorCreateWithoutSourcesInput, Prisma.VendorUncheckedCreateWithoutSourcesInput>
+  where?: Prisma.VendorWhereInput
+}
+
+export type VendorUpdateToOneWithWhereWithoutSourcesInput = {
+  where?: Prisma.VendorWhereInput
+  data: Prisma.XOR<Prisma.VendorUpdateWithoutSourcesInput, Prisma.VendorUncheckedUpdateWithoutSourcesInput>
+}
+
+export type VendorUpdateWithoutSourcesInput = {
+  vendorCode?: Prisma.StringFieldUpdateOperationsInput | string
+  companyName?: Prisma.StringFieldUpdateOperationsInput | string
+  website?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  location?: Prisma.StringFieldUpdateOperationsInput | string
+  serviceType?: Prisma.EnumServiceTypeFieldUpdateOperationsInput | $Enums.ServiceType
+  techStack?: Prisma.StringFieldUpdateOperationsInput | string
+  industryExperience?: Prisma.StringFieldUpdateOperationsInput | string
+  languageCapability?: Prisma.StringFieldUpdateOperationsInput | string
+  companySize?: Prisma.StringFieldUpdateOperationsInput | string
+  classification?: Prisma.EnumVendorClassificationFieldUpdateOperationsInput | $Enums.VendorClassification
+  note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  classificationHistories?: Prisma.ClassificationHistoryUpdateManyWithoutVendorNestedInput
+  summaries?: Prisma.VendorSummaryUpdateManyWithoutVendorNestedInput
+}
+
+export type VendorUncheckedUpdateWithoutSourcesInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  vendorCode?: Prisma.StringFieldUpdateOperationsInput | string
+  companyName?: Prisma.StringFieldUpdateOperationsInput | string
+  website?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  location?: Prisma.StringFieldUpdateOperationsInput | string
+  serviceType?: Prisma.EnumServiceTypeFieldUpdateOperationsInput | $Enums.ServiceType
+  techStack?: Prisma.StringFieldUpdateOperationsInput | string
+  industryExperience?: Prisma.StringFieldUpdateOperationsInput | string
+  languageCapability?: Prisma.StringFieldUpdateOperationsInput | string
+  companySize?: Prisma.StringFieldUpdateOperationsInput | string
+  classification?: Prisma.EnumVendorClassificationFieldUpdateOperationsInput | $Enums.VendorClassification
+  note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  classificationHistories?: Prisma.ClassificationHistoryUncheckedUpdateManyWithoutVendorNestedInput
+  summaries?: Prisma.VendorSummaryUncheckedUpdateManyWithoutVendorNestedInput
+}
+
+export type VendorCreateWithoutSummariesInput = {
+  vendorCode: string
+  companyName: string
+  website?: string | null
+  location: string
+  serviceType: $Enums.ServiceType
+  techStack: string
+  industryExperience: string
+  languageCapability: string
+  companySize: string
+  classification: $Enums.VendorClassification
+  note?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  classificationHistories?: Prisma.ClassificationHistoryCreateNestedManyWithoutVendorInput
+  sources?: Prisma.VendorSourceCreateNestedManyWithoutVendorInput
+}
+
+export type VendorUncheckedCreateWithoutSummariesInput = {
+  id?: number
+  vendorCode: string
+  companyName: string
+  website?: string | null
+  location: string
+  serviceType: $Enums.ServiceType
+  techStack: string
+  industryExperience: string
+  languageCapability: string
+  companySize: string
+  classification: $Enums.VendorClassification
+  note?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  classificationHistories?: Prisma.ClassificationHistoryUncheckedCreateNestedManyWithoutVendorInput
+  sources?: Prisma.VendorSourceUncheckedCreateNestedManyWithoutVendorInput
+}
+
+export type VendorCreateOrConnectWithoutSummariesInput = {
+  where: Prisma.VendorWhereUniqueInput
+  create: Prisma.XOR<Prisma.VendorCreateWithoutSummariesInput, Prisma.VendorUncheckedCreateWithoutSummariesInput>
+}
+
+export type VendorUpsertWithoutSummariesInput = {
+  update: Prisma.XOR<Prisma.VendorUpdateWithoutSummariesInput, Prisma.VendorUncheckedUpdateWithoutSummariesInput>
+  create: Prisma.XOR<Prisma.VendorCreateWithoutSummariesInput, Prisma.VendorUncheckedCreateWithoutSummariesInput>
+  where?: Prisma.VendorWhereInput
+}
+
+export type VendorUpdateToOneWithWhereWithoutSummariesInput = {
+  where?: Prisma.VendorWhereInput
+  data: Prisma.XOR<Prisma.VendorUpdateWithoutSummariesInput, Prisma.VendorUncheckedUpdateWithoutSummariesInput>
+}
+
+export type VendorUpdateWithoutSummariesInput = {
+  vendorCode?: Prisma.StringFieldUpdateOperationsInput | string
+  companyName?: Prisma.StringFieldUpdateOperationsInput | string
+  website?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  location?: Prisma.StringFieldUpdateOperationsInput | string
+  serviceType?: Prisma.EnumServiceTypeFieldUpdateOperationsInput | $Enums.ServiceType
+  techStack?: Prisma.StringFieldUpdateOperationsInput | string
+  industryExperience?: Prisma.StringFieldUpdateOperationsInput | string
+  languageCapability?: Prisma.StringFieldUpdateOperationsInput | string
+  companySize?: Prisma.StringFieldUpdateOperationsInput | string
+  classification?: Prisma.EnumVendorClassificationFieldUpdateOperationsInput | $Enums.VendorClassification
+  note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  classificationHistories?: Prisma.ClassificationHistoryUpdateManyWithoutVendorNestedInput
+  sources?: Prisma.VendorSourceUpdateManyWithoutVendorNestedInput
+}
+
+export type VendorUncheckedUpdateWithoutSummariesInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  vendorCode?: Prisma.StringFieldUpdateOperationsInput | string
+  companyName?: Prisma.StringFieldUpdateOperationsInput | string
+  website?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  location?: Prisma.StringFieldUpdateOperationsInput | string
+  serviceType?: Prisma.EnumServiceTypeFieldUpdateOperationsInput | $Enums.ServiceType
+  techStack?: Prisma.StringFieldUpdateOperationsInput | string
+  industryExperience?: Prisma.StringFieldUpdateOperationsInput | string
+  languageCapability?: Prisma.StringFieldUpdateOperationsInput | string
+  companySize?: Prisma.StringFieldUpdateOperationsInput | string
+  classification?: Prisma.EnumVendorClassificationFieldUpdateOperationsInput | $Enums.VendorClassification
+  note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  classificationHistories?: Prisma.ClassificationHistoryUncheckedUpdateManyWithoutVendorNestedInput
+  sources?: Prisma.VendorSourceUncheckedUpdateManyWithoutVendorNestedInput
+}
+
+
+/**
+ * Count Type VendorCountOutputType
+ */
+
+export type VendorCountOutputType = {
+  classificationHistories: number
+  sources: number
+  summaries: number
+}
+
+export type VendorCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  classificationHistories?: boolean | VendorCountOutputTypeCountClassificationHistoriesArgs
+  sources?: boolean | VendorCountOutputTypeCountSourcesArgs
+  summaries?: boolean | VendorCountOutputTypeCountSummariesArgs
+}
+
+/**
+ * VendorCountOutputType without action
+ */
+export type VendorCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the VendorCountOutputType
+   */
+  select?: Prisma.VendorCountOutputTypeSelect<ExtArgs> | null
+}
+
+/**
+ * VendorCountOutputType without action
+ */
+export type VendorCountOutputTypeCountClassificationHistoriesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.ClassificationHistoryWhereInput
+}
+
+/**
+ * VendorCountOutputType without action
+ */
+export type VendorCountOutputTypeCountSourcesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.VendorSourceWhereInput
+}
+
+/**
+ * VendorCountOutputType without action
+ */
+export type VendorCountOutputTypeCountSummariesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.VendorSummaryWhereInput
+}
 
 
 export type VendorSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -573,6 +950,10 @@ export type VendorSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   note?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  classificationHistories?: boolean | Prisma.Vendor$classificationHistoriesArgs<ExtArgs>
+  sources?: boolean | Prisma.Vendor$sourcesArgs<ExtArgs>
+  summaries?: boolean | Prisma.Vendor$summariesArgs<ExtArgs>
+  _count?: boolean | Prisma.VendorCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["vendor"]>
 
 export type VendorSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -627,10 +1008,22 @@ export type VendorSelectScalar = {
 }
 
 export type VendorOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "vendorCode" | "companyName" | "website" | "location" | "serviceType" | "techStack" | "industryExperience" | "languageCapability" | "companySize" | "classification" | "note" | "createdAt" | "updatedAt", ExtArgs["result"]["vendor"]>
+export type VendorInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  classificationHistories?: boolean | Prisma.Vendor$classificationHistoriesArgs<ExtArgs>
+  sources?: boolean | Prisma.Vendor$sourcesArgs<ExtArgs>
+  summaries?: boolean | Prisma.Vendor$summariesArgs<ExtArgs>
+  _count?: boolean | Prisma.VendorCountOutputTypeDefaultArgs<ExtArgs>
+}
+export type VendorIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
+export type VendorIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
 
 export type $VendorPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "Vendor"
-  objects: {}
+  objects: {
+    classificationHistories: Prisma.$ClassificationHistoryPayload<ExtArgs>[]
+    sources: Prisma.$VendorSourcePayload<ExtArgs>[]
+    summaries: Prisma.$VendorSummaryPayload<ExtArgs>[]
+  }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: number
     vendorCode: string
@@ -1040,6 +1433,9 @@ readonly fields: VendorFieldRefs;
  */
 export interface Prisma__VendorClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
+  classificationHistories<T extends Prisma.Vendor$classificationHistoriesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Vendor$classificationHistoriesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ClassificationHistoryPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  sources<T extends Prisma.Vendor$sourcesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Vendor$sourcesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$VendorSourcePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  summaries<T extends Prisma.Vendor$summariesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Vendor$summariesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$VendorSummaryPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1100,6 +1496,10 @@ export type VendorFindUniqueArgs<ExtArgs extends runtime.Types.Extensions.Intern
    */
   omit?: Prisma.VendorOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.VendorInclude<ExtArgs> | null
+  /**
    * Filter, which Vendor to fetch.
    */
   where: Prisma.VendorWhereUniqueInput
@@ -1118,6 +1518,10 @@ export type VendorFindUniqueOrThrowArgs<ExtArgs extends runtime.Types.Extensions
    */
   omit?: Prisma.VendorOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.VendorInclude<ExtArgs> | null
+  /**
    * Filter, which Vendor to fetch.
    */
   where: Prisma.VendorWhereUniqueInput
@@ -1135,6 +1539,10 @@ export type VendorFindFirstArgs<ExtArgs extends runtime.Types.Extensions.Interna
    * Omit specific fields from the Vendor
    */
   omit?: Prisma.VendorOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.VendorInclude<ExtArgs> | null
   /**
    * Filter, which Vendor to fetch.
    */
@@ -1184,6 +1592,10 @@ export type VendorFindFirstOrThrowArgs<ExtArgs extends runtime.Types.Extensions.
    */
   omit?: Prisma.VendorOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.VendorInclude<ExtArgs> | null
+  /**
    * Filter, which Vendor to fetch.
    */
   where?: Prisma.VendorWhereInput
@@ -1231,6 +1643,10 @@ export type VendorFindManyArgs<ExtArgs extends runtime.Types.Extensions.Internal
    * Omit specific fields from the Vendor
    */
   omit?: Prisma.VendorOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.VendorInclude<ExtArgs> | null
   /**
    * Filter, which Vendors to fetch.
    */
@@ -1280,6 +1696,10 @@ export type VendorCreateArgs<ExtArgs extends runtime.Types.Extensions.InternalAr
    */
   omit?: Prisma.VendorOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.VendorInclude<ExtArgs> | null
+  /**
    * The data needed to create a Vendor.
    */
   data: Prisma.XOR<Prisma.VendorCreateInput, Prisma.VendorUncheckedCreateInput>
@@ -1327,6 +1747,10 @@ export type VendorUpdateArgs<ExtArgs extends runtime.Types.Extensions.InternalAr
    * Omit specific fields from the Vendor
    */
   omit?: Prisma.VendorOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.VendorInclude<ExtArgs> | null
   /**
    * The data needed to update a Vendor.
    */
@@ -1394,6 +1818,10 @@ export type VendorUpsertArgs<ExtArgs extends runtime.Types.Extensions.InternalAr
    */
   omit?: Prisma.VendorOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.VendorInclude<ExtArgs> | null
+  /**
    * The filter to search for the Vendor to update in case it exists.
    */
   where: Prisma.VendorWhereUniqueInput
@@ -1420,6 +1848,10 @@ export type VendorDeleteArgs<ExtArgs extends runtime.Types.Extensions.InternalAr
    */
   omit?: Prisma.VendorOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.VendorInclude<ExtArgs> | null
+  /**
    * Filter which Vendor to delete.
    */
   where: Prisma.VendorWhereUniqueInput
@@ -1440,6 +1872,78 @@ export type VendorDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.Intern
 }
 
 /**
+ * Vendor.classificationHistories
+ */
+export type Vendor$classificationHistoriesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the ClassificationHistory
+   */
+  select?: Prisma.ClassificationHistorySelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the ClassificationHistory
+   */
+  omit?: Prisma.ClassificationHistoryOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ClassificationHistoryInclude<ExtArgs> | null
+  where?: Prisma.ClassificationHistoryWhereInput
+  orderBy?: Prisma.ClassificationHistoryOrderByWithRelationInput | Prisma.ClassificationHistoryOrderByWithRelationInput[]
+  cursor?: Prisma.ClassificationHistoryWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.ClassificationHistoryScalarFieldEnum | Prisma.ClassificationHistoryScalarFieldEnum[]
+}
+
+/**
+ * Vendor.sources
+ */
+export type Vendor$sourcesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the VendorSource
+   */
+  select?: Prisma.VendorSourceSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the VendorSource
+   */
+  omit?: Prisma.VendorSourceOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.VendorSourceInclude<ExtArgs> | null
+  where?: Prisma.VendorSourceWhereInput
+  orderBy?: Prisma.VendorSourceOrderByWithRelationInput | Prisma.VendorSourceOrderByWithRelationInput[]
+  cursor?: Prisma.VendorSourceWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.VendorSourceScalarFieldEnum | Prisma.VendorSourceScalarFieldEnum[]
+}
+
+/**
+ * Vendor.summaries
+ */
+export type Vendor$summariesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the VendorSummary
+   */
+  select?: Prisma.VendorSummarySelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the VendorSummary
+   */
+  omit?: Prisma.VendorSummaryOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.VendorSummaryInclude<ExtArgs> | null
+  where?: Prisma.VendorSummaryWhereInput
+  orderBy?: Prisma.VendorSummaryOrderByWithRelationInput | Prisma.VendorSummaryOrderByWithRelationInput[]
+  cursor?: Prisma.VendorSummaryWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.VendorSummaryScalarFieldEnum | Prisma.VendorSummaryScalarFieldEnum[]
+}
+
+/**
  * Vendor without action
  */
 export type VendorDefaultArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1451,4 +1955,8 @@ export type VendorDefaultArgs<ExtArgs extends runtime.Types.Extensions.InternalA
    * Omit specific fields from the Vendor
    */
   omit?: Prisma.VendorOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.VendorInclude<ExtArgs> | null
 }

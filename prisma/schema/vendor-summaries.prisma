@@ -1,1 +1,22 @@
+// Bảng chỉ ghi thêm: không có updatedAt, service không expose route sửa.
+model VendorSummary {
+  id Int @id @default(autoincrement())
 
+  vendorId Int
+  vendor   Vendor @relation(fields: [vendorId], references: [id], onDelete: Cascade)
+
+  summaryType SummaryType
+
+  content String? @db.Text
+
+  createdById Int
+  createdBy   Member @relation(fields: [createdById], references: [id], onDelete: Restrict)
+
+  createdAt DateTime @default(now())
+
+  @@index([vendorId])
+  @@index([vendorId, summaryType])
+  @@index([createdById])
+  @@index([createdAt])
+  @@map("vendor_summaries")
+}

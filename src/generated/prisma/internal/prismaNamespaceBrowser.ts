@@ -51,14 +51,15 @@ export const AnyNull = runtime.AnyNull
 
 
 export const ModelName = {
-<<<<<<< HEAD
+  ClassificationHistory: 'ClassificationHistory',
+  ClassificationRule: 'ClassificationRule',
+  Member: 'Member',
+  RevokedToken: 'RevokedToken',
   User: 'User',
   Post: 'Post',
+  VendorSource: 'VendorSource',
+  VendorSummary: 'VendorSummary',
   Vendor: 'Vendor'
-=======
-  Member: 'Member',
-  RevokedToken: 'RevokedToken'
->>>>>>> origin/develop
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -75,6 +76,34 @@ export const TransactionIsolationLevel = runtime.makeStrictEnum({
 } as const)
 
 export type TransactionIsolationLevel = (typeof TransactionIsolationLevel)[keyof typeof TransactionIsolationLevel]
+
+
+export const ClassificationHistoryScalarFieldEnum = {
+  id: 'id',
+  vendorId: 'vendorId',
+  changedById: 'changedById',
+  previousClassification: 'previousClassification',
+  newClassification: 'newClassification',
+  changedAt: 'changedAt',
+  reason: 'reason'
+} as const
+
+export type ClassificationHistoryScalarFieldEnum = (typeof ClassificationHistoryScalarFieldEnum)[keyof typeof ClassificationHistoryScalarFieldEnum]
+
+
+export const ClassificationRuleScalarFieldEnum = {
+  id: 'id',
+  classificationName: 'classificationName',
+  description: 'description',
+  judgmentCriteria: 'judgmentCriteria',
+  keywords: 'keywords',
+  priority: 'priority',
+  weight: 'weight',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type ClassificationRuleScalarFieldEnum = (typeof ClassificationRuleScalarFieldEnum)[keyof typeof ClassificationRuleScalarFieldEnum]
 
 
 export const MemberScalarFieldEnum = {
@@ -96,6 +125,52 @@ export const RevokedTokenScalarFieldEnum = {
 } as const
 
 export type RevokedTokenScalarFieldEnum = (typeof RevokedTokenScalarFieldEnum)[keyof typeof RevokedTokenScalarFieldEnum]
+
+
+export const UserScalarFieldEnum = {
+  id: 'id',
+  email: 'email',
+  name: 'name',
+  role: 'role'
+} as const
+
+export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum]
+
+
+export const PostScalarFieldEnum = {
+  id: 'id',
+  title: 'title',
+  content: 'content',
+  published: 'published',
+  authorId: 'authorId'
+} as const
+
+export type PostScalarFieldEnum = (typeof PostScalarFieldEnum)[keyof typeof PostScalarFieldEnum]
+
+
+export const VendorSourceScalarFieldEnum = {
+  id: 'id',
+  vendorId: 'vendorId',
+  sourceType: 'sourceType',
+  sourceUrl: 'sourceUrl',
+  sourceTitle: 'sourceTitle',
+  checkedAt: 'checkedAt',
+  memo: 'memo'
+} as const
+
+export type VendorSourceScalarFieldEnum = (typeof VendorSourceScalarFieldEnum)[keyof typeof VendorSourceScalarFieldEnum]
+
+
+export const VendorSummaryScalarFieldEnum = {
+  id: 'id',
+  vendorId: 'vendorId',
+  summaryType: 'summaryType',
+  content: 'content',
+  createdById: 'createdById',
+  createdAt: 'createdAt'
+} as const
+
+export type VendorSummaryScalarFieldEnum = (typeof VendorSummaryScalarFieldEnum)[keyof typeof VendorSummaryScalarFieldEnum]
 
 
 export const VendorScalarFieldEnum = {
@@ -132,4 +207,12 @@ export const QueryMode = {
 } as const
 
 export type QueryMode = (typeof QueryMode)[keyof typeof QueryMode]
+
+
+export const NullsOrder = {
+  first: 'first',
+  last: 'last'
+} as const
+
+export type NullsOrder = (typeof NullsOrder)[keyof typeof NullsOrder]
 

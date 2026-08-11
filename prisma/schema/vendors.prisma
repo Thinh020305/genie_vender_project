@@ -15,10 +15,10 @@ model Vendor {
   createdAt          DateTime             @default(now())
   updatedAt          DateTime             @updatedAt
 
-  // Mối quan hệ (tạm comment chờ My và Sơn push schema để tránh lỗi P1012)
-  // sources                 VendorSource[]
-  // classificationHistories ClassificationHistory[]
-  // summaries               VendorSummary[]
+  classificationHistories ClassificationHistory[]
+
+  sources                 VendorSource[]
+  summaries               VendorSummary[]
 
   @@map("vendors")
 }
