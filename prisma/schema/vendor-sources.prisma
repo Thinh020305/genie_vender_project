@@ -1,59 +1,20 @@
-// Source: docs/erd.md, table vendor_sources
-// Spec text (verbatim): "id, vendorId -> vendors, sourceType, sourceUrl,
-// sourceTitle, checkedAt, memo"
-
 model VendorSource {
-  // [AI] Int, NOT the `bigint` docs/erd.md asks for. The ERD was a draft; the
-  // team has since implemented and MIGRATED Int on both sides of every FK this
-  // table touches:
-  //     Vendor.id  Int  (feature/doduccuong, migration create_vendor_table, SERIAL)
-  //     Member.id  Int  (feature/{Thinh},   migration remove_user_post,     SERIAL)
-  // Prisma requires an FK column to match the referenced column exactly, so
-  // BigInt here fails validation with "The type of the field `vendorId` ... is
-  // not matching the type of the referenced field `id` in model `Vendor`".
-  // -> docs/erd.md still says bigint and needs updating to match the migrations.
-  // -> classification-history.prisma still uses String @default(uuid()) and has
-  //    the same clash to resolve (Sơn's file).
   id Int @id @default(autoincrement())
 
-  // [AI] Must match Vendor.id exactly. vendors.prisma is still EMPTY, so
-  // `prisma validate` / `prisma generate` will fail on the relation below
-  // until Cường writes it. Vendor also needs the back-relation field:
-  //     sources VendorSource[]
   vendorId Int
-
-  // [AI] onDelete: Cascade (not Restrict like classification_histories).
-  // Reasoning: a source row is subordinate evidence describing a vendor —
-  // it has no audit/legal value once the vendor is gone, unlike a
-  // classification history row. Not spec text; the ERD only draws the Ref.
-  // -> MENTION TO TEAM if vendors are meant to be soft-deleted instead,
-  //    in which case this should be Restrict and a deletedAt filter used.
-  vendor Vendor @relation(fields: [vendorId], references: [id], onDelete: Cascade)
-
-  // [AI] The ERD notes the allowed values inline
-  // ("PUBLIC_WEBSITE / DIRECTORY / LINKEDIN / ARTICLE / DEMO_DATA") and the
-  // SourceType enum in enums.prisma already matches them 1:1, so this is
-  // typed as the enum rather than the ERD's literal `varchar`.
+  vendor   Vendor @relation(fields: [vendorId], references: [id], onDelete: Cascade)
+  
   sourceType SourceType
 
-  // [AI] Nullable per the ERD (no [not null] marker). Necessary in practice:
-  // a DEMO_DATA source has no URL. Length caps below are invented — the ERD
-  // gives no lengths.
+  // Mỗi dòng phải có sourceUrl hoặc ghi chú demo trong memo.
+  // Kiểm ở VendorSourcesService.assertSourceEvidence().
   sourceUrl   String? @db.VarChar(2048)
   sourceTitle String? @db.VarChar(500)
 
-  // [AI] Nullable per ERD: a source that has never been re-verified has no
-  // checkedAt. NOT defaulted to now() — "never checked" and "checked at
-  // creation time" are different facts.
+  // Null = chưa đối chiếu lại lần nào.
   checkedAt DateTime?
 
   memo String? @db.VarChar(1000)
-
-  // [AI] The ERD gives vendor_sources NO createdAt/updatedAt columns, unlike
-  // vendors / classification_rules / vendor_summaries. Left absent to stay
-  // faithful to the ERD.
-  // -> MENTION TO TEAM: likely an ERD oversight rather than a decision. If
-  //    audit timestamps are wanted here, add them to docs/erd.md first.
 
   @@index([vendorId])
   @@index([sourceType])

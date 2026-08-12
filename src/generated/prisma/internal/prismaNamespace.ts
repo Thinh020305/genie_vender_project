@@ -16,10 +16,10 @@
  */
 
 import * as runtime from "@prisma/client/runtime/client"
-import type * as Prisma from "../models.js"
-import { type PrismaClient } from "./class.js"
+import type * as Prisma from "../models.ts"
+import { type PrismaClient } from "./class.ts"
 
-export type * from '../models.js'
+export type * from '../models.ts'
 
 export type DMMF = typeof runtime.DMMF
 
@@ -401,6 +401,8 @@ export const ModelName = {
   ClassificationRule: 'ClassificationRule',
   Member: 'Member',
   RevokedToken: 'RevokedToken',
+  VendorSource: 'VendorSource',
+  VendorSummary: 'VendorSummary',
   Vendor: 'Vendor'
 } as const
 
@@ -417,7 +419,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "classificationHistory" | "classificationRule" | "member" | "revokedToken" | "vendor"
+    modelProps: "classificationHistory" | "classificationRule" | "member" | "revokedToken" | "vendorSource" | "vendorSummary" | "vendor"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -717,6 +719,154 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    VendorSource: {
+      payload: Prisma.$VendorSourcePayload<ExtArgs>
+      fields: Prisma.VendorSourceFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.VendorSourceFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VendorSourcePayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.VendorSourceFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VendorSourcePayload>
+        }
+        findFirst: {
+          args: Prisma.VendorSourceFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VendorSourcePayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.VendorSourceFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VendorSourcePayload>
+        }
+        findMany: {
+          args: Prisma.VendorSourceFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VendorSourcePayload>[]
+        }
+        create: {
+          args: Prisma.VendorSourceCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VendorSourcePayload>
+        }
+        createMany: {
+          args: Prisma.VendorSourceCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.VendorSourceCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VendorSourcePayload>[]
+        }
+        delete: {
+          args: Prisma.VendorSourceDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VendorSourcePayload>
+        }
+        update: {
+          args: Prisma.VendorSourceUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VendorSourcePayload>
+        }
+        deleteMany: {
+          args: Prisma.VendorSourceDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.VendorSourceUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.VendorSourceUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VendorSourcePayload>[]
+        }
+        upsert: {
+          args: Prisma.VendorSourceUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VendorSourcePayload>
+        }
+        aggregate: {
+          args: Prisma.VendorSourceAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateVendorSource>
+        }
+        groupBy: {
+          args: Prisma.VendorSourceGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.VendorSourceGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.VendorSourceCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.VendorSourceCountAggregateOutputType> | number
+        }
+      }
+    }
+    VendorSummary: {
+      payload: Prisma.$VendorSummaryPayload<ExtArgs>
+      fields: Prisma.VendorSummaryFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.VendorSummaryFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VendorSummaryPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.VendorSummaryFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VendorSummaryPayload>
+        }
+        findFirst: {
+          args: Prisma.VendorSummaryFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VendorSummaryPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.VendorSummaryFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VendorSummaryPayload>
+        }
+        findMany: {
+          args: Prisma.VendorSummaryFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VendorSummaryPayload>[]
+        }
+        create: {
+          args: Prisma.VendorSummaryCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VendorSummaryPayload>
+        }
+        createMany: {
+          args: Prisma.VendorSummaryCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.VendorSummaryCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VendorSummaryPayload>[]
+        }
+        delete: {
+          args: Prisma.VendorSummaryDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VendorSummaryPayload>
+        }
+        update: {
+          args: Prisma.VendorSummaryUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VendorSummaryPayload>
+        }
+        deleteMany: {
+          args: Prisma.VendorSummaryDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.VendorSummaryUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.VendorSummaryUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VendorSummaryPayload>[]
+        }
+        upsert: {
+          args: Prisma.VendorSummaryUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VendorSummaryPayload>
+        }
+        aggregate: {
+          args: Prisma.VendorSummaryAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateVendorSummary>
+        }
+        groupBy: {
+          args: Prisma.VendorSummaryGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.VendorSummaryGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.VendorSummaryCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.VendorSummaryCountAggregateOutputType> | number
+        }
+      }
+    }
     Vendor: {
       payload: Prisma.$VendorPayload<ExtArgs>
       fields: Prisma.VendorFieldRefs
@@ -845,12 +995,12 @@ export type ClassificationHistoryScalarFieldEnum = (typeof ClassificationHistory
 
 export const ClassificationRuleScalarFieldEnum = {
   id: 'id',
-  keyword: 'keyword',
-  targetClassification: 'targetClassification',
+  classificationName: 'classificationName',
+  description: 'description',
+  judgmentCriteria: 'judgmentCriteria',
+  keywords: 'keywords',
   priority: 'priority',
   weight: 'weight',
-  isActive: 'isActive',
-  deletedAt: 'deletedAt',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
@@ -879,15 +1029,44 @@ export const RevokedTokenScalarFieldEnum = {
 export type RevokedTokenScalarFieldEnum = (typeof RevokedTokenScalarFieldEnum)[keyof typeof RevokedTokenScalarFieldEnum]
 
 
+export const VendorSourceScalarFieldEnum = {
+  id: 'id',
+  vendorId: 'vendorId',
+  sourceType: 'sourceType',
+  sourceUrl: 'sourceUrl',
+  sourceTitle: 'sourceTitle',
+  checkedAt: 'checkedAt',
+  memo: 'memo'
+} as const
+
+export type VendorSourceScalarFieldEnum = (typeof VendorSourceScalarFieldEnum)[keyof typeof VendorSourceScalarFieldEnum]
+
+
+export const VendorSummaryScalarFieldEnum = {
+  id: 'id',
+  vendorId: 'vendorId',
+  summaryType: 'summaryType',
+  content: 'content',
+  createdById: 'createdById',
+  createdAt: 'createdAt'
+} as const
+
+export type VendorSummaryScalarFieldEnum = (typeof VendorSummaryScalarFieldEnum)[keyof typeof VendorSummaryScalarFieldEnum]
+
+
 export const VendorScalarFieldEnum = {
   id: 'id',
+  vendorCode: 'vendorCode',
   companyName: 'companyName',
+  website: 'website',
+  location: 'location',
   serviceType: 'serviceType',
   techStack: 'techStack',
   industryExperience: 'industryExperience',
-  note: 'note',
-  location: 'location',
+  languageCapability: 'languageCapability',
+  companySize: 'companySize',
   classification: 'classification',
+  note: 'note',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
@@ -982,13 +1161,6 @@ export type ListDateTimeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaM
 
 
 /**
- * Reference to a field of type 'Boolean'
- */
-export type BooleanFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Boolean'>
-    
-
-
-/**
  * Reference to a field of type 'Role'
  */
 export type EnumRoleFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Role'>
@@ -999,6 +1171,34 @@ export type EnumRoleFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel
  * Reference to a field of type 'Role[]'
  */
 export type ListEnumRoleFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Role[]'>
+    
+
+
+/**
+ * Reference to a field of type 'SourceType'
+ */
+export type EnumSourceTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'SourceType'>
+    
+
+
+/**
+ * Reference to a field of type 'SourceType[]'
+ */
+export type ListEnumSourceTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'SourceType[]'>
+    
+
+
+/**
+ * Reference to a field of type 'SummaryType'
+ */
+export type EnumSummaryTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'SummaryType'>
+    
+
+
+/**
+ * Reference to a field of type 'SummaryType[]'
+ */
+export type ListEnumSummaryTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'SummaryType[]'>
     
 
 
@@ -1184,6 +1384,8 @@ export type GlobalOmitConfig = {
   classificationRule?: Prisma.ClassificationRuleOmit
   member?: Prisma.MemberOmit
   revokedToken?: Prisma.RevokedTokenOmit
+  vendorSource?: Prisma.VendorSourceOmit
+  vendorSummary?: Prisma.VendorSummaryOmit
   vendor?: Prisma.VendorOmit
 }
 

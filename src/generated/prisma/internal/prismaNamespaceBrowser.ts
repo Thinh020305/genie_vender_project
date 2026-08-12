@@ -17,8 +17,8 @@
 
 import * as runtime from "@prisma/client/runtime/index-browser"
 
-export type * from '../models.js'
-export type * from './prismaNamespace.js'
+export type * from '../models.ts'
+export type * from './prismaNamespace.ts'
 
 export const Decimal = runtime.Decimal
 
@@ -55,6 +55,8 @@ export const ModelName = {
   ClassificationRule: 'ClassificationRule',
   Member: 'Member',
   RevokedToken: 'RevokedToken',
+  VendorSource: 'VendorSource',
+  VendorSummary: 'VendorSummary',
   Vendor: 'Vendor'
 } as const
 
@@ -89,12 +91,12 @@ export type ClassificationHistoryScalarFieldEnum = (typeof ClassificationHistory
 
 export const ClassificationRuleScalarFieldEnum = {
   id: 'id',
-  keyword: 'keyword',
-  targetClassification: 'targetClassification',
+  classificationName: 'classificationName',
+  description: 'description',
+  judgmentCriteria: 'judgmentCriteria',
+  keywords: 'keywords',
   priority: 'priority',
   weight: 'weight',
-  isActive: 'isActive',
-  deletedAt: 'deletedAt',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
@@ -123,15 +125,44 @@ export const RevokedTokenScalarFieldEnum = {
 export type RevokedTokenScalarFieldEnum = (typeof RevokedTokenScalarFieldEnum)[keyof typeof RevokedTokenScalarFieldEnum]
 
 
+export const VendorSourceScalarFieldEnum = {
+  id: 'id',
+  vendorId: 'vendorId',
+  sourceType: 'sourceType',
+  sourceUrl: 'sourceUrl',
+  sourceTitle: 'sourceTitle',
+  checkedAt: 'checkedAt',
+  memo: 'memo'
+} as const
+
+export type VendorSourceScalarFieldEnum = (typeof VendorSourceScalarFieldEnum)[keyof typeof VendorSourceScalarFieldEnum]
+
+
+export const VendorSummaryScalarFieldEnum = {
+  id: 'id',
+  vendorId: 'vendorId',
+  summaryType: 'summaryType',
+  content: 'content',
+  createdById: 'createdById',
+  createdAt: 'createdAt'
+} as const
+
+export type VendorSummaryScalarFieldEnum = (typeof VendorSummaryScalarFieldEnum)[keyof typeof VendorSummaryScalarFieldEnum]
+
+
 export const VendorScalarFieldEnum = {
   id: 'id',
+  vendorCode: 'vendorCode',
   companyName: 'companyName',
+  website: 'website',
+  location: 'location',
   serviceType: 'serviceType',
   techStack: 'techStack',
   industryExperience: 'industryExperience',
-  note: 'note',
-  location: 'location',
+  languageCapability: 'languageCapability',
+  companySize: 'companySize',
   classification: 'classification',
+  note: 'note',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
