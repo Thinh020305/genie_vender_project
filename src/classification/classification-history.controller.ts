@@ -47,9 +47,9 @@ export class ClassificationHistoryController {
   @ApiResponse({ status: 403, description: 'REVIEWER role forbidden' })
   @ApiResponse({ status: 404, description: 'Vendor not found' })
   updateClassification(
-    @Param('id') id: string,
+    @Param('id') id: number,
     @Body() dto: UpdateClassificationDto,
-    @CurrentUser('sub') changedById: string,
+    @CurrentUser('sub') changedById: number,
   ) {
     return this.classificationHistoryService.updateClassification(
       id,
@@ -68,7 +68,7 @@ export class ClassificationHistoryController {
     status: 200,
     description: 'History rows, ordered by changedAt descending',
   })
-  getHistory(@Param('id') id: string) {
+  getHistory(@Param('id') id: number) {
     return this.classificationHistoryService.getHistory(id);
   }
 }

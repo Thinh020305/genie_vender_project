@@ -6,8 +6,9 @@ model Member {
   role         Role
   createdAt    DateTime @default(now())
 
+  vendorSummariesCreated VendorSummary[]
   classificationHistories ClassificationHistory[]
-
+  
   @@map("members")
 }
 

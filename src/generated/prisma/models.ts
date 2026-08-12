@@ -8,9 +8,11 @@
  *
  * 🟢 You can import this file directly.
  */
-export type * from './models/ClassificationHistory.js'
-export type * from './models/ClassificationRule.js'
-export type * from './models/Member.js'
-export type * from './models/RevokedToken.js'
-export type * from './models/Vendor.js'
-export type * from './commonInputTypes.js'
+export type * from './models/ClassificationHistory.ts'
+export type * from './models/ClassificationRule.ts'
+export type * from './models/Member.ts'
+export type * from './models/RevokedToken.ts'
+export type * from './models/VendorSource.ts'
+export type * from './models/VendorSummary.ts'
+export type * from './models/Vendor.ts'
+export type * from './commonInputTypes.ts'

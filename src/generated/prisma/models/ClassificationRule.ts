@@ -9,8 +9,8 @@
  * 🟢 You can import this file directly.
  */
 import type * as runtime from "@prisma/client/runtime/client"
-import type * as $Enums from "../enums.js"
-import type * as Prisma from "../internal/prismaNamespace.js"
+import type * as $Enums from "../enums.ts"
+import type * as Prisma from "../internal/prismaNamespace.ts"
 
 /**
  * Model ClassificationRule
@@ -40,36 +40,34 @@ export type ClassificationRuleSumAggregateOutputType = {
 
 export type ClassificationRuleMinAggregateOutputType = {
   id: number | null
-  keyword: string | null
-  targetClassification: $Enums.VendorClassification | null
+  classificationName: $Enums.VendorClassification | null
+  description: string | null
+  judgmentCriteria: string | null
   priority: number | null
   weight: number | null
-  isActive: boolean | null
-  deletedAt: Date | null
   createdAt: Date | null
   updatedAt: Date | null
 }
 
 export type ClassificationRuleMaxAggregateOutputType = {
   id: number | null
-  keyword: string | null
-  targetClassification: $Enums.VendorClassification | null
+  classificationName: $Enums.VendorClassification | null
+  description: string | null
+  judgmentCriteria: string | null
   priority: number | null
   weight: number | null
-  isActive: boolean | null
-  deletedAt: Date | null
   createdAt: Date | null
   updatedAt: Date | null
 }
 
 export type ClassificationRuleCountAggregateOutputType = {
   id: number
-  keyword: number
-  targetClassification: number
+  classificationName: number
+  description: number
+  judgmentCriteria: number
+  keywords: number
   priority: number
   weight: number
-  isActive: number
-  deletedAt: number
   createdAt: number
   updatedAt: number
   _all: number
@@ -90,36 +88,34 @@ export type ClassificationRuleSumAggregateInputType = {
 
 export type ClassificationRuleMinAggregateInputType = {
   id?: true
-  keyword?: true
-  targetClassification?: true
+  classificationName?: true
+  description?: true
+  judgmentCriteria?: true
   priority?: true
   weight?: true
-  isActive?: true
-  deletedAt?: true
   createdAt?: true
   updatedAt?: true
 }
 
 export type ClassificationRuleMaxAggregateInputType = {
   id?: true
-  keyword?: true
-  targetClassification?: true
+  classificationName?: true
+  description?: true
+  judgmentCriteria?: true
   priority?: true
   weight?: true
-  isActive?: true
-  deletedAt?: true
   createdAt?: true
   updatedAt?: true
 }
 
 export type ClassificationRuleCountAggregateInputType = {
   id?: true
-  keyword?: true
-  targetClassification?: true
+  classificationName?: true
+  description?: true
+  judgmentCriteria?: true
+  keywords?: true
   priority?: true
   weight?: true
-  isActive?: true
-  deletedAt?: true
   createdAt?: true
   updatedAt?: true
   _all?: true
@@ -213,12 +209,12 @@ export type ClassificationRuleGroupByArgs<ExtArgs extends runtime.Types.Extensio
 
 export type ClassificationRuleGroupByOutputType = {
   id: number
-  keyword: string
-  targetClassification: $Enums.VendorClassification
+  classificationName: $Enums.VendorClassification
+  description: string | null
+  judgmentCriteria: string | null
+  keywords: string[]
   priority: number
   weight: number
-  isActive: boolean
-  deletedAt: Date | null
   createdAt: Date
   updatedAt: Date
   _count: ClassificationRuleCountAggregateOutputType | null
@@ -248,52 +244,51 @@ export type ClassificationRuleWhereInput = {
   OR?: Prisma.ClassificationRuleWhereInput[]
   NOT?: Prisma.ClassificationRuleWhereInput | Prisma.ClassificationRuleWhereInput[]
   id?: Prisma.IntFilter<"ClassificationRule"> | number
-  keyword?: Prisma.StringFilter<"ClassificationRule"> | string
-  targetClassification?: Prisma.EnumVendorClassificationFilter<"ClassificationRule"> | $Enums.VendorClassification
+  classificationName?: Prisma.EnumVendorClassificationFilter<"ClassificationRule"> | $Enums.VendorClassification
+  description?: Prisma.StringNullableFilter<"ClassificationRule"> | string | null
+  judgmentCriteria?: Prisma.StringNullableFilter<"ClassificationRule"> | string | null
+  keywords?: Prisma.StringNullableListFilter<"ClassificationRule">
   priority?: Prisma.IntFilter<"ClassificationRule"> | number
   weight?: Prisma.IntFilter<"ClassificationRule"> | number
-  isActive?: Prisma.BoolFilter<"ClassificationRule"> | boolean
-  deletedAt?: Prisma.DateTimeNullableFilter<"ClassificationRule"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"ClassificationRule"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"ClassificationRule"> | Date | string
 }
 
 export type ClassificationRuleOrderByWithRelationInput = {
   id?: Prisma.SortOrder
-  keyword?: Prisma.SortOrder
-  targetClassification?: Prisma.SortOrder
+  classificationName?: Prisma.SortOrder
+  description?: Prisma.SortOrderInput | Prisma.SortOrder
+  judgmentCriteria?: Prisma.SortOrderInput | Prisma.SortOrder
+  keywords?: Prisma.SortOrder
   priority?: Prisma.SortOrder
   weight?: Prisma.SortOrder
-  isActive?: Prisma.SortOrder
-  deletedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
 
 export type ClassificationRuleWhereUniqueInput = Prisma.AtLeast<{
   id?: number
-  keyword_targetClassification?: Prisma.ClassificationRuleKeywordTargetClassificationCompoundUniqueInput
+  classificationName?: $Enums.VendorClassification
   AND?: Prisma.ClassificationRuleWhereInput | Prisma.ClassificationRuleWhereInput[]
   OR?: Prisma.ClassificationRuleWhereInput[]
   NOT?: Prisma.ClassificationRuleWhereInput | Prisma.ClassificationRuleWhereInput[]
-  keyword?: Prisma.StringFilter<"ClassificationRule"> | string
-  targetClassification?: Prisma.EnumVendorClassificationFilter<"ClassificationRule"> | $Enums.VendorClassification
+  description?: Prisma.StringNullableFilter<"ClassificationRule"> | string | null
+  judgmentCriteria?: Prisma.StringNullableFilter<"ClassificationRule"> | string | null
+  keywords?: Prisma.StringNullableListFilter<"ClassificationRule">
   priority?: Prisma.IntFilter<"ClassificationRule"> | number
   weight?: Prisma.IntFilter<"ClassificationRule"> | number
-  isActive?: Prisma.BoolFilter<"ClassificationRule"> | boolean
-  deletedAt?: Prisma.DateTimeNullableFilter<"ClassificationRule"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"ClassificationRule"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"ClassificationRule"> | Date | string
-}, "id" | "keyword_targetClassification">
+}, "id" | "classificationName">
 
 export type ClassificationRuleOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
-  keyword?: Prisma.SortOrder
-  targetClassification?: Prisma.SortOrder
+  classificationName?: Prisma.SortOrder
+  description?: Prisma.SortOrderInput | Prisma.SortOrder
+  judgmentCriteria?: Prisma.SortOrderInput | Prisma.SortOrder
+  keywords?: Prisma.SortOrder
   priority?: Prisma.SortOrder
   weight?: Prisma.SortOrder
-  isActive?: Prisma.SortOrder
-  deletedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   _count?: Prisma.ClassificationRuleCountOrderByAggregateInput
@@ -308,110 +303,113 @@ export type ClassificationRuleScalarWhereWithAggregatesInput = {
   OR?: Prisma.ClassificationRuleScalarWhereWithAggregatesInput[]
   NOT?: Prisma.ClassificationRuleScalarWhereWithAggregatesInput | Prisma.ClassificationRuleScalarWhereWithAggregatesInput[]
   id?: Prisma.IntWithAggregatesFilter<"ClassificationRule"> | number
-  keyword?: Prisma.StringWithAggregatesFilter<"ClassificationRule"> | string
-  targetClassification?: Prisma.EnumVendorClassificationWithAggregatesFilter<"ClassificationRule"> | $Enums.VendorClassification
+  classificationName?: Prisma.EnumVendorClassificationWithAggregatesFilter<"ClassificationRule"> | $Enums.VendorClassification
+  description?: Prisma.StringNullableWithAggregatesFilter<"ClassificationRule"> | string | null
+  judgmentCriteria?: Prisma.StringNullableWithAggregatesFilter<"ClassificationRule"> | string | null
+  keywords?: Prisma.StringNullableListFilter<"ClassificationRule">
   priority?: Prisma.IntWithAggregatesFilter<"ClassificationRule"> | number
   weight?: Prisma.IntWithAggregatesFilter<"ClassificationRule"> | number
-  isActive?: Prisma.BoolWithAggregatesFilter<"ClassificationRule"> | boolean
-  deletedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"ClassificationRule"> | Date | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"ClassificationRule"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"ClassificationRule"> | Date | string
 }
 
 export type ClassificationRuleCreateInput = {
-  keyword: string
-  targetClassification: $Enums.VendorClassification
+  classificationName: $Enums.VendorClassification
+  description?: string | null
+  judgmentCriteria?: string | null
+  keywords?: Prisma.ClassificationRuleCreatekeywordsInput | string[]
   priority?: number
   weight?: number
-  isActive?: boolean
-  deletedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
 
 export type ClassificationRuleUncheckedCreateInput = {
   id?: number
-  keyword: string
-  targetClassification: $Enums.VendorClassification
+  classificationName: $Enums.VendorClassification
+  description?: string | null
+  judgmentCriteria?: string | null
+  keywords?: Prisma.ClassificationRuleCreatekeywordsInput | string[]
   priority?: number
   weight?: number
-  isActive?: boolean
-  deletedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
 
 export type ClassificationRuleUpdateInput = {
-  keyword?: Prisma.StringFieldUpdateOperationsInput | string
-  targetClassification?: Prisma.EnumVendorClassificationFieldUpdateOperationsInput | $Enums.VendorClassification
+  classificationName?: Prisma.EnumVendorClassificationFieldUpdateOperationsInput | $Enums.VendorClassification
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  judgmentCriteria?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  keywords?: Prisma.ClassificationRuleUpdatekeywordsInput | string[]
   priority?: Prisma.IntFieldUpdateOperationsInput | number
   weight?: Prisma.IntFieldUpdateOperationsInput | number
-  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type ClassificationRuleUncheckedUpdateInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
-  keyword?: Prisma.StringFieldUpdateOperationsInput | string
-  targetClassification?: Prisma.EnumVendorClassificationFieldUpdateOperationsInput | $Enums.VendorClassification
+  classificationName?: Prisma.EnumVendorClassificationFieldUpdateOperationsInput | $Enums.VendorClassification
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  judgmentCriteria?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  keywords?: Prisma.ClassificationRuleUpdatekeywordsInput | string[]
   priority?: Prisma.IntFieldUpdateOperationsInput | number
   weight?: Prisma.IntFieldUpdateOperationsInput | number
-  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type ClassificationRuleCreateManyInput = {
   id?: number
-  keyword: string
-  targetClassification: $Enums.VendorClassification
+  classificationName: $Enums.VendorClassification
+  description?: string | null
+  judgmentCriteria?: string | null
+  keywords?: Prisma.ClassificationRuleCreatekeywordsInput | string[]
   priority?: number
   weight?: number
-  isActive?: boolean
-  deletedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
 
 export type ClassificationRuleUpdateManyMutationInput = {
-  keyword?: Prisma.StringFieldUpdateOperationsInput | string
-  targetClassification?: Prisma.EnumVendorClassificationFieldUpdateOperationsInput | $Enums.VendorClassification
+  classificationName?: Prisma.EnumVendorClassificationFieldUpdateOperationsInput | $Enums.VendorClassification
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  judgmentCriteria?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  keywords?: Prisma.ClassificationRuleUpdatekeywordsInput | string[]
   priority?: Prisma.IntFieldUpdateOperationsInput | number
   weight?: Prisma.IntFieldUpdateOperationsInput | number
-  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type ClassificationRuleUncheckedUpdateManyInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
-  keyword?: Prisma.StringFieldUpdateOperationsInput | string
-  targetClassification?: Prisma.EnumVendorClassificationFieldUpdateOperationsInput | $Enums.VendorClassification
+  classificationName?: Prisma.EnumVendorClassificationFieldUpdateOperationsInput | $Enums.VendorClassification
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  judgmentCriteria?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  keywords?: Prisma.ClassificationRuleUpdatekeywordsInput | string[]
   priority?: Prisma.IntFieldUpdateOperationsInput | number
   weight?: Prisma.IntFieldUpdateOperationsInput | number
-  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
-export type ClassificationRuleKeywordTargetClassificationCompoundUniqueInput = {
-  keyword: string
-  targetClassification: $Enums.VendorClassification
+export type StringNullableListFilter<$PrismaModel = never> = {
+  equals?: string[] | Prisma.ListStringFieldRefInput<$PrismaModel> | null
+  has?: string | Prisma.StringFieldRefInput<$PrismaModel> | null
+  hasEvery?: string[] | Prisma.ListStringFieldRefInput<$PrismaModel>
+  hasSome?: string[] | Prisma.ListStringFieldRefInput<$PrismaModel>
+  isEmpty?: boolean
 }
 
 export type ClassificationRuleCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
-  keyword?: Prisma.SortOrder
-  targetClassification?: Prisma.SortOrder
+  classificationName?: Prisma.SortOrder
+  description?: Prisma.SortOrder
+  judgmentCriteria?: Prisma.SortOrder
+  keywords?: Prisma.SortOrder
   priority?: Prisma.SortOrder
   weight?: Prisma.SortOrder
-  isActive?: Prisma.SortOrder
-  deletedAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -424,24 +422,22 @@ export type ClassificationRuleAvgOrderByAggregateInput = {
 
 export type ClassificationRuleMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
-  keyword?: Prisma.SortOrder
-  targetClassification?: Prisma.SortOrder
+  classificationName?: Prisma.SortOrder
+  description?: Prisma.SortOrder
+  judgmentCriteria?: Prisma.SortOrder
   priority?: Prisma.SortOrder
   weight?: Prisma.SortOrder
-  isActive?: Prisma.SortOrder
-  deletedAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
 
 export type ClassificationRuleMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
-  keyword?: Prisma.SortOrder
-  targetClassification?: Prisma.SortOrder
+  classificationName?: Prisma.SortOrder
+  description?: Prisma.SortOrder
+  judgmentCriteria?: Prisma.SortOrder
   priority?: Prisma.SortOrder
   weight?: Prisma.SortOrder
-  isActive?: Prisma.SortOrder
-  deletedAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -452,77 +448,78 @@ export type ClassificationRuleSumOrderByAggregateInput = {
   weight?: Prisma.SortOrder
 }
 
-export type BoolFieldUpdateOperationsInput = {
-  set?: boolean
+export type ClassificationRuleCreatekeywordsInput = {
+  set: string[]
 }
 
-export type NullableDateTimeFieldUpdateOperationsInput = {
-  set?: Date | string | null
+export type ClassificationRuleUpdatekeywordsInput = {
+  set?: string[]
+  push?: string | string[]
 }
 
 
 
 export type ClassificationRuleSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
-  keyword?: boolean
-  targetClassification?: boolean
+  classificationName?: boolean
+  description?: boolean
+  judgmentCriteria?: boolean
+  keywords?: boolean
   priority?: boolean
   weight?: boolean
-  isActive?: boolean
-  deletedAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }, ExtArgs["result"]["classificationRule"]>
 
 export type ClassificationRuleSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
-  keyword?: boolean
-  targetClassification?: boolean
+  classificationName?: boolean
+  description?: boolean
+  judgmentCriteria?: boolean
+  keywords?: boolean
   priority?: boolean
   weight?: boolean
-  isActive?: boolean
-  deletedAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }, ExtArgs["result"]["classificationRule"]>
 
 export type ClassificationRuleSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
-  keyword?: boolean
-  targetClassification?: boolean
+  classificationName?: boolean
+  description?: boolean
+  judgmentCriteria?: boolean
+  keywords?: boolean
   priority?: boolean
   weight?: boolean
-  isActive?: boolean
-  deletedAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }, ExtArgs["result"]["classificationRule"]>
 
 export type ClassificationRuleSelectScalar = {
   id?: boolean
-  keyword?: boolean
-  targetClassification?: boolean
+  classificationName?: boolean
+  description?: boolean
+  judgmentCriteria?: boolean
+  keywords?: boolean
   priority?: boolean
   weight?: boolean
-  isActive?: boolean
-  deletedAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type ClassificationRuleOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "keyword" | "targetClassification" | "priority" | "weight" | "isActive" | "deletedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["classificationRule"]>
+export type ClassificationRuleOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "classificationName" | "description" | "judgmentCriteria" | "keywords" | "priority" | "weight" | "createdAt" | "updatedAt", ExtArgs["result"]["classificationRule"]>
 
 export type $ClassificationRulePayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "ClassificationRule"
   objects: {}
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: number
-    keyword: string
-    targetClassification: $Enums.VendorClassification
+    classificationName: $Enums.VendorClassification
+    description: string | null
+    judgmentCriteria: string | null
+    keywords: string[]
     priority: number
     weight: number
-    isActive: boolean
-    deletedAt: Date | null
     createdAt: Date
     updatedAt: Date
   }, ExtArgs["result"]["classificationRule"]>
@@ -949,12 +946,12 @@ export interface Prisma__ClassificationRuleClient<T, Null = never, ExtArgs exten
  */
 export interface ClassificationRuleFieldRefs {
   readonly id: Prisma.FieldRef<"ClassificationRule", 'Int'>
-  readonly keyword: Prisma.FieldRef<"ClassificationRule", 'String'>
-  readonly targetClassification: Prisma.FieldRef<"ClassificationRule", 'VendorClassification'>
+  readonly classificationName: Prisma.FieldRef<"ClassificationRule", 'VendorClassification'>
+  readonly description: Prisma.FieldRef<"ClassificationRule", 'String'>
+  readonly judgmentCriteria: Prisma.FieldRef<"ClassificationRule", 'String'>
+  readonly keywords: Prisma.FieldRef<"ClassificationRule", 'String[]'>
   readonly priority: Prisma.FieldRef<"ClassificationRule", 'Int'>
   readonly weight: Prisma.FieldRef<"ClassificationRule", 'Int'>
-  readonly isActive: Prisma.FieldRef<"ClassificationRule", 'Boolean'>
-  readonly deletedAt: Prisma.FieldRef<"ClassificationRule", 'DateTime'>
   readonly createdAt: Prisma.FieldRef<"ClassificationRule", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"ClassificationRule", 'DateTime'>
 }

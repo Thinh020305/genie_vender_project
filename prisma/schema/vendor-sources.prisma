@@ -3,7 +3,7 @@ model VendorSource {
 
   vendorId Int
   vendor   Vendor @relation(fields: [vendorId], references: [id], onDelete: Cascade)
-
+  
   sourceType SourceType
 
   // Mỗi dòng phải có sourceUrl hoặc ghi chú demo trong memo.

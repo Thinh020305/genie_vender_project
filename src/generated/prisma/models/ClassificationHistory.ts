@@ -9,8 +9,8 @@
  * 🟢 You can import this file directly.
  */
 import type * as runtime from "@prisma/client/runtime/client"
-import type * as $Enums from "../enums.js"
-import type * as Prisma from "../internal/prismaNamespace.js"
+import type * as $Enums from "../enums.ts"
+import type * as Prisma from "../internal/prismaNamespace.ts"
 
 /**
  * Model ClassificationHistory
@@ -27,16 +27,18 @@ export type AggregateClassificationHistory = {
 }
 
 export type ClassificationHistoryAvgAggregateOutputType = {
+  vendorId: number | null
   changedById: number | null
 }
 
 export type ClassificationHistorySumAggregateOutputType = {
+  vendorId: number | null
   changedById: number | null
 }
 
 export type ClassificationHistoryMinAggregateOutputType = {
   id: string | null
-  vendorId: string | null
+  vendorId: number | null
   changedById: number | null
   previousClassification: $Enums.VendorClassification | null
   newClassification: $Enums.VendorClassification | null
@@ -46,7 +48,7 @@ export type ClassificationHistoryMinAggregateOutputType = {
 
 export type ClassificationHistoryMaxAggregateOutputType = {
   id: string | null
-  vendorId: string | null
+  vendorId: number | null
   changedById: number | null
   previousClassification: $Enums.VendorClassification | null
   newClassification: $Enums.VendorClassification | null
@@ -67,10 +69,12 @@ export type ClassificationHistoryCountAggregateOutputType = {
 
 
 export type ClassificationHistoryAvgAggregateInputType = {
+  vendorId?: true
   changedById?: true
 }
 
 export type ClassificationHistorySumAggregateInputType = {
+  vendorId?: true
   changedById?: true
 }
 
@@ -193,7 +197,7 @@ export type ClassificationHistoryGroupByArgs<ExtArgs extends runtime.Types.Exten
 
 export type ClassificationHistoryGroupByOutputType = {
   id: string
-  vendorId: string
+  vendorId: number
   changedById: number
   previousClassification: $Enums.VendorClassification
   newClassification: $Enums.VendorClassification
@@ -226,7 +230,7 @@ export type ClassificationHistoryWhereInput = {
   OR?: Prisma.ClassificationHistoryWhereInput[]
   NOT?: Prisma.ClassificationHistoryWhereInput | Prisma.ClassificationHistoryWhereInput[]
   id?: Prisma.StringFilter<"ClassificationHistory"> | string
-  vendorId?: Prisma.StringFilter<"ClassificationHistory"> | string
+  vendorId?: Prisma.IntFilter<"ClassificationHistory"> | number
   changedById?: Prisma.IntFilter<"ClassificationHistory"> | number
   previousClassification?: Prisma.EnumVendorClassificationFilter<"ClassificationHistory"> | $Enums.VendorClassification
   newClassification?: Prisma.EnumVendorClassificationFilter<"ClassificationHistory"> | $Enums.VendorClassification
@@ -253,7 +257,7 @@ export type ClassificationHistoryWhereUniqueInput = Prisma.AtLeast<{
   AND?: Prisma.ClassificationHistoryWhereInput | Prisma.ClassificationHistoryWhereInput[]
   OR?: Prisma.ClassificationHistoryWhereInput[]
   NOT?: Prisma.ClassificationHistoryWhereInput | Prisma.ClassificationHistoryWhereInput[]
-  vendorId?: Prisma.StringFilter<"ClassificationHistory"> | string
+  vendorId?: Prisma.IntFilter<"ClassificationHistory"> | number
   changedById?: Prisma.IntFilter<"ClassificationHistory"> | number
   previousClassification?: Prisma.EnumVendorClassificationFilter<"ClassificationHistory"> | $Enums.VendorClassification
   newClassification?: Prisma.EnumVendorClassificationFilter<"ClassificationHistory"> | $Enums.VendorClassification
@@ -283,7 +287,7 @@ export type ClassificationHistoryScalarWhereWithAggregatesInput = {
   OR?: Prisma.ClassificationHistoryScalarWhereWithAggregatesInput[]
   NOT?: Prisma.ClassificationHistoryScalarWhereWithAggregatesInput | Prisma.ClassificationHistoryScalarWhereWithAggregatesInput[]
   id?: Prisma.StringWithAggregatesFilter<"ClassificationHistory"> | string
-  vendorId?: Prisma.StringWithAggregatesFilter<"ClassificationHistory"> | string
+  vendorId?: Prisma.IntWithAggregatesFilter<"ClassificationHistory"> | number
   changedById?: Prisma.IntWithAggregatesFilter<"ClassificationHistory"> | number
   previousClassification?: Prisma.EnumVendorClassificationWithAggregatesFilter<"ClassificationHistory"> | $Enums.VendorClassification
   newClassification?: Prisma.EnumVendorClassificationWithAggregatesFilter<"ClassificationHistory"> | $Enums.VendorClassification
@@ -303,7 +307,7 @@ export type ClassificationHistoryCreateInput = {
 
 export type ClassificationHistoryUncheckedCreateInput = {
   id?: string
-  vendorId: string
+  vendorId: number
   changedById: number
   previousClassification: $Enums.VendorClassification
   newClassification: $Enums.VendorClassification
@@ -323,7 +327,7 @@ export type ClassificationHistoryUpdateInput = {
 
 export type ClassificationHistoryUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  vendorId?: Prisma.StringFieldUpdateOperationsInput | string
+  vendorId?: Prisma.IntFieldUpdateOperationsInput | number
   changedById?: Prisma.IntFieldUpdateOperationsInput | number
   previousClassification?: Prisma.EnumVendorClassificationFieldUpdateOperationsInput | $Enums.VendorClassification
   newClassification?: Prisma.EnumVendorClassificationFieldUpdateOperationsInput | $Enums.VendorClassification
@@ -333,7 +337,7 @@ export type ClassificationHistoryUncheckedUpdateInput = {
 
 export type ClassificationHistoryCreateManyInput = {
   id?: string
-  vendorId: string
+  vendorId: number
   changedById: number
   previousClassification: $Enums.VendorClassification
   newClassification: $Enums.VendorClassification
@@ -351,7 +355,7 @@ export type ClassificationHistoryUpdateManyMutationInput = {
 
 export type ClassificationHistoryUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  vendorId?: Prisma.StringFieldUpdateOperationsInput | string
+  vendorId?: Prisma.IntFieldUpdateOperationsInput | number
   changedById?: Prisma.IntFieldUpdateOperationsInput | number
   previousClassification?: Prisma.EnumVendorClassificationFieldUpdateOperationsInput | $Enums.VendorClassification
   newClassification?: Prisma.EnumVendorClassificationFieldUpdateOperationsInput | $Enums.VendorClassification
@@ -370,6 +374,7 @@ export type ClassificationHistoryCountOrderByAggregateInput = {
 }
 
 export type ClassificationHistoryAvgOrderByAggregateInput = {
+  vendorId?: Prisma.SortOrder
   changedById?: Prisma.SortOrder
 }
 
@@ -394,6 +399,7 @@ export type ClassificationHistoryMinOrderByAggregateInput = {
 }
 
 export type ClassificationHistorySumOrderByAggregateInput = {
+  vendorId?: Prisma.SortOrder
   changedById?: Prisma.SortOrder
 }
 
@@ -526,7 +532,7 @@ export type ClassificationHistoryCreateWithoutChangedByInput = {
 
 export type ClassificationHistoryUncheckedCreateWithoutChangedByInput = {
   id?: string
-  vendorId: string
+  vendorId: number
   previousClassification: $Enums.VendorClassification
   newClassification: $Enums.VendorClassification
   changedAt?: Date | string
@@ -564,7 +570,7 @@ export type ClassificationHistoryScalarWhereInput = {
   OR?: Prisma.ClassificationHistoryScalarWhereInput[]
   NOT?: Prisma.ClassificationHistoryScalarWhereInput | Prisma.ClassificationHistoryScalarWhereInput[]
   id?: Prisma.StringFilter<"ClassificationHistory"> | string
-  vendorId?: Prisma.StringFilter<"ClassificationHistory"> | string
+  vendorId?: Prisma.IntFilter<"ClassificationHistory"> | number
   changedById?: Prisma.IntFilter<"ClassificationHistory"> | number
   previousClassification?: Prisma.EnumVendorClassificationFilter<"ClassificationHistory"> | $Enums.VendorClassification
   newClassification?: Prisma.EnumVendorClassificationFilter<"ClassificationHistory"> | $Enums.VendorClassification
@@ -618,7 +624,7 @@ export type ClassificationHistoryUpdateManyWithWhereWithoutVendorInput = {
 
 export type ClassificationHistoryCreateManyChangedByInput = {
   id?: string
-  vendorId: string
+  vendorId: number
   previousClassification: $Enums.VendorClassification
   newClassification: $Enums.VendorClassification
   changedAt?: Date | string
@@ -636,7 +642,7 @@ export type ClassificationHistoryUpdateWithoutChangedByInput = {
 
 export type ClassificationHistoryUncheckedUpdateWithoutChangedByInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  vendorId?: Prisma.StringFieldUpdateOperationsInput | string
+  vendorId?: Prisma.IntFieldUpdateOperationsInput | number
   previousClassification?: Prisma.EnumVendorClassificationFieldUpdateOperationsInput | $Enums.VendorClassification
   newClassification?: Prisma.EnumVendorClassificationFieldUpdateOperationsInput | $Enums.VendorClassification
   changedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -645,7 +651,7 @@ export type ClassificationHistoryUncheckedUpdateWithoutChangedByInput = {
 
 export type ClassificationHistoryUncheckedUpdateManyWithoutChangedByInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  vendorId?: Prisma.StringFieldUpdateOperationsInput | string
+  vendorId?: Prisma.IntFieldUpdateOperationsInput | number
   previousClassification?: Prisma.EnumVendorClassificationFieldUpdateOperationsInput | $Enums.VendorClassification
   newClassification?: Prisma.EnumVendorClassificationFieldUpdateOperationsInput | $Enums.VendorClassification
   changedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -758,7 +764,7 @@ export type $ClassificationHistoryPayload<ExtArgs extends runtime.Types.Extensio
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
-    vendorId: string
+    vendorId: number
     changedById: number
     previousClassification: $Enums.VendorClassification
     newClassification: $Enums.VendorClassification
@@ -1190,7 +1196,7 @@ export interface Prisma__ClassificationHistoryClient<T, Null = never, ExtArgs ex
  */
 export interface ClassificationHistoryFieldRefs {
   readonly id: Prisma.FieldRef<"ClassificationHistory", 'String'>
-  readonly vendorId: Prisma.FieldRef<"ClassificationHistory", 'String'>
+  readonly vendorId: Prisma.FieldRef<"ClassificationHistory", 'Int'>
   readonly changedById: Prisma.FieldRef<"ClassificationHistory", 'Int'>
   readonly previousClassification: Prisma.FieldRef<"ClassificationHistory", 'VendorClassification'>
   readonly newClassification: Prisma.FieldRef<"ClassificationHistory", 'VendorClassification'>

@@ -9,8 +9,8 @@
  * 🟢 You can import this file directly.
  */
 import type * as runtime from "@prisma/client/runtime/client"
-import type * as $Enums from "../enums.js"
-import type * as Prisma from "../internal/prismaNamespace.js"
+import type * as $Enums from "../enums.ts"
+import type * as Prisma from "../internal/prismaNamespace.ts"
 
 /**
  * Model Vendor
@@ -20,86 +20,128 @@ export type VendorModel = runtime.Types.Result.DefaultSelection<Prisma.$VendorPa
 
 export type AggregateVendor = {
   _count: VendorCountAggregateOutputType | null
+  _avg: VendorAvgAggregateOutputType | null
+  _sum: VendorSumAggregateOutputType | null
   _min: VendorMinAggregateOutputType | null
   _max: VendorMaxAggregateOutputType | null
 }
 
+export type VendorAvgAggregateOutputType = {
+  id: number | null
+}
+
+export type VendorSumAggregateOutputType = {
+  id: number | null
+}
+
 export type VendorMinAggregateOutputType = {
-  id: string | null
+  id: number | null
+  vendorCode: string | null
   companyName: string | null
+  website: string | null
+  location: string | null
   serviceType: $Enums.ServiceType | null
   techStack: string | null
   industryExperience: string | null
-  note: string | null
-  location: string | null
+  languageCapability: string | null
+  companySize: string | null
   classification: $Enums.VendorClassification | null
+  note: string | null
   createdAt: Date | null
   updatedAt: Date | null
 }
 
 export type VendorMaxAggregateOutputType = {
-  id: string | null
+  id: number | null
+  vendorCode: string | null
   companyName: string | null
+  website: string | null
+  location: string | null
   serviceType: $Enums.ServiceType | null
   techStack: string | null
   industryExperience: string | null
-  note: string | null
-  location: string | null
+  languageCapability: string | null
+  companySize: string | null
   classification: $Enums.VendorClassification | null
+  note: string | null
   createdAt: Date | null
   updatedAt: Date | null
 }
 
 export type VendorCountAggregateOutputType = {
   id: number
+  vendorCode: number
   companyName: number
+  website: number
+  location: number
   serviceType: number
   techStack: number
   industryExperience: number
-  note: number
-  location: number
+  languageCapability: number
+  companySize: number
   classification: number
+  note: number
   createdAt: number
   updatedAt: number
   _all: number
 }
 
 
+export type VendorAvgAggregateInputType = {
+  id?: true
+}
+
+export type VendorSumAggregateInputType = {
+  id?: true
+}
+
 export type VendorMinAggregateInputType = {
   id?: true
+  vendorCode?: true
   companyName?: true
+  website?: true
+  location?: true
   serviceType?: true
   techStack?: true
   industryExperience?: true
-  note?: true
-  location?: true
+  languageCapability?: true
+  companySize?: true
   classification?: true
+  note?: true
   createdAt?: true
   updatedAt?: true
 }
 
 export type VendorMaxAggregateInputType = {
   id?: true
+  vendorCode?: true
   companyName?: true
+  website?: true
+  location?: true
   serviceType?: true
   techStack?: true
   industryExperience?: true
-  note?: true
-  location?: true
+  languageCapability?: true
+  companySize?: true
   classification?: true
+  note?: true
   createdAt?: true
   updatedAt?: true
 }
 
 export type VendorCountAggregateInputType = {
   id?: true
+  vendorCode?: true
   companyName?: true
+  website?: true
+  location?: true
   serviceType?: true
   techStack?: true
   industryExperience?: true
-  note?: true
-  location?: true
+  languageCapability?: true
+  companySize?: true
   classification?: true
+  note?: true
   createdAt?: true
   updatedAt?: true
   _all?: true
@@ -143,6 +185,18 @@ export type VendorAggregateArgs<ExtArgs extends runtime.Types.Extensions.Interna
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
    * 
+   * Select which fields to average
+  **/
+  _avg?: VendorAvgAggregateInputType
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+   * 
+   * Select which fields to sum
+  **/
+  _sum?: VendorSumAggregateInputType
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+   * 
    * Select which fields to find the minimum value
   **/
   _min?: VendorMinAggregateInputType
@@ -173,22 +227,30 @@ export type VendorGroupByArgs<ExtArgs extends runtime.Types.Extensions.InternalA
   take?: number
   skip?: number
   _count?: VendorCountAggregateInputType | true
+  _avg?: VendorAvgAggregateInputType
+  _sum?: VendorSumAggregateInputType
   _min?: VendorMinAggregateInputType
   _max?: VendorMaxAggregateInputType
 }
 
 export type VendorGroupByOutputType = {
-  id: string
+  id: number
+  vendorCode: string
   companyName: string
+  website: string | null
+  location: string
   serviceType: $Enums.ServiceType
   techStack: string
   industryExperience: string
-  note: string | null
-  location: string
+  languageCapability: string
+  companySize: string
   classification: $Enums.VendorClassification
+  note: string | null
   createdAt: Date
   updatedAt: Date
   _count: VendorCountAggregateOutputType | null
+  _avg: VendorAvgAggregateOutputType | null
+  _sum: VendorSumAggregateOutputType | null
   _min: VendorMinAggregateOutputType | null
   _max: VendorMaxAggregateOutputType | null
 }
@@ -212,173 +274,234 @@ export type VendorWhereInput = {
   AND?: Prisma.VendorWhereInput | Prisma.VendorWhereInput[]
   OR?: Prisma.VendorWhereInput[]
   NOT?: Prisma.VendorWhereInput | Prisma.VendorWhereInput[]
-  id?: Prisma.StringFilter<"Vendor"> | string
+  id?: Prisma.IntFilter<"Vendor"> | number
+  vendorCode?: Prisma.StringFilter<"Vendor"> | string
   companyName?: Prisma.StringFilter<"Vendor"> | string
+  website?: Prisma.StringNullableFilter<"Vendor"> | string | null
+  location?: Prisma.StringFilter<"Vendor"> | string
   serviceType?: Prisma.EnumServiceTypeFilter<"Vendor"> | $Enums.ServiceType
   techStack?: Prisma.StringFilter<"Vendor"> | string
   industryExperience?: Prisma.StringFilter<"Vendor"> | string
-  note?: Prisma.StringNullableFilter<"Vendor"> | string | null
-  location?: Prisma.StringFilter<"Vendor"> | string
+  languageCapability?: Prisma.StringFilter<"Vendor"> | string
+  companySize?: Prisma.StringFilter<"Vendor"> | string
   classification?: Prisma.EnumVendorClassificationFilter<"Vendor"> | $Enums.VendorClassification
+  note?: Prisma.StringNullableFilter<"Vendor"> | string | null
   createdAt?: Prisma.DateTimeFilter<"Vendor"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Vendor"> | Date | string
   classificationHistories?: Prisma.ClassificationHistoryListRelationFilter
+  sources?: Prisma.VendorSourceListRelationFilter
+  summaries?: Prisma.VendorSummaryListRelationFilter
 }
 
 export type VendorOrderByWithRelationInput = {
   id?: Prisma.SortOrder
+  vendorCode?: Prisma.SortOrder
   companyName?: Prisma.SortOrder
+  website?: Prisma.SortOrderInput | Prisma.SortOrder
+  location?: Prisma.SortOrder
   serviceType?: Prisma.SortOrder
   techStack?: Prisma.SortOrder
   industryExperience?: Prisma.SortOrder
-  note?: Prisma.SortOrderInput | Prisma.SortOrder
-  location?: Prisma.SortOrder
+  languageCapability?: Prisma.SortOrder
+  companySize?: Prisma.SortOrder
   classification?: Prisma.SortOrder
+  note?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   classificationHistories?: Prisma.ClassificationHistoryOrderByRelationAggregateInput
+  sources?: Prisma.VendorSourceOrderByRelationAggregateInput
+  summaries?: Prisma.VendorSummaryOrderByRelationAggregateInput
 }
 
 export type VendorWhereUniqueInput = Prisma.AtLeast<{
-  id?: string
+  id?: number
+  vendorCode?: string
   AND?: Prisma.VendorWhereInput | Prisma.VendorWhereInput[]
   OR?: Prisma.VendorWhereInput[]
   NOT?: Prisma.VendorWhereInput | Prisma.VendorWhereInput[]
   companyName?: Prisma.StringFilter<"Vendor"> | string
+  website?: Prisma.StringNullableFilter<"Vendor"> | string | null
+  location?: Prisma.StringFilter<"Vendor"> | string
   serviceType?: Prisma.EnumServiceTypeFilter<"Vendor"> | $Enums.ServiceType
   techStack?: Prisma.StringFilter<"Vendor"> | string
   industryExperience?: Prisma.StringFilter<"Vendor"> | string
-  note?: Prisma.StringNullableFilter<"Vendor"> | string | null
-  location?: Prisma.StringFilter<"Vendor"> | string
+  languageCapability?: Prisma.StringFilter<"Vendor"> | string
+  companySize?: Prisma.StringFilter<"Vendor"> | string
   classification?: Prisma.EnumVendorClassificationFilter<"Vendor"> | $Enums.VendorClassification
+  note?: Prisma.StringNullableFilter<"Vendor"> | string | null
   createdAt?: Prisma.DateTimeFilter<"Vendor"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Vendor"> | Date | string
   classificationHistories?: Prisma.ClassificationHistoryListRelationFilter
-}, "id">
+  sources?: Prisma.VendorSourceListRelationFilter
+  summaries?: Prisma.VendorSummaryListRelationFilter
+}, "id" | "vendorCode">
 
 export type VendorOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
+  vendorCode?: Prisma.SortOrder
   companyName?: Prisma.SortOrder
+  website?: Prisma.SortOrderInput | Prisma.SortOrder
+  location?: Prisma.SortOrder
   serviceType?: Prisma.SortOrder
   techStack?: Prisma.SortOrder
   industryExperience?: Prisma.SortOrder
-  note?: Prisma.SortOrderInput | Prisma.SortOrder
-  location?: Prisma.SortOrder
+  languageCapability?: Prisma.SortOrder
+  companySize?: Prisma.SortOrder
   classification?: Prisma.SortOrder
+  note?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   _count?: Prisma.VendorCountOrderByAggregateInput
+  _avg?: Prisma.VendorAvgOrderByAggregateInput
   _max?: Prisma.VendorMaxOrderByAggregateInput
   _min?: Prisma.VendorMinOrderByAggregateInput
+  _sum?: Prisma.VendorSumOrderByAggregateInput
 }
 
 export type VendorScalarWhereWithAggregatesInput = {
   AND?: Prisma.VendorScalarWhereWithAggregatesInput | Prisma.VendorScalarWhereWithAggregatesInput[]
   OR?: Prisma.VendorScalarWhereWithAggregatesInput[]
   NOT?: Prisma.VendorScalarWhereWithAggregatesInput | Prisma.VendorScalarWhereWithAggregatesInput[]
-  id?: Prisma.StringWithAggregatesFilter<"Vendor"> | string
+  id?: Prisma.IntWithAggregatesFilter<"Vendor"> | number
+  vendorCode?: Prisma.StringWithAggregatesFilter<"Vendor"> | string
   companyName?: Prisma.StringWithAggregatesFilter<"Vendor"> | string
+  website?: Prisma.StringNullableWithAggregatesFilter<"Vendor"> | string | null
+  location?: Prisma.StringWithAggregatesFilter<"Vendor"> | string
   serviceType?: Prisma.EnumServiceTypeWithAggregatesFilter<"Vendor"> | $Enums.ServiceType
   techStack?: Prisma.StringWithAggregatesFilter<"Vendor"> | string
   industryExperience?: Prisma.StringWithAggregatesFilter<"Vendor"> | string
-  note?: Prisma.StringNullableWithAggregatesFilter<"Vendor"> | string | null
-  location?: Prisma.StringWithAggregatesFilter<"Vendor"> | string
+  languageCapability?: Prisma.StringWithAggregatesFilter<"Vendor"> | string
+  companySize?: Prisma.StringWithAggregatesFilter<"Vendor"> | string
   classification?: Prisma.EnumVendorClassificationWithAggregatesFilter<"Vendor"> | $Enums.VendorClassification
+  note?: Prisma.StringNullableWithAggregatesFilter<"Vendor"> | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Vendor"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"Vendor"> | Date | string
 }
 
 export type VendorCreateInput = {
-  id?: string
+  vendorCode: string
   companyName: string
+  website?: string | null
+  location: string
   serviceType: $Enums.ServiceType
   techStack: string
   industryExperience: string
-  note?: string | null
-  location: string
+  languageCapability: string
+  companySize: string
   classification: $Enums.VendorClassification
+  note?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   classificationHistories?: Prisma.ClassificationHistoryCreateNestedManyWithoutVendorInput
+  sources?: Prisma.VendorSourceCreateNestedManyWithoutVendorInput
+  summaries?: Prisma.VendorSummaryCreateNestedManyWithoutVendorInput
 }
 
 export type VendorUncheckedCreateInput = {
-  id?: string
+  id?: number
+  vendorCode: string
   companyName: string
+  website?: string | null
+  location: string
   serviceType: $Enums.ServiceType
   techStack: string
   industryExperience: string
-  note?: string | null
-  location: string
+  languageCapability: string
+  companySize: string
   classification: $Enums.VendorClassification
+  note?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   classificationHistories?: Prisma.ClassificationHistoryUncheckedCreateNestedManyWithoutVendorInput
+  sources?: Prisma.VendorSourceUncheckedCreateNestedManyWithoutVendorInput
+  summaries?: Prisma.VendorSummaryUncheckedCreateNestedManyWithoutVendorInput
 }
 
 export type VendorUpdateInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
+  vendorCode?: Prisma.StringFieldUpdateOperationsInput | string
   companyName?: Prisma.StringFieldUpdateOperationsInput | string
+  website?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  location?: Prisma.StringFieldUpdateOperationsInput | string
   serviceType?: Prisma.EnumServiceTypeFieldUpdateOperationsInput | $Enums.ServiceType
   techStack?: Prisma.StringFieldUpdateOperationsInput | string
   industryExperience?: Prisma.StringFieldUpdateOperationsInput | string
-  note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  location?: Prisma.StringFieldUpdateOperationsInput | string
+  languageCapability?: Prisma.StringFieldUpdateOperationsInput | string
+  companySize?: Prisma.StringFieldUpdateOperationsInput | string
   classification?: Prisma.EnumVendorClassificationFieldUpdateOperationsInput | $Enums.VendorClassification
+  note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   classificationHistories?: Prisma.ClassificationHistoryUpdateManyWithoutVendorNestedInput
+  sources?: Prisma.VendorSourceUpdateManyWithoutVendorNestedInput
+  summaries?: Prisma.VendorSummaryUpdateManyWithoutVendorNestedInput
 }
 
 export type VendorUncheckedUpdateInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  vendorCode?: Prisma.StringFieldUpdateOperationsInput | string
   companyName?: Prisma.StringFieldUpdateOperationsInput | string
+  website?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  location?: Prisma.StringFieldUpdateOperationsInput | string
   serviceType?: Prisma.EnumServiceTypeFieldUpdateOperationsInput | $Enums.ServiceType
   techStack?: Prisma.StringFieldUpdateOperationsInput | string
   industryExperience?: Prisma.StringFieldUpdateOperationsInput | string
-  note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  location?: Prisma.StringFieldUpdateOperationsInput | string
+  languageCapability?: Prisma.StringFieldUpdateOperationsInput | string
+  companySize?: Prisma.StringFieldUpdateOperationsInput | string
   classification?: Prisma.EnumVendorClassificationFieldUpdateOperationsInput | $Enums.VendorClassification
+  note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   classificationHistories?: Prisma.ClassificationHistoryUncheckedUpdateManyWithoutVendorNestedInput
+  sources?: Prisma.VendorSourceUncheckedUpdateManyWithoutVendorNestedInput
+  summaries?: Prisma.VendorSummaryUncheckedUpdateManyWithoutVendorNestedInput
 }
 
 export type VendorCreateManyInput = {
-  id?: string
+  id?: number
+  vendorCode: string
   companyName: string
+  website?: string | null
+  location: string
   serviceType: $Enums.ServiceType
   techStack: string
   industryExperience: string
-  note?: string | null
-  location: string
+  languageCapability: string
+  companySize: string
   classification: $Enums.VendorClassification
+  note?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
 
 export type VendorUpdateManyMutationInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
+  vendorCode?: Prisma.StringFieldUpdateOperationsInput | string
   companyName?: Prisma.StringFieldUpdateOperationsInput | string
+  website?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  location?: Prisma.StringFieldUpdateOperationsInput | string
   serviceType?: Prisma.EnumServiceTypeFieldUpdateOperationsInput | $Enums.ServiceType
   techStack?: Prisma.StringFieldUpdateOperationsInput | string
   industryExperience?: Prisma.StringFieldUpdateOperationsInput | string
-  note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  location?: Prisma.StringFieldUpdateOperationsInput | string
+  languageCapability?: Prisma.StringFieldUpdateOperationsInput | string
+  companySize?: Prisma.StringFieldUpdateOperationsInput | string
   classification?: Prisma.EnumVendorClassificationFieldUpdateOperationsInput | $Enums.VendorClassification
+  note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type VendorUncheckedUpdateManyInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  vendorCode?: Prisma.StringFieldUpdateOperationsInput | string
   companyName?: Prisma.StringFieldUpdateOperationsInput | string
+  website?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  location?: Prisma.StringFieldUpdateOperationsInput | string
   serviceType?: Prisma.EnumServiceTypeFieldUpdateOperationsInput | $Enums.ServiceType
   techStack?: Prisma.StringFieldUpdateOperationsInput | string
   industryExperience?: Prisma.StringFieldUpdateOperationsInput | string
-  note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  location?: Prisma.StringFieldUpdateOperationsInput | string
+  languageCapability?: Prisma.StringFieldUpdateOperationsInput | string
+  companySize?: Prisma.StringFieldUpdateOperationsInput | string
   classification?: Prisma.EnumVendorClassificationFieldUpdateOperationsInput | $Enums.VendorClassification
+  note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -390,41 +513,61 @@ export type VendorScalarRelationFilter = {
 
 export type VendorCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
+  vendorCode?: Prisma.SortOrder
   companyName?: Prisma.SortOrder
+  website?: Prisma.SortOrder
+  location?: Prisma.SortOrder
   serviceType?: Prisma.SortOrder
   techStack?: Prisma.SortOrder
   industryExperience?: Prisma.SortOrder
-  note?: Prisma.SortOrder
-  location?: Prisma.SortOrder
+  languageCapability?: Prisma.SortOrder
+  companySize?: Prisma.SortOrder
   classification?: Prisma.SortOrder
+  note?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
 
+export type VendorAvgOrderByAggregateInput = {
+  id?: Prisma.SortOrder
+}
+
 export type VendorMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
+  vendorCode?: Prisma.SortOrder
   companyName?: Prisma.SortOrder
+  website?: Prisma.SortOrder
+  location?: Prisma.SortOrder
   serviceType?: Prisma.SortOrder
   techStack?: Prisma.SortOrder
   industryExperience?: Prisma.SortOrder
-  note?: Prisma.SortOrder
-  location?: Prisma.SortOrder
+  languageCapability?: Prisma.SortOrder
+  companySize?: Prisma.SortOrder
   classification?: Prisma.SortOrder
+  note?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
 
 export type VendorMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
+  vendorCode?: Prisma.SortOrder
   companyName?: Prisma.SortOrder
+  website?: Prisma.SortOrder
+  location?: Prisma.SortOrder
   serviceType?: Prisma.SortOrder
   techStack?: Prisma.SortOrder
   industryExperience?: Prisma.SortOrder
-  note?: Prisma.SortOrder
-  location?: Prisma.SortOrder
+  languageCapability?: Prisma.SortOrder
+  companySize?: Prisma.SortOrder
   classification?: Prisma.SortOrder
+  note?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+}
+
+export type VendorSumOrderByAggregateInput = {
+  id?: Prisma.SortOrder
 }
 
 export type VendorCreateNestedOneWithoutClassificationHistoriesInput = {
@@ -441,34 +584,73 @@ export type VendorUpdateOneRequiredWithoutClassificationHistoriesNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.VendorUpdateToOneWithWhereWithoutClassificationHistoriesInput, Prisma.VendorUpdateWithoutClassificationHistoriesInput>, Prisma.VendorUncheckedUpdateWithoutClassificationHistoriesInput>
 }
 
+export type VendorCreateNestedOneWithoutSourcesInput = {
+  create?: Prisma.XOR<Prisma.VendorCreateWithoutSourcesInput, Prisma.VendorUncheckedCreateWithoutSourcesInput>
+  connectOrCreate?: Prisma.VendorCreateOrConnectWithoutSourcesInput
+  connect?: Prisma.VendorWhereUniqueInput
+}
+
+export type VendorUpdateOneRequiredWithoutSourcesNestedInput = {
+  create?: Prisma.XOR<Prisma.VendorCreateWithoutSourcesInput, Prisma.VendorUncheckedCreateWithoutSourcesInput>
+  connectOrCreate?: Prisma.VendorCreateOrConnectWithoutSourcesInput
+  upsert?: Prisma.VendorUpsertWithoutSourcesInput
+  connect?: Prisma.VendorWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.VendorUpdateToOneWithWhereWithoutSourcesInput, Prisma.VendorUpdateWithoutSourcesInput>, Prisma.VendorUncheckedUpdateWithoutSourcesInput>
+}
+
+export type VendorCreateNestedOneWithoutSummariesInput = {
+  create?: Prisma.XOR<Prisma.VendorCreateWithoutSummariesInput, Prisma.VendorUncheckedCreateWithoutSummariesInput>
+  connectOrCreate?: Prisma.VendorCreateOrConnectWithoutSummariesInput
+  connect?: Prisma.VendorWhereUniqueInput
+}
+
+export type VendorUpdateOneRequiredWithoutSummariesNestedInput = {
+  create?: Prisma.XOR<Prisma.VendorCreateWithoutSummariesInput, Prisma.VendorUncheckedCreateWithoutSummariesInput>
+  connectOrCreate?: Prisma.VendorCreateOrConnectWithoutSummariesInput
+  upsert?: Prisma.VendorUpsertWithoutSummariesInput
+  connect?: Prisma.VendorWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.VendorUpdateToOneWithWhereWithoutSummariesInput, Prisma.VendorUpdateWithoutSummariesInput>, Prisma.VendorUncheckedUpdateWithoutSummariesInput>
+}
+
 export type EnumServiceTypeFieldUpdateOperationsInput = {
   set?: $Enums.ServiceType
 }
 
 export type VendorCreateWithoutClassificationHistoriesInput = {
-  id?: string
+  vendorCode: string
   companyName: string
+  website?: string | null
+  location: string
   serviceType: $Enums.ServiceType
   techStack: string
   industryExperience: string
-  note?: string | null
-  location: string
+  languageCapability: string
+  companySize: string
   classification: $Enums.VendorClassification
+  note?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  sources?: Prisma.VendorSourceCreateNestedManyWithoutVendorInput
+  summaries?: Prisma.VendorSummaryCreateNestedManyWithoutVendorInput
 }
 
 export type VendorUncheckedCreateWithoutClassificationHistoriesInput = {
-  id?: string
+  id?: number
+  vendorCode: string
   companyName: string
+  website?: string | null
+  location: string
   serviceType: $Enums.ServiceType
   techStack: string
   industryExperience: string
-  note?: string | null
-  location: string
+  languageCapability: string
+  companySize: string
   classification: $Enums.VendorClassification
+  note?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  sources?: Prisma.VendorSourceUncheckedCreateNestedManyWithoutVendorInput
+  summaries?: Prisma.VendorSummaryUncheckedCreateNestedManyWithoutVendorInput
 }
 
 export type VendorCreateOrConnectWithoutClassificationHistoriesInput = {
@@ -488,29 +670,220 @@ export type VendorUpdateToOneWithWhereWithoutClassificationHistoriesInput = {
 }
 
 export type VendorUpdateWithoutClassificationHistoriesInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
+  vendorCode?: Prisma.StringFieldUpdateOperationsInput | string
   companyName?: Prisma.StringFieldUpdateOperationsInput | string
+  website?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  location?: Prisma.StringFieldUpdateOperationsInput | string
   serviceType?: Prisma.EnumServiceTypeFieldUpdateOperationsInput | $Enums.ServiceType
   techStack?: Prisma.StringFieldUpdateOperationsInput | string
   industryExperience?: Prisma.StringFieldUpdateOperationsInput | string
-  note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  location?: Prisma.StringFieldUpdateOperationsInput | string
+  languageCapability?: Prisma.StringFieldUpdateOperationsInput | string
+  companySize?: Prisma.StringFieldUpdateOperationsInput | string
   classification?: Prisma.EnumVendorClassificationFieldUpdateOperationsInput | $Enums.VendorClassification
+  note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  sources?: Prisma.VendorSourceUpdateManyWithoutVendorNestedInput
+  summaries?: Prisma.VendorSummaryUpdateManyWithoutVendorNestedInput
 }
 
 export type VendorUncheckedUpdateWithoutClassificationHistoriesInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  vendorCode?: Prisma.StringFieldUpdateOperationsInput | string
   companyName?: Prisma.StringFieldUpdateOperationsInput | string
+  website?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  location?: Prisma.StringFieldUpdateOperationsInput | string
   serviceType?: Prisma.EnumServiceTypeFieldUpdateOperationsInput | $Enums.ServiceType
   techStack?: Prisma.StringFieldUpdateOperationsInput | string
   industryExperience?: Prisma.StringFieldUpdateOperationsInput | string
-  note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  location?: Prisma.StringFieldUpdateOperationsInput | string
+  languageCapability?: Prisma.StringFieldUpdateOperationsInput | string
+  companySize?: Prisma.StringFieldUpdateOperationsInput | string
   classification?: Prisma.EnumVendorClassificationFieldUpdateOperationsInput | $Enums.VendorClassification
+  note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  sources?: Prisma.VendorSourceUncheckedUpdateManyWithoutVendorNestedInput
+  summaries?: Prisma.VendorSummaryUncheckedUpdateManyWithoutVendorNestedInput
+}
+
+export type VendorCreateWithoutSourcesInput = {
+  vendorCode: string
+  companyName: string
+  website?: string | null
+  location: string
+  serviceType: $Enums.ServiceType
+  techStack: string
+  industryExperience: string
+  languageCapability: string
+  companySize: string
+  classification: $Enums.VendorClassification
+  note?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  classificationHistories?: Prisma.ClassificationHistoryCreateNestedManyWithoutVendorInput
+  summaries?: Prisma.VendorSummaryCreateNestedManyWithoutVendorInput
+}
+
+export type VendorUncheckedCreateWithoutSourcesInput = {
+  id?: number
+  vendorCode: string
+  companyName: string
+  website?: string | null
+  location: string
+  serviceType: $Enums.ServiceType
+  techStack: string
+  industryExperience: string
+  languageCapability: string
+  companySize: string
+  classification: $Enums.VendorClassification
+  note?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  classificationHistories?: Prisma.ClassificationHistoryUncheckedCreateNestedManyWithoutVendorInput
+  summaries?: Prisma.VendorSummaryUncheckedCreateNestedManyWithoutVendorInput
+}
+
+export type VendorCreateOrConnectWithoutSourcesInput = {
+  where: Prisma.VendorWhereUniqueInput
+  create: Prisma.XOR<Prisma.VendorCreateWithoutSourcesInput, Prisma.VendorUncheckedCreateWithoutSourcesInput>
+}
+
+export type VendorUpsertWithoutSourcesInput = {
+  update: Prisma.XOR<Prisma.VendorUpdateWithoutSourcesInput, Prisma.VendorUncheckedUpdateWithoutSourcesInput>
+  create: Prisma.XOR<Prisma.VendorCreateWithoutSourcesInput, Prisma.VendorUncheckedCreateWithoutSourcesInput>
+  where?: Prisma.VendorWhereInput
+}
+
+export type VendorUpdateToOneWithWhereWithoutSourcesInput = {
+  where?: Prisma.VendorWhereInput
+  data: Prisma.XOR<Prisma.VendorUpdateWithoutSourcesInput, Prisma.VendorUncheckedUpdateWithoutSourcesInput>
+}
+
+export type VendorUpdateWithoutSourcesInput = {
+  vendorCode?: Prisma.StringFieldUpdateOperationsInput | string
+  companyName?: Prisma.StringFieldUpdateOperationsInput | string
+  website?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  location?: Prisma.StringFieldUpdateOperationsInput | string
+  serviceType?: Prisma.EnumServiceTypeFieldUpdateOperationsInput | $Enums.ServiceType
+  techStack?: Prisma.StringFieldUpdateOperationsInput | string
+  industryExperience?: Prisma.StringFieldUpdateOperationsInput | string
+  languageCapability?: Prisma.StringFieldUpdateOperationsInput | string
+  companySize?: Prisma.StringFieldUpdateOperationsInput | string
+  classification?: Prisma.EnumVendorClassificationFieldUpdateOperationsInput | $Enums.VendorClassification
+  note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  classificationHistories?: Prisma.ClassificationHistoryUpdateManyWithoutVendorNestedInput
+  summaries?: Prisma.VendorSummaryUpdateManyWithoutVendorNestedInput
+}
+
+export type VendorUncheckedUpdateWithoutSourcesInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  vendorCode?: Prisma.StringFieldUpdateOperationsInput | string
+  companyName?: Prisma.StringFieldUpdateOperationsInput | string
+  website?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  location?: Prisma.StringFieldUpdateOperationsInput | string
+  serviceType?: Prisma.EnumServiceTypeFieldUpdateOperationsInput | $Enums.ServiceType
+  techStack?: Prisma.StringFieldUpdateOperationsInput | string
+  industryExperience?: Prisma.StringFieldUpdateOperationsInput | string
+  languageCapability?: Prisma.StringFieldUpdateOperationsInput | string
+  companySize?: Prisma.StringFieldUpdateOperationsInput | string
+  classification?: Prisma.EnumVendorClassificationFieldUpdateOperationsInput | $Enums.VendorClassification
+  note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  classificationHistories?: Prisma.ClassificationHistoryUncheckedUpdateManyWithoutVendorNestedInput
+  summaries?: Prisma.VendorSummaryUncheckedUpdateManyWithoutVendorNestedInput
+}
+
+export type VendorCreateWithoutSummariesInput = {
+  vendorCode: string
+  companyName: string
+  website?: string | null
+  location: string
+  serviceType: $Enums.ServiceType
+  techStack: string
+  industryExperience: string
+  languageCapability: string
+  companySize: string
+  classification: $Enums.VendorClassification
+  note?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  classificationHistories?: Prisma.ClassificationHistoryCreateNestedManyWithoutVendorInput
+  sources?: Prisma.VendorSourceCreateNestedManyWithoutVendorInput
+}
+
+export type VendorUncheckedCreateWithoutSummariesInput = {
+  id?: number
+  vendorCode: string
+  companyName: string
+  website?: string | null
+  location: string
+  serviceType: $Enums.ServiceType
+  techStack: string
+  industryExperience: string
+  languageCapability: string
+  companySize: string
+  classification: $Enums.VendorClassification
+  note?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  classificationHistories?: Prisma.ClassificationHistoryUncheckedCreateNestedManyWithoutVendorInput
+  sources?: Prisma.VendorSourceUncheckedCreateNestedManyWithoutVendorInput
+}
+
+export type VendorCreateOrConnectWithoutSummariesInput = {
+  where: Prisma.VendorWhereUniqueInput
+  create: Prisma.XOR<Prisma.VendorCreateWithoutSummariesInput, Prisma.VendorUncheckedCreateWithoutSummariesInput>
+}
+
+export type VendorUpsertWithoutSummariesInput = {
+  update: Prisma.XOR<Prisma.VendorUpdateWithoutSummariesInput, Prisma.VendorUncheckedUpdateWithoutSummariesInput>
+  create: Prisma.XOR<Prisma.VendorCreateWithoutSummariesInput, Prisma.VendorUncheckedCreateWithoutSummariesInput>
+  where?: Prisma.VendorWhereInput
+}
+
+export type VendorUpdateToOneWithWhereWithoutSummariesInput = {
+  where?: Prisma.VendorWhereInput
+  data: Prisma.XOR<Prisma.VendorUpdateWithoutSummariesInput, Prisma.VendorUncheckedUpdateWithoutSummariesInput>
+}
+
+export type VendorUpdateWithoutSummariesInput = {
+  vendorCode?: Prisma.StringFieldUpdateOperationsInput | string
+  companyName?: Prisma.StringFieldUpdateOperationsInput | string
+  website?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  location?: Prisma.StringFieldUpdateOperationsInput | string
+  serviceType?: Prisma.EnumServiceTypeFieldUpdateOperationsInput | $Enums.ServiceType
+  techStack?: Prisma.StringFieldUpdateOperationsInput | string
+  industryExperience?: Prisma.StringFieldUpdateOperationsInput | string
+  languageCapability?: Prisma.StringFieldUpdateOperationsInput | string
+  companySize?: Prisma.StringFieldUpdateOperationsInput | string
+  classification?: Prisma.EnumVendorClassificationFieldUpdateOperationsInput | $Enums.VendorClassification
+  note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  classificationHistories?: Prisma.ClassificationHistoryUpdateManyWithoutVendorNestedInput
+  sources?: Prisma.VendorSourceUpdateManyWithoutVendorNestedInput
+}
+
+export type VendorUncheckedUpdateWithoutSummariesInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  vendorCode?: Prisma.StringFieldUpdateOperationsInput | string
+  companyName?: Prisma.StringFieldUpdateOperationsInput | string
+  website?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  location?: Prisma.StringFieldUpdateOperationsInput | string
+  serviceType?: Prisma.EnumServiceTypeFieldUpdateOperationsInput | $Enums.ServiceType
+  techStack?: Prisma.StringFieldUpdateOperationsInput | string
+  industryExperience?: Prisma.StringFieldUpdateOperationsInput | string
+  languageCapability?: Prisma.StringFieldUpdateOperationsInput | string
+  companySize?: Prisma.StringFieldUpdateOperationsInput | string
+  classification?: Prisma.EnumVendorClassificationFieldUpdateOperationsInput | $Enums.VendorClassification
+  note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  classificationHistories?: Prisma.ClassificationHistoryUncheckedUpdateManyWithoutVendorNestedInput
+  sources?: Prisma.VendorSourceUncheckedUpdateManyWithoutVendorNestedInput
 }
 
 
@@ -520,10 +893,14 @@ export type VendorUncheckedUpdateWithoutClassificationHistoriesInput = {
 
 export type VendorCountOutputType = {
   classificationHistories: number
+  sources: number
+  summaries: number
 }
 
 export type VendorCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   classificationHistories?: boolean | VendorCountOutputTypeCountClassificationHistoriesArgs
+  sources?: boolean | VendorCountOutputTypeCountSourcesArgs
+  summaries?: boolean | VendorCountOutputTypeCountSummariesArgs
 }
 
 /**
@@ -543,64 +920,98 @@ export type VendorCountOutputTypeCountClassificationHistoriesArgs<ExtArgs extend
   where?: Prisma.ClassificationHistoryWhereInput
 }
 
+/**
+ * VendorCountOutputType without action
+ */
+export type VendorCountOutputTypeCountSourcesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.VendorSourceWhereInput
+}
+
+/**
+ * VendorCountOutputType without action
+ */
+export type VendorCountOutputTypeCountSummariesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.VendorSummaryWhereInput
+}
+
 
 export type VendorSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
+  vendorCode?: boolean
   companyName?: boolean
+  website?: boolean
+  location?: boolean
   serviceType?: boolean
   techStack?: boolean
   industryExperience?: boolean
-  note?: boolean
-  location?: boolean
+  languageCapability?: boolean
+  companySize?: boolean
   classification?: boolean
+  note?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   classificationHistories?: boolean | Prisma.Vendor$classificationHistoriesArgs<ExtArgs>
+  sources?: boolean | Prisma.Vendor$sourcesArgs<ExtArgs>
+  summaries?: boolean | Prisma.Vendor$summariesArgs<ExtArgs>
   _count?: boolean | Prisma.VendorCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["vendor"]>
 
 export type VendorSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
+  vendorCode?: boolean
   companyName?: boolean
+  website?: boolean
+  location?: boolean
   serviceType?: boolean
   techStack?: boolean
   industryExperience?: boolean
-  note?: boolean
-  location?: boolean
+  languageCapability?: boolean
+  companySize?: boolean
   classification?: boolean
+  note?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }, ExtArgs["result"]["vendor"]>
 
 export type VendorSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
+  vendorCode?: boolean
   companyName?: boolean
+  website?: boolean
+  location?: boolean
   serviceType?: boolean
   techStack?: boolean
   industryExperience?: boolean
-  note?: boolean
-  location?: boolean
+  languageCapability?: boolean
+  companySize?: boolean
   classification?: boolean
+  note?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }, ExtArgs["result"]["vendor"]>
 
 export type VendorSelectScalar = {
   id?: boolean
+  vendorCode?: boolean
   companyName?: boolean
+  website?: boolean
+  location?: boolean
   serviceType?: boolean
   techStack?: boolean
   industryExperience?: boolean
-  note?: boolean
-  location?: boolean
+  languageCapability?: boolean
+  companySize?: boolean
   classification?: boolean
+  note?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type VendorOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "companyName" | "serviceType" | "techStack" | "industryExperience" | "note" | "location" | "classification" | "createdAt" | "updatedAt", ExtArgs["result"]["vendor"]>
+export type VendorOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "vendorCode" | "companyName" | "website" | "location" | "serviceType" | "techStack" | "industryExperience" | "languageCapability" | "companySize" | "classification" | "note" | "createdAt" | "updatedAt", ExtArgs["result"]["vendor"]>
 export type VendorInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   classificationHistories?: boolean | Prisma.Vendor$classificationHistoriesArgs<ExtArgs>
+  sources?: boolean | Prisma.Vendor$sourcesArgs<ExtArgs>
+  summaries?: boolean | Prisma.Vendor$summariesArgs<ExtArgs>
   _count?: boolean | Prisma.VendorCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type VendorIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -610,16 +1021,22 @@ export type $VendorPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs
   name: "Vendor"
   objects: {
     classificationHistories: Prisma.$ClassificationHistoryPayload<ExtArgs>[]
+    sources: Prisma.$VendorSourcePayload<ExtArgs>[]
+    summaries: Prisma.$VendorSummaryPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
-    id: string
+    id: number
+    vendorCode: string
     companyName: string
+    website: string | null
+    location: string
     serviceType: $Enums.ServiceType
     techStack: string
     industryExperience: string
-    note: string | null
-    location: string
+    languageCapability: string
+    companySize: string
     classification: $Enums.VendorClassification
+    note: string | null
     createdAt: Date
     updatedAt: Date
   }, ExtArgs["result"]["vendor"]>
@@ -1017,6 +1434,8 @@ readonly fields: VendorFieldRefs;
 export interface Prisma__VendorClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
   classificationHistories<T extends Prisma.Vendor$classificationHistoriesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Vendor$classificationHistoriesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ClassificationHistoryPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  sources<T extends Prisma.Vendor$sourcesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Vendor$sourcesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$VendorSourcePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  summaries<T extends Prisma.Vendor$summariesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Vendor$summariesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$VendorSummaryPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1046,14 +1465,18 @@ export interface Prisma__VendorClient<T, Null = never, ExtArgs extends runtime.T
  * Fields of the Vendor model
  */
 export interface VendorFieldRefs {
-  readonly id: Prisma.FieldRef<"Vendor", 'String'>
+  readonly id: Prisma.FieldRef<"Vendor", 'Int'>
+  readonly vendorCode: Prisma.FieldRef<"Vendor", 'String'>
   readonly companyName: Prisma.FieldRef<"Vendor", 'String'>
+  readonly website: Prisma.FieldRef<"Vendor", 'String'>
+  readonly location: Prisma.FieldRef<"Vendor", 'String'>
   readonly serviceType: Prisma.FieldRef<"Vendor", 'ServiceType'>
   readonly techStack: Prisma.FieldRef<"Vendor", 'String'>
   readonly industryExperience: Prisma.FieldRef<"Vendor", 'String'>
-  readonly note: Prisma.FieldRef<"Vendor", 'String'>
-  readonly location: Prisma.FieldRef<"Vendor", 'String'>
+  readonly languageCapability: Prisma.FieldRef<"Vendor", 'String'>
+  readonly companySize: Prisma.FieldRef<"Vendor", 'String'>
   readonly classification: Prisma.FieldRef<"Vendor", 'VendorClassification'>
+  readonly note: Prisma.FieldRef<"Vendor", 'String'>
   readonly createdAt: Prisma.FieldRef<"Vendor", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"Vendor", 'DateTime'>
 }
@@ -1470,6 +1893,54 @@ export type Vendor$classificationHistoriesArgs<ExtArgs extends runtime.Types.Ext
   take?: number
   skip?: number
   distinct?: Prisma.ClassificationHistoryScalarFieldEnum | Prisma.ClassificationHistoryScalarFieldEnum[]
+}
+
+/**
+ * Vendor.sources
+ */
+export type Vendor$sourcesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the VendorSource
+   */
+  select?: Prisma.VendorSourceSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the VendorSource
+   */
+  omit?: Prisma.VendorSourceOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.VendorSourceInclude<ExtArgs> | null
+  where?: Prisma.VendorSourceWhereInput
+  orderBy?: Prisma.VendorSourceOrderByWithRelationInput | Prisma.VendorSourceOrderByWithRelationInput[]
+  cursor?: Prisma.VendorSourceWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.VendorSourceScalarFieldEnum | Prisma.VendorSourceScalarFieldEnum[]
+}
+
+/**
+ * Vendor.summaries
+ */
+export type Vendor$summariesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the VendorSummary
+   */
+  select?: Prisma.VendorSummarySelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the VendorSummary
+   */
+  omit?: Prisma.VendorSummaryOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.VendorSummaryInclude<ExtArgs> | null
+  where?: Prisma.VendorSummaryWhereInput
+  orderBy?: Prisma.VendorSummaryOrderByWithRelationInput | Prisma.VendorSummaryOrderByWithRelationInput[]
+  cursor?: Prisma.VendorSummaryWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.VendorSummaryScalarFieldEnum | Prisma.VendorSummaryScalarFieldEnum[]
 }
 
 /**
