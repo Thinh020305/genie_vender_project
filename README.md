@@ -45,20 +45,6 @@ Backend API cho hệ thống quản lý và phân loại nhà cung cấp (vendor
 
 ## Công nghệ sử dụng
 
-<<<<<<< HEAD
-| Thành phần          | Công nghệ                             |
-| ------------------- | ------------------------------------- |
-| Runtime             | Node.js 24                            |
-| Framework           | NestJS 11                             |
-| Ngôn ngữ            | TypeScript 5                          |
-| Cơ sở dữ liệu       | PostgreSQL 16                         |
-| ORM                 | Prisma 7                              |
-| PostgreSQL driver   | `pg`, `@prisma/adapter-pg`            |
-| Xác thực nền tảng   | Passport, Passport JWT, `@nestjs/jwt` |
-| Kiểm thử            | Jest, Supertest                       |
-| Chất lượng mã nguồn | ESLint, Prettier                      |
-| Đóng gói            | Docker, Docker Compose                |
-=======
 | Thành phần | Công nghệ |
 | --- | --- |
 | Runtime | Node.js 24 |
@@ -71,7 +57,6 @@ Backend API cho hệ thống quản lý và phân loại nhà cung cấp (vendor
 | Kiểm thử | Jest, Supertest |
 | Chất lượng mã nguồn | ESLint, Prettier |
 | Đóng gói | Docker, Docker Compose |
->>>>>>> origin/develop
 
 ---
 
@@ -171,16 +156,6 @@ Hello World!
 
 ## Biến môi trường
 
-<<<<<<< HEAD
-| Biến                 | Bắt buộc | Giá trị mẫu                                                                                | Mô tả                                         |
-| -------------------- | -------- | ------------------------------------------------------------------------------------------ | --------------------------------------------- |
-| `PORT`               | Không    | `3000`                                                                                     | Cổng HTTP của ứng dụng; mặc định là `3000`.   |
-| `DATABASE_URL`       | Có       | `postgresql://postgres:mysecretpassword@localhost:5431/genie_vendor_project?schema=public` | Chuỗi kết nối PostgreSQL được Prisma sử dụng. |
-| `POSTGRES_HOST_PORT` | Không\*  | `5431`                                                                                     | Cổng PostgreSQL phía máy host.                |
-| `POSTGRES_USER`      | Không\*  | `postgres`                                                                                 | Tên người dùng PostgreSQL.                    |
-| `POSTGRES_PASSWORD`  | Không\*  | `mysecretpassword`                                                                         | Mật khẩu PostgreSQL.                          |
-| `POSTGRES_DB`        | Không\*  | `genie_vendor_project`                                                                     | Tên database.                                 |
-=======
 | Biến | Bắt buộc | Giá trị mẫu | Mô tả |
 | --- | --- | --- | --- |
 | `PORT` | Không | `3000` | Cổng HTTP của ứng dụng; mặc định là `3000`. |
@@ -189,7 +164,6 @@ Hello World!
 | `POSTGRES_USER` | Không\* | `postgres` | Tên người dùng PostgreSQL. |
 | `POSTGRES_PASSWORD` | Không\* | `mysecretpassword` | Mật khẩu PostgreSQL. |
 | `POSTGRES_DB` | Không\* | `genie_vendor_project` | Tên database. |
->>>>>>> origin/develop
 
 \* File `compose.yaml` hiện đang khai báo trực tiếp thông tin PostgreSQL và mapping cổng. Các biến `POSTGRES_\*` trong `.env` chỉ mang tính quy ước cho tới khi Compose được chuyển sang cú pháp `${...}`.
 
@@ -261,15 +235,6 @@ Prisma Client được sinh vào `src/generated/prisma/`. Không sửa trực ti
 
 ## Chạy ứng dụng
 
-<<<<<<< HEAD
-| Lệnh                  | Mục đích                                                         |
-| --------------------- | ---------------------------------------------------------------- |
-| `npm run start`       | Chạy ứng dụng bằng Nest CLI.                                     |
-| `npm run start:dev`   | Chạy development mode và tự khởi động lại khi mã nguồn thay đổi. |
-| `npm run start:debug` | Chạy watch mode kèm Node debugger.                               |
-| `npm run build`       | Biên dịch TypeScript vào `dist/`.                                |
-| `npm run start:prod`  | Chạy bản đã build bằng `node dist/main`.                         |
-=======
 | Lệnh | Mục đích |
 | --- | --- |
 | `npm run start` | Chạy ứng dụng bằng Nest CLI. |
@@ -277,7 +242,6 @@ Prisma Client được sinh vào `src/generated/prisma/`. Không sửa trực ti
 | `npm run start:debug` | Chạy watch mode kèm Node debugger. |
 | `npm run build` | Biên dịch TypeScript vào `dist/`. |
 | `npm run start:prod` | Chạy bản đã build bằng `node dist/main`. |
->>>>>>> origin/develop
 
 Chạy production tại máy local:
 

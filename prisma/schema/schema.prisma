@@ -2,7 +2,10 @@ generator client {
   provider     = "prisma-client"
   output       = "../../src/generated/prisma"
   moduleFormat = "cjs"
-  importFileExtension = "ts"
+  // TypeScript preserves explicit import extensions when compiling under
+  // `module: NodeNext`.  Generated files are emitted as `.js` into `dist`, so
+  // their runtime imports must also use `.js` rather than the source `.ts`.
+  importFileExtension = "js"
 }
 
 datasource db {
