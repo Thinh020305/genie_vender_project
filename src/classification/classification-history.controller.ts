@@ -24,7 +24,7 @@ import { UpdateClassificationDto } from './dto/update-classification.dto';
 // something else (e.g. 'jwt' or 'access-token'), this needs to match.
 // -> CONFIRM WITH THỊNH
 @ApiBearerAuth()
-@Controller('api/vendors')
+@Controller('vendors')
 @UseGuards(JwtAuthGuard, RolesGuard)
 export class ClassificationHistoryController {
   constructor(

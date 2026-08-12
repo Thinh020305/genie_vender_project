@@ -20,8 +20,11 @@ import { ClassificationRulesService } from './classification-rules.service';
 import { CreateClassificationRuleDto } from './dto/create-classification-rule.dto';
 import { MatchClassificationRulesDto } from './dto/match-classification-rules.dto';
 import { UpdateClassificationRuleDto } from './dto/update-classification-rule.dto';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
-@Controller('api/classification-rules')
+@ApiTags('classification')
+@ApiBearerAuth()
+@Controller('classification-rules')
 @UseGuards(JwtAuthGuard, RolesGuard)
 export class ClassificationRulesController {
   constructor(

@@ -28,7 +28,7 @@ import { ClassificationSuggestion } from './interfaces/classification-suggestion
 
 @ApiTags('vendors')
 @ApiBearerAuth()
-@Controller('api/vendors')
+@Controller('vendors')
 @UseGuards(JwtAuthGuard, RolesGuard)
 export class LlmController {
   constructor(
