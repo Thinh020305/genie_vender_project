@@ -17,8 +17,8 @@
 
 import * as runtime from "@prisma/client/runtime/index-browser"
 
-export type * from '../models.js'
-export type * from './prismaNamespace.js'
+export type * from '../models.ts'
+export type * from './prismaNamespace.ts'
 
 export const Decimal = runtime.Decimal
 
@@ -55,8 +55,6 @@ export const ModelName = {
   ClassificationRule: 'ClassificationRule',
   Member: 'Member',
   RevokedToken: 'RevokedToken',
-  User: 'User',
-  Post: 'Post',
   VendorSource: 'VendorSource',
   VendorSummary: 'VendorSummary',
   Vendor: 'Vendor'
@@ -125,27 +123,6 @@ export const RevokedTokenScalarFieldEnum = {
 } as const
 
 export type RevokedTokenScalarFieldEnum = (typeof RevokedTokenScalarFieldEnum)[keyof typeof RevokedTokenScalarFieldEnum]
-
-
-export const UserScalarFieldEnum = {
-  id: 'id',
-  email: 'email',
-  name: 'name',
-  role: 'role'
-} as const
-
-export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum]
-
-
-export const PostScalarFieldEnum = {
-  id: 'id',
-  title: 'title',
-  content: 'content',
-  published: 'published',
-  authorId: 'authorId'
-} as const
-
-export type PostScalarFieldEnum = (typeof PostScalarFieldEnum)[keyof typeof PostScalarFieldEnum]
 
 
 export const VendorSourceScalarFieldEnum = {
