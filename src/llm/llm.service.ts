@@ -4,6 +4,17 @@ import {
   Logger,
 } from '@nestjs/common';
 
+// [AI] Minimal shape of a Groq/OpenAI-compatible chat completion response —
+// just enough to type response.json() so the fields accessed below aren't
+// `any`. Not exhaustive (no usage/id/etc.) since nothing else is read here.
+interface ChatCompletionResponse {
+  choices?: Array<{
+    message?: {
+      content?: string;
+    };
+  }>;
+}
+
 @Injectable()
 export class LlmService {
   private readonly logger = new Logger(LlmService.name);
@@ -65,8 +76,8 @@ export class LlmService {
         throw new Error(`LLM API responded ${response.status}`);
       }
 
-      const data = await response.json();
-      const text = data?.choices?.[0]?.message?.content; // OpenAI-compatible shape is choices[0].message.content
+      const data = (await response.json()) as ChatCompletionResponse;
+      const text = data.choices?.[0]?.message?.content; // OpenAI-compatible shape is choices[0].message.content
 
       if (typeof text !== 'string') {
         throw new Error('LLM API returned an unexpected response shape');
