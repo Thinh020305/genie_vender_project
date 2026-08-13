@@ -13,7 +13,10 @@ import { VendorsService } from './vendors.service';
 import { CreateVendorDto } from './dto/create-vendor.dto';
 import { QueryVendorDto } from './dto/query-vendor.dto';
 import { UpdateVendorDto } from './dto/update-vendor.dto';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
+@ApiTags('vendors')
+@ApiBearerAuth()
 @Controller('vendors')
 export class VendorsController {
   constructor(private readonly vendorsService: VendorsService) {}

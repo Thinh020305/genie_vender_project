@@ -21,9 +21,12 @@ import { Role } from '../generated/prisma/enums';
 import { CreateVendorSummaryDto } from './dto/create-vendor-summary.dto';
 import { QueryVendorSummariesDto } from './dto/query-vendor-summaries.dto';
 import { VendorSummariesService } from './vendor-summaries.service';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
 // Không có route PATCH: bảng chỉ ghi thêm.
-@Controller('api/vendors/:vendorId/summaries')
+@ApiTags('vendor-summaries')
+@ApiBearerAuth()
+@Controller('vendors/:vendorId/summaries')
 @UseGuards(JwtAuthGuard, RolesGuard)
 export class VendorSummariesController {
   constructor(
