@@ -14,7 +14,7 @@ import { VendorStatsResponseDto } from './dto/vendor-stats-response.dto';
 // [AI — HIGH PRIORITY] Route collision flag unchanged, see earlier writeup.
 @ApiTags('vendors')
 @ApiBearerAuth()
-@Controller('api/vendors')
+@Controller('vendors')
 @UseGuards(JwtAuthGuard, RolesGuard)
 export class StatisticsController {
   constructor(private readonly statisticsService: StatisticsService) {}

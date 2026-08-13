@@ -19,8 +19,11 @@ import { CreateVendorSourceDto } from './dto/create-vendor-source.dto';
 import { QueryVendorSourcesDto } from './dto/query-vendor-sources.dto';
 import { UpdateVendorSourceDto } from './dto/update-vendor-source.dto';
 import { VendorSourcesService } from './vendor-sources.service';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
-@Controller('api/vendors/:vendorId/sources')
+@ApiTags('vendor-sources')
+@ApiBearerAuth()
+@Controller('vendors/:vendorId/sources')
 @UseGuards(JwtAuthGuard, RolesGuard)
 export class VendorSourcesController {
   constructor(private readonly vendorSourcesService: VendorSourcesService) {}
