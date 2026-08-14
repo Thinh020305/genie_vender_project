@@ -224,6 +224,8 @@ export type MemberWhereInput = {
   name?: Prisma.StringFilter<"Member"> | string
   role?: Prisma.EnumRoleFilter<"Member"> | $Enums.Role
   createdAt?: Prisma.DateTimeFilter<"Member"> | Date | string
+  vendorSummariesCreated?: Prisma.VendorSummaryListRelationFilter
+  classificationHistories?: Prisma.ClassificationHistoryListRelationFilter
 }
 
 export type MemberOrderByWithRelationInput = {
@@ -233,6 +235,8 @@ export type MemberOrderByWithRelationInput = {
   name?: Prisma.SortOrder
   role?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
+  vendorSummariesCreated?: Prisma.VendorSummaryOrderByRelationAggregateInput
+  classificationHistories?: Prisma.ClassificationHistoryOrderByRelationAggregateInput
 }
 
 export type MemberWhereUniqueInput = Prisma.AtLeast<{
@@ -245,6 +249,8 @@ export type MemberWhereUniqueInput = Prisma.AtLeast<{
   name?: Prisma.StringFilter<"Member"> | string
   role?: Prisma.EnumRoleFilter<"Member"> | $Enums.Role
   createdAt?: Prisma.DateTimeFilter<"Member"> | Date | string
+  vendorSummariesCreated?: Prisma.VendorSummaryListRelationFilter
+  classificationHistories?: Prisma.ClassificationHistoryListRelationFilter
 }, "id" | "email">
 
 export type MemberOrderByWithAggregationInput = {
@@ -279,6 +285,8 @@ export type MemberCreateInput = {
   name: string
   role: $Enums.Role
   createdAt?: Date | string
+  vendorSummariesCreated?: Prisma.VendorSummaryCreateNestedManyWithoutCreatedByInput
+  classificationHistories?: Prisma.ClassificationHistoryCreateNestedManyWithoutChangedByInput
 }
 
 export type MemberUncheckedCreateInput = {
@@ -288,6 +296,8 @@ export type MemberUncheckedCreateInput = {
   name: string
   role: $Enums.Role
   createdAt?: Date | string
+  vendorSummariesCreated?: Prisma.VendorSummaryUncheckedCreateNestedManyWithoutCreatedByInput
+  classificationHistories?: Prisma.ClassificationHistoryUncheckedCreateNestedManyWithoutChangedByInput
 }
 
 export type MemberUpdateInput = {
@@ -296,6 +306,8 @@ export type MemberUpdateInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  vendorSummariesCreated?: Prisma.VendorSummaryUpdateManyWithoutCreatedByNestedInput
+  classificationHistories?: Prisma.ClassificationHistoryUpdateManyWithoutChangedByNestedInput
 }
 
 export type MemberUncheckedUpdateInput = {
@@ -305,6 +317,8 @@ export type MemberUncheckedUpdateInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  vendorSummariesCreated?: Prisma.VendorSummaryUncheckedUpdateManyWithoutCreatedByNestedInput
+  classificationHistories?: Prisma.ClassificationHistoryUncheckedUpdateManyWithoutChangedByNestedInput
 }
 
 export type MemberCreateManyInput = {
@@ -331,6 +345,11 @@ export type MemberUncheckedUpdateManyInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type MemberScalarRelationFilter = {
+  is?: Prisma.MemberWhereInput
+  isNot?: Prisma.MemberWhereInput
 }
 
 export type MemberCountOrderByAggregateInput = {
@@ -368,26 +387,184 @@ export type MemberSumOrderByAggregateInput = {
   id?: Prisma.SortOrder
 }
 
-export type StringFieldUpdateOperationsInput = {
-  set?: string
+export type MemberCreateNestedOneWithoutClassificationHistoriesInput = {
+  create?: Prisma.XOR<Prisma.MemberCreateWithoutClassificationHistoriesInput, Prisma.MemberUncheckedCreateWithoutClassificationHistoriesInput>
+  connectOrCreate?: Prisma.MemberCreateOrConnectWithoutClassificationHistoriesInput
+  connect?: Prisma.MemberWhereUniqueInput
+}
+
+export type MemberUpdateOneRequiredWithoutClassificationHistoriesNestedInput = {
+  create?: Prisma.XOR<Prisma.MemberCreateWithoutClassificationHistoriesInput, Prisma.MemberUncheckedCreateWithoutClassificationHistoriesInput>
+  connectOrCreate?: Prisma.MemberCreateOrConnectWithoutClassificationHistoriesInput
+  upsert?: Prisma.MemberUpsertWithoutClassificationHistoriesInput
+  connect?: Prisma.MemberWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.MemberUpdateToOneWithWhereWithoutClassificationHistoriesInput, Prisma.MemberUpdateWithoutClassificationHistoriesInput>, Prisma.MemberUncheckedUpdateWithoutClassificationHistoriesInput>
 }
 
 export type EnumRoleFieldUpdateOperationsInput = {
   set?: $Enums.Role
 }
 
-export type DateTimeFieldUpdateOperationsInput = {
-  set?: Date | string
+export type MemberCreateNestedOneWithoutVendorSummariesCreatedInput = {
+  create?: Prisma.XOR<Prisma.MemberCreateWithoutVendorSummariesCreatedInput, Prisma.MemberUncheckedCreateWithoutVendorSummariesCreatedInput>
+  connectOrCreate?: Prisma.MemberCreateOrConnectWithoutVendorSummariesCreatedInput
+  connect?: Prisma.MemberWhereUniqueInput
 }
 
-export type IntFieldUpdateOperationsInput = {
-  set?: number
-  increment?: number
-  decrement?: number
-  multiply?: number
-  divide?: number
+export type MemberUpdateOneRequiredWithoutVendorSummariesCreatedNestedInput = {
+  create?: Prisma.XOR<Prisma.MemberCreateWithoutVendorSummariesCreatedInput, Prisma.MemberUncheckedCreateWithoutVendorSummariesCreatedInput>
+  connectOrCreate?: Prisma.MemberCreateOrConnectWithoutVendorSummariesCreatedInput
+  upsert?: Prisma.MemberUpsertWithoutVendorSummariesCreatedInput
+  connect?: Prisma.MemberWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.MemberUpdateToOneWithWhereWithoutVendorSummariesCreatedInput, Prisma.MemberUpdateWithoutVendorSummariesCreatedInput>, Prisma.MemberUncheckedUpdateWithoutVendorSummariesCreatedInput>
 }
 
+export type MemberCreateWithoutClassificationHistoriesInput = {
+  email: string
+  passwordHash: string
+  name: string
+  role: $Enums.Role
+  createdAt?: Date | string
+  vendorSummariesCreated?: Prisma.VendorSummaryCreateNestedManyWithoutCreatedByInput
+}
+
+export type MemberUncheckedCreateWithoutClassificationHistoriesInput = {
+  id?: number
+  email: string
+  passwordHash: string
+  name: string
+  role: $Enums.Role
+  createdAt?: Date | string
+  vendorSummariesCreated?: Prisma.VendorSummaryUncheckedCreateNestedManyWithoutCreatedByInput
+}
+
+export type MemberCreateOrConnectWithoutClassificationHistoriesInput = {
+  where: Prisma.MemberWhereUniqueInput
+  create: Prisma.XOR<Prisma.MemberCreateWithoutClassificationHistoriesInput, Prisma.MemberUncheckedCreateWithoutClassificationHistoriesInput>
+}
+
+export type MemberUpsertWithoutClassificationHistoriesInput = {
+  update: Prisma.XOR<Prisma.MemberUpdateWithoutClassificationHistoriesInput, Prisma.MemberUncheckedUpdateWithoutClassificationHistoriesInput>
+  create: Prisma.XOR<Prisma.MemberCreateWithoutClassificationHistoriesInput, Prisma.MemberUncheckedCreateWithoutClassificationHistoriesInput>
+  where?: Prisma.MemberWhereInput
+}
+
+export type MemberUpdateToOneWithWhereWithoutClassificationHistoriesInput = {
+  where?: Prisma.MemberWhereInput
+  data: Prisma.XOR<Prisma.MemberUpdateWithoutClassificationHistoriesInput, Prisma.MemberUncheckedUpdateWithoutClassificationHistoriesInput>
+}
+
+export type MemberUpdateWithoutClassificationHistoriesInput = {
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  vendorSummariesCreated?: Prisma.VendorSummaryUpdateManyWithoutCreatedByNestedInput
+}
+
+export type MemberUncheckedUpdateWithoutClassificationHistoriesInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  vendorSummariesCreated?: Prisma.VendorSummaryUncheckedUpdateManyWithoutCreatedByNestedInput
+}
+
+export type MemberCreateWithoutVendorSummariesCreatedInput = {
+  email: string
+  passwordHash: string
+  name: string
+  role: $Enums.Role
+  createdAt?: Date | string
+  classificationHistories?: Prisma.ClassificationHistoryCreateNestedManyWithoutChangedByInput
+}
+
+export type MemberUncheckedCreateWithoutVendorSummariesCreatedInput = {
+  id?: number
+  email: string
+  passwordHash: string
+  name: string
+  role: $Enums.Role
+  createdAt?: Date | string
+  classificationHistories?: Prisma.ClassificationHistoryUncheckedCreateNestedManyWithoutChangedByInput
+}
+
+export type MemberCreateOrConnectWithoutVendorSummariesCreatedInput = {
+  where: Prisma.MemberWhereUniqueInput
+  create: Prisma.XOR<Prisma.MemberCreateWithoutVendorSummariesCreatedInput, Prisma.MemberUncheckedCreateWithoutVendorSummariesCreatedInput>
+}
+
+export type MemberUpsertWithoutVendorSummariesCreatedInput = {
+  update: Prisma.XOR<Prisma.MemberUpdateWithoutVendorSummariesCreatedInput, Prisma.MemberUncheckedUpdateWithoutVendorSummariesCreatedInput>
+  create: Prisma.XOR<Prisma.MemberCreateWithoutVendorSummariesCreatedInput, Prisma.MemberUncheckedCreateWithoutVendorSummariesCreatedInput>
+  where?: Prisma.MemberWhereInput
+}
+
+export type MemberUpdateToOneWithWhereWithoutVendorSummariesCreatedInput = {
+  where?: Prisma.MemberWhereInput
+  data: Prisma.XOR<Prisma.MemberUpdateWithoutVendorSummariesCreatedInput, Prisma.MemberUncheckedUpdateWithoutVendorSummariesCreatedInput>
+}
+
+export type MemberUpdateWithoutVendorSummariesCreatedInput = {
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  classificationHistories?: Prisma.ClassificationHistoryUpdateManyWithoutChangedByNestedInput
+}
+
+export type MemberUncheckedUpdateWithoutVendorSummariesCreatedInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  classificationHistories?: Prisma.ClassificationHistoryUncheckedUpdateManyWithoutChangedByNestedInput
+}
+
+
+/**
+ * Count Type MemberCountOutputType
+ */
+
+export type MemberCountOutputType = {
+  vendorSummariesCreated: number
+  classificationHistories: number
+}
+
+export type MemberCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  vendorSummariesCreated?: boolean | MemberCountOutputTypeCountVendorSummariesCreatedArgs
+  classificationHistories?: boolean | MemberCountOutputTypeCountClassificationHistoriesArgs
+}
+
+/**
+ * MemberCountOutputType without action
+ */
+export type MemberCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the MemberCountOutputType
+   */
+  select?: Prisma.MemberCountOutputTypeSelect<ExtArgs> | null
+}
+
+/**
+ * MemberCountOutputType without action
+ */
+export type MemberCountOutputTypeCountVendorSummariesCreatedArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.VendorSummaryWhereInput
+}
+
+/**
+ * MemberCountOutputType without action
+ */
+export type MemberCountOutputTypeCountClassificationHistoriesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.ClassificationHistoryWhereInput
+}
 
 
 export type MemberSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -397,6 +574,9 @@ export type MemberSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   name?: boolean
   role?: boolean
   createdAt?: boolean
+  vendorSummariesCreated?: boolean | Prisma.Member$vendorSummariesCreatedArgs<ExtArgs>
+  classificationHistories?: boolean | Prisma.Member$classificationHistoriesArgs<ExtArgs>
+  _count?: boolean | Prisma.MemberCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["member"]>
 
 export type MemberSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -427,10 +607,20 @@ export type MemberSelectScalar = {
 }
 
 export type MemberOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "email" | "passwordHash" | "name" | "role" | "createdAt", ExtArgs["result"]["member"]>
+export type MemberInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  vendorSummariesCreated?: boolean | Prisma.Member$vendorSummariesCreatedArgs<ExtArgs>
+  classificationHistories?: boolean | Prisma.Member$classificationHistoriesArgs<ExtArgs>
+  _count?: boolean | Prisma.MemberCountOutputTypeDefaultArgs<ExtArgs>
+}
+export type MemberIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
+export type MemberIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
 
 export type $MemberPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "Member"
-  objects: {}
+  objects: {
+    vendorSummariesCreated: Prisma.$VendorSummaryPayload<ExtArgs>[]
+    classificationHistories: Prisma.$ClassificationHistoryPayload<ExtArgs>[]
+  }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: number
     email: string
@@ -832,6 +1022,8 @@ readonly fields: MemberFieldRefs;
  */
 export interface Prisma__MemberClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
+  vendorSummariesCreated<T extends Prisma.Member$vendorSummariesCreatedArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Member$vendorSummariesCreatedArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$VendorSummaryPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  classificationHistories<T extends Prisma.Member$classificationHistoriesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Member$classificationHistoriesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ClassificationHistoryPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -884,6 +1076,10 @@ export type MemberFindUniqueArgs<ExtArgs extends runtime.Types.Extensions.Intern
    */
   omit?: Prisma.MemberOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.MemberInclude<ExtArgs> | null
+  /**
    * Filter, which Member to fetch.
    */
   where: Prisma.MemberWhereUniqueInput
@@ -902,6 +1098,10 @@ export type MemberFindUniqueOrThrowArgs<ExtArgs extends runtime.Types.Extensions
    */
   omit?: Prisma.MemberOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.MemberInclude<ExtArgs> | null
+  /**
    * Filter, which Member to fetch.
    */
   where: Prisma.MemberWhereUniqueInput
@@ -919,6 +1119,10 @@ export type MemberFindFirstArgs<ExtArgs extends runtime.Types.Extensions.Interna
    * Omit specific fields from the Member
    */
   omit?: Prisma.MemberOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.MemberInclude<ExtArgs> | null
   /**
    * Filter, which Member to fetch.
    */
@@ -968,6 +1172,10 @@ export type MemberFindFirstOrThrowArgs<ExtArgs extends runtime.Types.Extensions.
    */
   omit?: Prisma.MemberOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.MemberInclude<ExtArgs> | null
+  /**
    * Filter, which Member to fetch.
    */
   where?: Prisma.MemberWhereInput
@@ -1015,6 +1223,10 @@ export type MemberFindManyArgs<ExtArgs extends runtime.Types.Extensions.Internal
    * Omit specific fields from the Member
    */
   omit?: Prisma.MemberOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.MemberInclude<ExtArgs> | null
   /**
    * Filter, which Members to fetch.
    */
@@ -1064,6 +1276,10 @@ export type MemberCreateArgs<ExtArgs extends runtime.Types.Extensions.InternalAr
    */
   omit?: Prisma.MemberOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.MemberInclude<ExtArgs> | null
+  /**
    * The data needed to create a Member.
    */
   data: Prisma.XOR<Prisma.MemberCreateInput, Prisma.MemberUncheckedCreateInput>
@@ -1111,6 +1327,10 @@ export type MemberUpdateArgs<ExtArgs extends runtime.Types.Extensions.InternalAr
    * Omit specific fields from the Member
    */
   omit?: Prisma.MemberOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.MemberInclude<ExtArgs> | null
   /**
    * The data needed to update a Member.
    */
@@ -1178,6 +1398,10 @@ export type MemberUpsertArgs<ExtArgs extends runtime.Types.Extensions.InternalAr
    */
   omit?: Prisma.MemberOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.MemberInclude<ExtArgs> | null
+  /**
    * The filter to search for the Member to update in case it exists.
    */
   where: Prisma.MemberWhereUniqueInput
@@ -1204,6 +1428,10 @@ export type MemberDeleteArgs<ExtArgs extends runtime.Types.Extensions.InternalAr
    */
   omit?: Prisma.MemberOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.MemberInclude<ExtArgs> | null
+  /**
    * Filter which Member to delete.
    */
   where: Prisma.MemberWhereUniqueInput
@@ -1224,6 +1452,54 @@ export type MemberDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.Intern
 }
 
 /**
+ * Member.vendorSummariesCreated
+ */
+export type Member$vendorSummariesCreatedArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the VendorSummary
+   */
+  select?: Prisma.VendorSummarySelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the VendorSummary
+   */
+  omit?: Prisma.VendorSummaryOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.VendorSummaryInclude<ExtArgs> | null
+  where?: Prisma.VendorSummaryWhereInput
+  orderBy?: Prisma.VendorSummaryOrderByWithRelationInput | Prisma.VendorSummaryOrderByWithRelationInput[]
+  cursor?: Prisma.VendorSummaryWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.VendorSummaryScalarFieldEnum | Prisma.VendorSummaryScalarFieldEnum[]
+}
+
+/**
+ * Member.classificationHistories
+ */
+export type Member$classificationHistoriesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the ClassificationHistory
+   */
+  select?: Prisma.ClassificationHistorySelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the ClassificationHistory
+   */
+  omit?: Prisma.ClassificationHistoryOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ClassificationHistoryInclude<ExtArgs> | null
+  where?: Prisma.ClassificationHistoryWhereInput
+  orderBy?: Prisma.ClassificationHistoryOrderByWithRelationInput | Prisma.ClassificationHistoryOrderByWithRelationInput[]
+  cursor?: Prisma.ClassificationHistoryWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.ClassificationHistoryScalarFieldEnum | Prisma.ClassificationHistoryScalarFieldEnum[]
+}
+
+/**
  * Member without action
  */
 export type MemberDefaultArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1235,4 +1511,8 @@ export type MemberDefaultArgs<ExtArgs extends runtime.Types.Extensions.InternalA
    * Omit specific fields from the Member
    */
   omit?: Prisma.MemberOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.MemberInclude<ExtArgs> | null
 }

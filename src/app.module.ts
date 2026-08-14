@@ -11,10 +11,12 @@ import { ClassificationModule } from './classification/classification.module';
 import { StatisticsModule } from './statistics/statistics.module';
 import { LlmModule } from './llm/llm.module';
 import { VendorsModule } from './vendors/vendors.module';
-import { PrismaModule } from './prisma/prisma.module';
-import { PrismaService } from './prisma/prisma.service';
+import { VendorSourcesModule } from './vendor-sources/vendor-sources.module';
+import { VendorSummariesModule } from './vendor-summaries/vendor-summaries.module';
+import { PrismaModule } from '../prisma/prisma.module';
+import { PrismaService } from '../prisma/prisma.service';
 
-// Common (Filters, Guards, Interceptors)
+// Common
 import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
 import { JwtAuthGuard } from './common/guards/jwt-auth.guard';
 import { RolesGuard } from './common/guards/roles.guard';
@@ -25,17 +27,24 @@ import { ResponseInterceptor } from './common/interceptors/response.interceptor'
     ConfigModule.forRoot({
       isGlobal: true,
     }),
+
+    PrismaModule,
+
     AuthModule,
     ClassificationModule,
     StatisticsModule,
     LlmModule,
     VendorsModule,
-    PrismaModule,
+    VendorSourcesModule,
+    VendorSummariesModule,
   ],
+
   controllers: [AppController],
+
   providers: [
     AppService,
     PrismaService,
+
     {
       provide: APP_FILTER,
       useClass: AllExceptionsFilter,

@@ -1,1 +1,22 @@
+model VendorSource {
+  id Int @id @default(autoincrement())
 
+  vendorId Int
+  vendor   Vendor @relation(fields: [vendorId], references: [id], onDelete: Cascade)
+  
+  sourceType SourceType
+
+  // Mỗi dòng phải có sourceUrl hoặc ghi chú demo trong memo.
+  // Kiểm ở VendorSourcesService.assertSourceEvidence().
+  sourceUrl   String? @db.VarChar(2048)
+  sourceTitle String? @db.VarChar(500)
+
+  // Null = chưa đối chiếu lại lần nào.
+  checkedAt DateTime?
+
+  memo String? @db.VarChar(1000)
+
+  @@index([vendorId])
+  @@index([sourceType])
+  @@map("vendor_sources")
+}
