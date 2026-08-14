@@ -100,15 +100,11 @@ Khi thay đổi schema trong quá trình phát triển thì dùng `migrate dev` 
 npx prisma migrate dev --name <ten_migration>
 ```
 
-### 5. Tạo tài khoản đầu tiên
-
-Dự án **chưa có seed script**. Cần chèn thủ công ít nhất một thành viên `ADMIN` để đăng nhập được. Mật khẩu lưu dạng băm bcrypt trong cột `password`:
+### 5. Khởi tạo seed script để chạy demo
 
 ```bash
-node -e "console.log(require('bcrypt').hashSync('your-password', 10))"
+node prisma/seed.mjs
 ```
-
-Rồi chèn vào bảng `members` với `role = 'ADMIN'`.
 
 ### 6. Chạy server
 
