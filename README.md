@@ -114,6 +114,13 @@ npm run start:dev
 
 Mặc định `http://localhost:3000`. Kiểm tra sống: `GET /api` trả `Hello World!`.
 
+### 7. Đăng nhập trên Swagger
+
+Mở [Swagger UI](http://localhost:3000/api/docs#/), gọi `POST /api/auth/login` bằng một trong các tài khoản trong `prisma/seed.mjs`. Sao chép `accessToken` trong response body, sau đó chọn **Authorize** ở góc trên bên phải, dán token vào, chọn **Authorize**, và chọn **Close**.
+
+Access token sẽ hết hạn sau một thời gian sử dụng. Khi đó, gọi lại `POST /api/auth/login` để lấy token mới và cập nhật trong Swagger.
+
+
 > Trên Windows PowerShell, nếu execution policy chặn `npm.ps1`, dùng `npm.cmd` thay cho `npm`.
 
 ---
