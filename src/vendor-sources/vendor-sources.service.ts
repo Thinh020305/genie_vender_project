@@ -104,11 +104,22 @@ export class VendorSourcesService {
 
     // Kiểm trên dòng sau khi gộp: PATCH chỉ xoá sourceUrl vẫn có thể để lại
     // dòng không còn URL lẫn ghi chú demo.
-    this.assertSourceEvidence(
-      dto.sourceType ?? existing.sourceType,
-      dto.sourceUrl ?? existing.sourceUrl ?? undefined,
-      dto.memo ?? existing.memo ?? undefined,
-    );
+    //
+    // Dùng `'field' in dto` thay vì `dto.field ?? existing.field`: `??` coi
+    // `null` và `undefined` là như nhau, nên `{"sourceUrl": null}` (xoá tường
+    // minh) bị đọc nhầm thành "không gửi trường" và rơi về giá trị cũ —
+    // trong khi khối `data` bên dưới vẫn ghi `null` xuống DB. Kiểm tra `in`
+    // phân biệt đúng "trường có mặt trong body, giá trị null" (cần merge
+    // thành "rỗng") với "trường vắng mặt" (giữ nguyên giá trị cũ).
+    const mergedSourceType = dto.sourceType ?? existing.sourceType;
+    const mergedSourceUrl =
+      'sourceUrl' in dto
+        ? (dto.sourceUrl ?? undefined)
+        : (existing.sourceUrl ?? undefined);
+    const mergedMemo =
+      'memo' in dto ? (dto.memo ?? undefined) : (existing.memo ?? undefined);
+
+    this.assertSourceEvidence(mergedSourceType, mergedSourceUrl, mergedMemo);
 
     const updated = await this.prisma.vendorSource.update({
       where: { id: sourceId },
