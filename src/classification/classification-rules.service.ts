@@ -79,18 +79,35 @@ export class ClassificationRulesService {
       );
     }
 
-    const created = await this.prisma.classificationRule.create({
-      data: {
-        classificationName: dto.classificationName,
-        description: dto.description ?? null,
-        judgmentCriteria: dto.judgmentCriteria ?? null,
-        keywords: dto.keywords ?? [],
-        priority: dto.priority ?? DEFAULT_PRIORITY,
-        weight: dto.weight ?? DEFAULT_WEIGHT,
-      },
-    });
+    // check-then-write: the findUnique above only rules out a rule that
+    // existed *before* this request started. Two requests for the same
+    // classificationName can both pass that check and both reach create()
+    // before either commits — the DB's unique constraint on
+    // classificationName still stops the second write, but as a raw P2002
+    // instead of the handled ConflictException above, which the global
+    // filter turns into a 500. Same try/catch shape as update() below.
+    try {
+      const created = await this.prisma.classificationRule.create({
+        data: {
+          classificationName: dto.classificationName,
+          description: dto.description ?? null,
+          judgmentCriteria: dto.judgmentCriteria ?? null,
+          keywords: dto.keywords ?? [],
+          priority: dto.priority ?? DEFAULT_PRIORITY,
+          weight: dto.weight ?? DEFAULT_WEIGHT,
+        },
+      });
 
-    return ClassificationRuleEntity.fromModel(created);
+      return ClassificationRuleEntity.fromModel(created);
+    } catch (error) {
+      if (isUniqueConstraintError(error)) {
+        throw new ConflictException(
+          `A classification rule for ${dto.classificationName} already exists. Update it instead.`,
+        );
+      }
+
+      throw error;
+    }
   }
 
   async update(

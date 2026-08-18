@@ -1,24 +1,28 @@
-import { ClassificationHistoryService } from './classification-history.service';
+import { ConflictException } from '@nestjs/common';
+import { ClassificationRulesService } from './classification-rules.service';
+import { RuleMatcherService } from './rule-matcher.service';
+import { VendorClassification } from '../generated/prisma/enums';
 
-describe('ClassificationHistoryService', () => {
-  it('throws BadRequestException when new classification equals current', async () => {
+describe('ClassificationRulesService.create', () => {
+  it('maps a P2002 from create() to 409, not a raw 500', async () => {
     const mockPrisma = {
-      vendor: {
-        findUnique: jest
-          .fn()
-          .mockResolvedValue({ id: '1', classification: 'SI_COMPANY' }),
+      classificationRule: {
+        // pre-check sees nothing yet...
+        findUnique: jest.fn().mockResolvedValue(null),
+        // ...but by the time create() runs, another request already won.
+        create: jest.fn().mockRejectedValue({ code: 'P2002' }),
       },
-      $transaction: jest.fn(),
     };
-    const service = new ClassificationHistoryService(mockPrisma as any);
-    await expect(
-      service.updateClassification(
-        '1',
-        { newClassification: 'SI_COMPANY' } as any,
-        'member-1',
-      ),
-    ).rejects.toThrow(
-      'New classification is identical to current classification',
+
+    const service = new ClassificationRulesService(
+      mockPrisma as any,
+      new RuleMatcherService(),
     );
+
+    await expect(
+      service.create({
+        classificationName: VendorClassification.PRODUCT_COMPANY,
+      } as any),
+    ).rejects.toThrow(ConflictException);
   });
 });
