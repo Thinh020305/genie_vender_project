@@ -136,7 +136,7 @@ for (const [vendorId, type, content] of summaries) {
 const count = async (t) =>
   (await client.query(`SELECT count(*)::int AS n FROM ${t}`)).rows[0].n;
 
-console.log('\nSeed xong:');
+console.log('\nSeed:');
 console.log(`  members             ${await count('members')}`);
 console.log(`  classification_rules ${await count('classification_rules')}`);
 console.log(`  vendors             ${await count('vendors')}`);
