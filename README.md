@@ -326,7 +326,7 @@ Endpoint này **chỉ xem trước**, không bao giờ ghi vào `vendors.classif
 
 `Member.password` không bao giờ rời khỏi tầng dữ liệu. Truy vấn tác giả bản tóm tắt ghim sẵn phép chiếu `{ id, name, email }`.
 
----
+Ba điểm về cách dùng LLM:
 
 ## Tính năng LLM
 
