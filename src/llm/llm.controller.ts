@@ -26,7 +26,7 @@ import {
 } from './prompts/classify-vendor.prompt';
 import { ClassificationSuggestion } from './interfaces/classification-suggestion.interface';
 
-@ApiTags('vendors')
+@ApiTags('LLM API')
 @ApiBearerAuth()
 @Controller('vendors')
 @UseGuards(JwtAuthGuard, RolesGuard)
@@ -91,4 +91,5 @@ export class LlmController {
         'This is an AI-generated suggestion for reference only. It must be reviewed by a team member and confirmed via PATCH /api/vendors/{id}/classification before it takes effect.',
     };
   }
+
 }

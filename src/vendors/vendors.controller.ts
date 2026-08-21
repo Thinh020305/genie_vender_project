@@ -24,7 +24,7 @@ import { Role } from '../generated/prisma/enums';
 // getAllAndOverride() finds nothing and lets ANY authenticated role through
 // (see roles.guard.ts) — including REVIEWER, which is spec'd as read-only.
 // No @UseGuards() needed here; the global guards already read @Roles().
-@ApiTags('vendors')
+@ApiTags('Vendor API')
 @ApiBearerAuth()
 @Controller('vendors')
 export class VendorsController {

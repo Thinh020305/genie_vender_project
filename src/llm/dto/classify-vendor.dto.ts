@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsUUID } from 'class-validator';
+import { IsInt, Min } from 'class-validator';
 
 export class ClassifyVendorDto {
   // POST /api/vendors/classify has no :id param in the spec's endpoint table
@@ -12,7 +12,8 @@ export class ClassifyVendorDto {
   // because it ties cleanly into the "pre-fill reason on PATCH /classification"
   // flow — but this is a real design fork, not spec text.
   // -> MENTION TO TEAM
-  @ApiProperty({ format: 'uuid' })
-  @IsUUID()
+  @ApiProperty({ type: Number, minimum: 1, example: 1 })
+  @IsInt()
+  @Min(1)
   vendorId!: number;
 }

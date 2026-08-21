@@ -1,22 +1,29 @@
-### Building and running your application
+# Docker trong môi trường phát triển
 
-When you're ready, start your application by running:
-`docker compose up --build`.
+`compose.yaml` của dự án chỉ dùng để chạy PostgreSQL. API NestJS được chạy trên máy host để hỗ trợ hot reload và debug thuận tiện.
 
-Your application will be available at http://localhost:3000.
+```bash
+docker compose up -d postgres
+docker compose ps
+```
 
-### Deploying your application to the cloud
+Sau khi PostgreSQL ở trạng thái `healthy`, chạy migration, seed và API:
 
-First, build your image, e.g.: `docker build -t myapp .`.
-If your cloud uses a different CPU architecture than your development
-machine (e.g., you are on a Mac M1 and your cloud provider is amd64),
-you'll want to build the image for that platform, e.g.:
-`docker build --platform=linux/amd64 -t myapp .`.
+```bash
+npx prisma generate
+npx prisma migrate deploy
+node prisma/seed.mjs
+npm run start:dev
+```
 
-Then, push it to your registry, e.g. `docker push myregistry.com/myapp`.
+API mặc định ở `http://localhost:3000/api`, Swagger UI ở `http://localhost:3000/api/docs`.
 
-Consult Docker's [getting started](https://docs.docker.com/go/get-started-sharing/)
-docs for more detail on building and pushing.
+Xem đầy đủ yêu cầu hệ thống, cấu hình `.env`, tài khoản demo và các bước cài đặt trong [README.md](README.md#bắt-đầu-nhanh).
 
-### References
-* [Docker's Node.js guide](https://docs.docker.com/language/nodejs/)
+Để dừng PostgreSQL nhưng vẫn giữ dữ liệu:
+
+```bash
+docker compose down
+```
+
+Không dùng `docker compose down -v` trừ khi muốn xoá toàn bộ database local.

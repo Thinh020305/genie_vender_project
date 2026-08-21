@@ -20,9 +20,9 @@ import { ClassificationRulesService } from './classification-rules.service';
 import { CreateClassificationRuleDto } from './dto/create-classification-rule.dto';
 import { MatchClassificationRulesDto } from './dto/match-classification-rules.dto';
 import { UpdateClassificationRuleDto } from './dto/update-classification-rule.dto';
-import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiExcludeEndpoint, ApiTags } from '@nestjs/swagger';
 
-@ApiTags('classification')
+@ApiTags('Classification API')
 @ApiBearerAuth()
 @Controller('classification-rules')
 @UseGuards(JwtAuthGuard, RolesGuard)
@@ -39,6 +39,7 @@ export class ClassificationRulesController {
   // Phải khai trước @Get(':id') / @Patch(':id'): Express khớp theo thứ tự đăng
   // ký, nếu ':id' đứng trước thì "match" bị gán vào :id và ParseIntPipe trả 400.
   @Post('match')
+  @ApiExcludeEndpoint()
   @HttpCode(HttpStatus.OK)
   @Roles(Role.ADMIN, Role.DEVELOPER)
   match(@Body() dto: MatchClassificationRulesDto) {
@@ -46,17 +47,20 @@ export class ClassificationRulesController {
   }
 
   @Get(':id')
+  @ApiExcludeEndpoint()
   findOne(@Param('id', ParseIntPipe) id: number) {
     return this.classificationRulesService.findOne(id);
   }
 
   @Post()
+  @ApiExcludeEndpoint()
   @Roles(Role.ADMIN)
   create(@Body() dto: CreateClassificationRuleDto) {
     return this.classificationRulesService.create(dto);
   }
 
   @Patch(':id')
+  @ApiExcludeEndpoint()
   @Roles(Role.ADMIN)
   update(
     @Param('id', ParseIntPipe) id: number,
@@ -66,6 +70,7 @@ export class ClassificationRulesController {
   }
 
   @Delete(':id')
+  @ApiExcludeEndpoint()
   @Roles(Role.ADMIN)
   remove(@Param('id', ParseIntPipe) id: number) {
     return this.classificationRulesService.remove(id);
