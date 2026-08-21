@@ -19,11 +19,11 @@ import { CreateVendorSourceDto } from './dto/create-vendor-source.dto';
 import { QueryVendorSourcesDto } from './dto/query-vendor-sources.dto';
 import { UpdateVendorSourceDto } from './dto/update-vendor-source.dto';
 import { VendorSourcesService } from './vendor-sources.service';
-import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiExcludeEndpoint, ApiTags } from '@nestjs/swagger';
 
-@ApiTags('vendor-sources')
+@ApiTags('Source API')
 @ApiBearerAuth()
-@Controller('vendors/:vendorId/sources')
+@Controller('vendors/:id/sources')
 @UseGuards(JwtAuthGuard, RolesGuard)
 export class VendorSourcesController {
   constructor(private readonly vendorSourcesService: VendorSourcesService) {}
@@ -31,7 +31,7 @@ export class VendorSourcesController {
   @Post()
   @Roles(Role.ADMIN, Role.DEVELOPER)
   create(
-    @Param('vendorId', ParseIntPipe) vendorId: number,
+    @Param('id', ParseIntPipe) vendorId: number,
     @Body() dto: CreateVendorSourceDto,
   ) {
     return this.vendorSourcesService.create(vendorId, dto);
@@ -41,15 +41,16 @@ export class VendorSourcesController {
   // đó là cách REVIEWER có quyền chỉ đọc.
   @Get()
   findAll(
-    @Param('vendorId', ParseIntPipe) vendorId: number,
+    @Param('id', ParseIntPipe) vendorId: number,
     @Query() query: QueryVendorSourcesDto,
   ) {
     return this.vendorSourcesService.findAllForVendor(vendorId, query);
   }
 
   @Get(':sourceId')
+  @ApiExcludeEndpoint()
   findOne(
-    @Param('vendorId', ParseIntPipe) vendorId: number,
+    @Param('id', ParseIntPipe) vendorId: number,
     @Param('sourceId', ParseIntPipe) sourceId: number,
   ) {
     return this.vendorSourcesService.findOne(vendorId, sourceId);
@@ -58,7 +59,7 @@ export class VendorSourcesController {
   @Patch(':sourceId')
   @Roles(Role.ADMIN, Role.DEVELOPER)
   update(
-    @Param('vendorId', ParseIntPipe) vendorId: number,
+    @Param('id', ParseIntPipe) vendorId: number,
     @Param('sourceId', ParseIntPipe) sourceId: number,
     @Body() dto: UpdateVendorSourceDto,
   ) {
@@ -66,9 +67,10 @@ export class VendorSourcesController {
   }
 
   @Delete(':sourceId')
+  @ApiExcludeEndpoint()
   @Roles(Role.ADMIN)
   remove(
-    @Param('vendorId', ParseIntPipe) vendorId: number,
+    @Param('id', ParseIntPipe) vendorId: number,
     @Param('sourceId', ParseIntPipe) sourceId: number,
   ) {
     return this.vendorSourcesService.remove(vendorId, sourceId);

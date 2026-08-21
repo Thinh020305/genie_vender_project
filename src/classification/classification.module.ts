@@ -16,7 +16,7 @@ import { RuleMatcherService } from './rule-matcher.service';
 // so nothing could inject it — ClassificationRulesService is its first
 // consumer.
 @Module({
-  controllers: [ClassificationHistoryController, ClassificationRulesController],
+  controllers: [ClassificationRulesController, ClassificationHistoryController],
   providers: [
     ClassificationHistoryService,
     ClassificationRulesService,
