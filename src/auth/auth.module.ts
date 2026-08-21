@@ -12,15 +12,14 @@ import { RevokedTokenService } from './revoked-token.service';
 @Module({
   imports: [
     MembersModule,
-    PrismaModule,    
+    PrismaModule,
     PassportModule,
 
     JwtModule.registerAsync({
       inject: [ConfigService],
 
       useFactory: (configService: ConfigService) => ({
-        secret:
-          configService.getOrThrow<string>('JWT_SECRET'),
+        secret: configService.getOrThrow<string>('JWT_SECRET'),
 
         signOptions: {
           expiresIn: '1h',
@@ -31,10 +30,6 @@ import { RevokedTokenService } from './revoked-token.service';
 
   controllers: [AuthController],
 
-  providers: [
-    AuthService,
-    JwtStrategy,
-    RevokedTokenService,
-  ],
+  providers: [AuthService, JwtStrategy, RevokedTokenService],
 })
 export class AuthModule {}

@@ -8,6 +8,11 @@
  *
  * 🟢 You can import this file directly.
  */
+export type * from './models/ClassificationHistory.js'
+export type * from './models/ClassificationRule.js'
 export type * from './models/Member.js'
 export type * from './models/RevokedToken.js'
+export type * from './models/VendorSource.js'
+export type * from './models/VendorSummary.js'
+export type * from './models/Vendor.js'
 export type * from './commonInputTypes.js'

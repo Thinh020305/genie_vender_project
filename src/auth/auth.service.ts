@@ -1,7 +1,4 @@
-import {
-  Injectable,
-  UnauthorizedException,
-} from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { MembersService } from '../members/members.service';
@@ -22,9 +19,7 @@ export class AuthService {
     const member = await this.membersService.findByEmail(dto.email);
 
     if (!member) {
-      throw new UnauthorizedException(
-        'Email or password is incorrect',
-      );
+      throw new UnauthorizedException('Email or password is incorrect');
     }
 
     const passwordMatched = await bcrypt.compare(
@@ -33,9 +28,7 @@ export class AuthService {
     );
 
     if (!passwordMatched) {
-      throw new UnauthorizedException(
-        'Email or password is incorrect',
-      );
+      throw new UnauthorizedException('Email or password is incorrect');
     }
 
     const payload: JwtPayload = {
@@ -45,8 +38,7 @@ export class AuthService {
       jti: randomUUID(),
     };
 
-    const accessToken =
-      await this.jwtService.signAsync(payload);
+    const accessToken = await this.jwtService.signAsync(payload);
 
     return {
       accessToken,
@@ -59,16 +51,11 @@ export class AuthService {
     };
   }
   async logout(payload: JwtPayload): Promise<null> {
-  if (!payload.jti || !payload.exp) {
-    throw new UnauthorizedException(
-      'Invalid access token',
-    );
-  }
+    if (!payload.jti || !payload.exp) {
+      throw new UnauthorizedException('Invalid access token');
+    }
 
-  await this.revokedTokenService.revoke(
-    payload.jti,
-    payload.exp,
-  );
-  return null;
- }
+    await this.revokedTokenService.revoke(payload.jti, payload.exp);
+    return null;
+  }
 }

@@ -1,58 +1,83 @@
-import { Injectable, InternalServerErrorException, Logger } from '@nestjs/common';
+import {
+  Injectable,
+  InternalServerErrorException,
+  Logger,
+} from '@nestjs/common';
+
+// [AI] Minimal shape of a Groq/OpenAI-compatible chat completion response —
+// just enough to type response.json() so the fields accessed below aren't
+// `any`. Not exhaustive (no usage/id/etc.) since nothing else is read here.
+interface ChatCompletionResponse {
+  choices?: Array<{
+    message?: {
+      content?: string;
+    };
+  }>;
+}
 
 @Injectable()
 export class LlmService {
   private readonly logger = new Logger(LlmService.name);
 
-  // [AI] Kept generic on purpose (system prompt + user prompt in, raw text
-  // out) so summarize-vendor and extract-fields can reuse this later
-  // without a rewrite — that reuse plan isn't in the spec, just anticipating
-  // the other two optional LLM endpoints listed in the PDF.
-  async generateCompletion(system: string, userPrompt: string): Promise<string> {
-    // [AI] process.env.LLM_API_KEY — this variable does not exist in
-    // .env.example (currently an EMPTY file) or anywhere in the repo.
-    // Someone has to add it before this ever runs.
-    // -> MENTION TO TEAM (likely a config/.env addition — check with
-    //    Thịnh since he owns config/.env.example in the task split, even
-    //    though the LLM key itself is Sơn's module's concern)
+  async generateCompletion(
+    system: string,
+    userPrompt: string,
+  ): Promise<string> {
     const apiKey = process.env.LLM_API_KEY;
     if (!apiKey) {
       throw new InternalServerErrorException('LLM_API_KEY is not configured');
     }
 
-    // [AI] Provider/endpoint/model choice — the PDF never names a specific
-    // LLM provider or model. Used native fetch() against the Anthropic
-    // Messages API here to avoid adding an unrequested SDK dependency
-    // (@anthropic-ai/sdk is NOT in package.json). Team may prefer a
-    // different provider or the official SDK instead.
-    // -> MENTION TO TEAM
-    const model = process.env.LLM_MODEL ?? 'claude-sonnet-4-6'; // [AI] placeholder model string, not spec-given
+    // [AI] Switched from Anthropic to Groq. Model default updated to
+    // openai/gpt-oss-20b — Groq deprecated llama-3.3-70b-versatile and
+    // llama-3.1-8b-instant in June 2026, so the old placeholder would have
+    // 400'd immediately. gpt-oss-20b chosen for cost/speed on a
+    // classification task; gpt-oss-120b is available if quality matters
+    // more than latency here.
+    // -> MENTION TO TEAM: Groq's model catalog churns often (their own
+    //    docs note this) — worth checking https://console.groq.com/docs/models
+    //    or GET /v1/models before a demo, not just trusting this default.
+    const model = process.env.LLM_MODEL ?? 'openai/gpt-oss-20b';
 
     try {
-      const response = await fetch('https://api.anthropic.com/v1/messages', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-api-key': apiKey,
-          'anthropic-version': '2023-06-01', // [AI] API version pinned arbitrarily
+      // [AI] Endpoint + auth header changed for Groq's OpenAI-compatible
+      // API: Authorization: Bearer, not x-api-key + anthropic-version.
+      const response = await fetch(
+        'https://api.groq.com/openai/v1/chat/completions',
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${apiKey}`,
+          },
+          body: JSON.stringify({
+            model,
+            max_tokens: 1024, // [AI] arbitrary cap, unchanged from before — not spec-given
+            // [AI] Groq/OpenAI-compatible format puts the system prompt
+            // INSIDE the messages array, unlike Anthropic's separate top-
+            // level `system` field. This is a real shape difference, not
+            // cosmetic — a straight copy-paste of the old body would 400.
+            messages: [
+              { role: 'system', content: system },
+              { role: 'user', content: userPrompt },
+            ],
+            // [AI] Optional: Groq supports response_format: { type: "json_object" }
+            // on models that support structured outputs, which would enforce
+            // the "respond with ONLY JSON" instruction at the API level
+            // instead of just hoping the model listens to the prompt.
+            // Left OFF here since not every Groq model supports it — verify
+            // for whichever model you settle on, then turn it on.
+            // -> MENTION TO TEAM as a reliability improvement
+          }),
         },
-        body: JSON.stringify({
-          model,
-          max_tokens: 1024, // [AI] arbitrary cap, not spec-given
-          system,
-          messages: [{ role: 'user', content: userPrompt }],
-        }),
-      });
+      );
 
       if (!response.ok) {
-        // [AI] Wrapping any upstream failure as 500 — spec doesn't say
-        // what HTTP status a failed LLM call should return to the caller.
-        // -> MENTION TO TEAM (502 Bad Gateway might read better than 500)
         throw new Error(`LLM API responded ${response.status}`);
       }
 
-      const data = await response.json();
-      const text = data?.content?.[0]?.text;
+      const data = (await response.json()) as ChatCompletionResponse;
+      const text = data.choices?.[0]?.message?.content; // OpenAI-compatible shape is choices[0].message.content
 
       if (typeof text !== 'string') {
         throw new Error('LLM API returned an unexpected response shape');
@@ -61,7 +86,9 @@ export class LlmService {
       return text;
     } catch (err) {
       this.logger.error('LLM completion failed', err as Error);
-      throw new InternalServerErrorException('Failed to get a response from the LLM');
+      throw new InternalServerErrorException(
+        'Failed to get a response from the LLM',
+      );
     }
   }
 }

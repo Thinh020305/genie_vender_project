@@ -1,112 +1,87 @@
-# Genie Vendor Project
+# Genie Vina — Vendor Intelligence API
 
-Backend API cho hệ thống quản lý và phân loại nhà cung cấp (vendor), được xây dựng bằng NestJS, TypeScript, Prisma ORM và PostgreSQL.
+REST API cấu trúc hoá thông tin nhà cung cấp IT/phần mềm Việt Nam, phục vụ doanh nghiệp Hàn Quốc cần so sánh đối tác phát triển. Cho phép đăng ký, tra cứu, tìm kiếm, lọc, phân loại và tóm tắt dữ liệu vendor.
 
-> **Trạng thái hiện tại:** dự án đang ở giai đoạn khởi tạo nền tảng. API hiện có endpoint kiểm tra hoạt động, mô hình `User`/`Post`, các enum nghiệp vụ vendor và các thành phần dùng chung cho JWT, phân quyền, chuẩn hóa response. Các module nghiệp vụ vendor chưa được triển khai.
+Xây dựng bằng **NestJS 11 · TypeScript 5 · Prisma 7 · PostgreSQL 16**.
+
+> **Phạm vi:** đây là Demo MVP mang tính giáo dục. Kết quả phân loại và đầu ra LLM chỉ là tham khảo — **không** phải khuyến nghị đối tác, xếp hạng, thẩm định hay đánh giá tín nhiệm.
 
 ---
 
 ## Mục lục
 
-- [Tính năng hiện có](#tính-năng-hiện-có)
-- [Công nghệ sử dụng](#công-nghệ-sử-dụng)
+- [Kiến trúc](#kiến-trúc)
 - [Yêu cầu hệ thống](#yêu-cầu-hệ-thống)
 - [Bắt đầu nhanh](#bắt-đầu-nhanh)
 - [Biến môi trường](#biến-môi-trường)
-- [Cơ sở dữ liệu và Prisma](#cơ-sở-dữ-liệu-và-prisma)
-- [Chạy ứng dụng](#chạy-ứng-dụng)
-- [API hiện có](#api-hiện-có)
-- [Cấu trúc dự án](#cấu-trúc-dự-án)
-- [Kiểm thử và chất lượng mã nguồn](#kiểm-thử-và-chất-lượng-mã-nguồn)
-- [Docker](#docker)
-- [Quy ước phát triển](#quy-ước-phát-triển)
-- [Xử lý sự cố](#xử-lý-sự-cố)
-- [Giới hạn hiện tại](#giới-hạn-hiện-tại)
-- [Giấy phép](#giấy-phép)
+- [Cơ sở dữ liệu](#cơ-sở-dữ-liệu)
+- [Xác thực và phân quyền](#xác-thực-và-phân-quyền)
+- [Danh sách API](#danh-sách-api)
+- [Định dạng response](#định-dạng-response)
+- [Nghiệp vụ đã hiện thực](#nghiệp-vụ-đã-hiện-thực)
+- [Tính năng LLM](#tính-năng-llm)
+- [Kiểm thử](#kiểm-thử)
+- [Quy trình Git](#quy-trình-git)
+- [Vấn đề đã biết](#vấn-đề-đã-biết)
+- [Cấu trúc thư mục](#cấu-trúc-thư-mục)
 
 ---
 
-## Tính năng hiện có
+## Kiến trúc
 
-- Khung ứng dụng NestJS 11 với TypeScript.
-- Kết nối PostgreSQL qua Prisma 7 và `@prisma/adapter-pg`.
-- Prisma schema dạng nhiều file trong `prisma/schema/`.
-- Migration cho `User`, `Post` và các enum nghiệp vụ.
-- Seed hai tài khoản mẫu.
-- Thành phần nền tảng cho xác thực và phân quyền:
-  - `JwtAuthGuard`.
-  - `RolesGuard`.
-  - decorator `@Roles()`, `@Public()` và `@CurrentUser()`.
-- Interceptor chuẩn hóa response thành `{ status, message, data }`.
-- Exception filter chuẩn hóa lỗi HTTP.
-- Unit test và end-to-end test mẫu cho endpoint gốc.
-
----
-
-## Công nghệ sử dụng
-
-| Thành phần | Công nghệ |
+| Module | Trách nhiệm |
 | --- | --- |
-| Runtime | Node.js 24 |
-| Framework | NestJS 11 |
-| Ngôn ngữ | TypeScript 5 |
-| Cơ sở dữ liệu | PostgreSQL 16 |
-| ORM | Prisma 7 |
-| PostgreSQL driver | `pg`, `@prisma/adapter-pg` |
-| Xác thực nền tảng | Passport, Passport JWT, `@nestjs/jwt` |
-| Kiểm thử | Jest, Supertest |
-| Chất lượng mã nguồn | ESLint, Prettier |
-| Đóng gói | Docker, Docker Compose |
+| `auth` | Đăng nhập/đăng xuất JWT, thu hồi token qua bảng `RevokedToken` |
+| `members` | Truy vấn thành viên phục vụ xác thực |
+| `vendors` | CRUD vendor, tìm kiếm, lọc tổ hợp, phân trang |
+| `vendor-sources` | Nguồn công khai của vendor + quy tắc kiểm soát nguồn |
+| `vendor-summaries` | Bản tóm tắt hồ sơ vendor (ghi thêm, không sửa) |
+| `classification` | Danh mục tiêu chí phân loại, lịch sử thay đổi, khớp tiêu chí tự động |
+| `statistics` | Thống kê tổng hợp theo phân loại / địa điểm / loại dịch vụ |
+| `llm` | Gợi ý phân loại bằng LLM (Groq) |
+| `common` | Guard, decorator, filter, interceptor dùng chung |
+
+Ba thành phần đăng ký toàn cục trong `AppModule`:
+
+- `AllExceptionsFilter` — chuẩn hoá mọi lỗi về cùng một hình dạng
+- `ResponseInterceptor` — bọc mọi response thành `{ status, message, data }`
+- `JwtAuthGuard` + `RolesGuard` — bảo vệ mặc định toàn bộ route, trừ route gắn `@Public()`
 
 ---
 
 ## Yêu cầu hệ thống
 
-Cài đặt các công cụ sau trước khi bắt đầu:
-
-- Node.js 24.x (Dockerfile sử dụng `24.18.0`).
-- npm 11.x hoặc phiên bản tương thích với Node.js 24.
-- Docker Desktop/Docker Engine có Docker Compose
-- Git.
+- Node.js 24.x
+- Docker Desktop / Docker Engine kèm Docker Compose
+- Git
 
 ---
 
 ## Bắt đầu nhanh
 
-### 1. Lấy mã nguồn và cài dependency
+### 1. Cài dependency
 
 ```bash
 git clone <repository-url>
-cd genie_vendor_project
+cd genie_vender_project
 npm ci
 ```
 
-### 2. Tạo file môi trường
+### 2. Tạo file `.env`
 
-Tạo `.env` tại thư mục gốc:
+Sao chép từ `.env.example` rồi điền giá trị thật:
 
-```dotenv
-PORT=3000
-
-POSTGRES_HOST_PORT=5431
-POSTGRES_USER=postgres
-POSTGRES_PASSWORD=mysecretpassword
-POSTGRES_DB=genie_vendor_project
-
-DATABASE_URL="postgresql://postgres:mysecretpassword@localhost:5431/genie_vendor_project?schema=public"
+```bash
+cp .env.example .env
 ```
-
-Không commit file `.env` hoặc thông tin bí mật lên Git.
 
 ### 3. Khởi động PostgreSQL
 
 ```bash
-docker compose up -d genie_vendor_postgres
+docker compose up -d
 ```
 
-Container genie_vendor_postgres được công bố tại `localhost:5431`; cổng bên trong container là `5432`.
-
-Kiểm tra trạng thái:
+Container `genie_vendor_postgres` publish ở `localhost:5431` (bên trong container là `5432`). Kiểm tra:
 
 ```bash
 docker compose ps
@@ -119,379 +94,318 @@ npx prisma generate
 npx prisma migrate deploy
 ```
 
-Trong quá trình phát triển schema, dùng `migrate dev` thay cho `migrate deploy`:
+Khi thay đổi schema trong quá trình phát triển thì dùng `migrate dev` thay cho `migrate deploy`:
 
 ```bash
 npx prisma migrate dev --name <ten_migration>
 ```
 
-### 5. Nạp dữ liệu mẫu (không bắt buộc)
+### 5. Khởi tạo seed script để chạy demo
 
 ```bash
-npx ts-node prisma/seed.ts
+node prisma/seed.mjs
 ```
 
-Seed hiện tạo hai user nếu email chưa tồn tại:
-
-- `admin@example.com`
-- `member@example.com`
-
-Do trường `role` có giá trị mặc định, cả hai user hiện được tạo với role `DEVELOPER`.
-
-### 6. Chạy server phát triển
+### 6. Chạy server
 
 ```bash
 npm run start:dev
 ```
 
-Mở `http://localhost:3000`. Kết quả mong đợi:
+Mặc định `http://localhost:3000`. Kiểm tra sống: `GET /api` trả `Hello World!`.
 
-```text
-Hello World!
-```
+### 7. Đăng nhập trên Swagger
 
-> Trên Windows PowerShell, nếu execution policy chặn `npm.ps1`, hãy dùng `npm.cmd` thay cho `npm`, ví dụ `npm.cmd run start:dev`.
+Mở [Swagger UI](http://localhost:3000/api/docs#/), gọi `POST /api/auth/login` bằng một trong các tài khoản trong `prisma/seed.mjs`. Sao chép `accessToken` trong response body, sau đó chọn **Authorize** ở góc trên bên phải, dán token vào, chọn **Authorize**, và chọn **Close**.
+
+Access token sẽ hết hạn sau một thời gian sử dụng. Khi đó, gọi lại `POST /api/auth/login` để lấy token mới và cập nhật trong Swagger.
+
+
+> Trên Windows PowerShell, nếu execution policy chặn `npm.ps1`, dùng `npm.cmd` thay cho `npm`.
 
 ---
 
 ## Biến môi trường
 
-| Biến | Bắt buộc | Giá trị mẫu | Mô tả |
-| --- | --- | --- | --- |
-| `PORT` | Không | `3000` | Cổng HTTP của ứng dụng; mặc định là `3000`. |
-| `DATABASE_URL` | Có | `postgresql://postgres:mysecretpassword@localhost:5431/genie_vendor_project?schema=public` | Chuỗi kết nối PostgreSQL được Prisma sử dụng. |
-| `POSTGRES_HOST_PORT` | Không\* | `5431` | Cổng PostgreSQL phía máy host. |
-| `POSTGRES_USER` | Không\* | `postgres` | Tên người dùng PostgreSQL. |
-| `POSTGRES_PASSWORD` | Không\* | `mysecretpassword` | Mật khẩu PostgreSQL. |
-| `POSTGRES_DB` | Không\* | `genie_vendor_project` | Tên database. |
+| Biến | Bắt buộc | Mô tả |
+| --- | --- | --- |
+| `DATABASE_URL` | Có | Chuỗi kết nối PostgreSQL cho Prisma |
+| `JWT_SECRET` | Có | Khoá ký JWT. `JwtStrategy` dùng `getOrThrow` nên thiếu là app không khởi động |
+| `PORT` | Không | Cổng HTTP, mặc định `3000` |
+| `LLM_API_KEY` | Chỉ khi dùng LLM | API key Groq cho `POST /vendors/classify` |
+| `LLM_MODEL` | Không | Mặc định `openai/gpt-oss-20b` |
+| `POSTGRES_HOST_PORT` | Không | Cổng PostgreSQL phía host, mặc định `5431` |
+| `POSTGRES_USER` · `POSTGRES_PASSWORD` · `POSTGRES_DB` | Không | Thông tin container PostgreSQL |
 
-\* File `compose.yaml` hiện đang khai báo trực tiếp thông tin PostgreSQL và mapping cổng. Các biến `POSTGRES_\*` trong `.env` chỉ mang tính quy ước cho tới khi Compose được chuyển sang cú pháp `${...}`.
-
-Nếu chạy API trong một container cùng Docker network với PostgreSQL, hostname trong `DATABASE_URL` phải là tên service `postgres` và cổng phải là `5432`, không phải `localhost:5431`:
+Nếu chạy API trong container cùng network với PostgreSQL, hostname phải là tên service và cổng là `5432`:
 
 ```dotenv
-DATABASE_URL="postgresql://postgres:mysecretpassword@postgres:5432/genie_vendor_project?schema=public"
+DATABASE_URL="postgresql://user:pass@postgres:5432/genie_vendor_project?schema=public"
 ```
+
+Không commit `.env` lên Git.
 
 ---
 
-## Cơ sở dữ liệu và Prisma
+## Cơ sở dữ liệu
 
-### Mô hình hiện tại
+Schema chia nhiều file trong `prisma/schema/`. Sơ đồ ERD đầy đủ ở [`docs/erd.md`](docs/erd.md) (dán vào dbdiagram.io để xem).
 
-```text
-User (1) ──────── (n) Post
+```
+members ──┬─< classification_histories >─┬── vendors ──< vendor_sources
+          └─< vendor_summaries >─────────┘
+
+classification_rules   (bảng tra cứu, không nối khoá ngoại)
 ```
 
-`User` gồm:
-
-- `id`: khóa chính tự tăng.
-- `email`: duy nhất.
-- `name`: có thể rỗng.
-- `role`: `ADMIN`, `DEVELOPER` hoặc `REVIEWER`; mặc định `DEVELOPER`.
-- `posts`: danh sách bài viết liên quan.
-
-`Post` gồm:
-
-- `id`: khóa chính tự tăng.
-- `title`: tiêu đề bắt buộc.
-- `content`: nội dung có thể rỗng.
-- `published`: trạng thái xuất bản, mặc định `false`.
-- `authorId`: khóa ngoại tùy chọn đến `User`.
-
-Các enum đã được chuẩn bị cho miền nghiệp vụ vendor:
-
-- `ServiceType`: `OUTSOURCING`, `SI`, `PRODUCT`, `CONSULTING`, `SPECIALIZED_TECH`.
-- `SourceType`: `PUBLIC_WEBSITE`, `DIRECTORY`, `LINKEDIN`, `ARTICLE`, `DEMO_DATA`.
-- `SummaryType`: `PROFILE_SUMMARY`, `LLM_SUMMARY`, `MANUAL_NOTE`.
-- `VendorClassification`: `OUTSOURCING_VENDOR`, `SI_COMPANY`, `PRODUCT_COMPANY`, `CONSULTING_IT_SERVICE`, `SPECIALIZED_TECH_VENDOR`.
-
-### Các lệnh Prisma thường dùng
-
-```bash
-# Sinh lại Prisma Client sau khi sửa schema
-npx prisma generate
-
-# Tạo và áp dụng migration khi phát triển
-npx prisma migrate dev --name <ten_migration>
-
-# Áp dụng migration có sẵn tại môi trường triển khai
-npx prisma migrate deploy
-
-# Kiểm tra trạng thái migration
-npx prisma migrate status
-
-# Mở giao diện quản lý dữ liệu
-npx prisma studio
-
-# Kiểm tra và định dạng schema
-npx prisma validate
-npx prisma format
-```
-
-Prisma Client được sinh vào `src/generated/prisma/`. Không sửa trực tiếp các file trong thư mục này.
-
----
-
-## Chạy ứng dụng
-
-| Lệnh | Mục đích |
+| Bảng | Vai trò |
 | --- | --- |
-| `npm run start` | Chạy ứng dụng bằng Nest CLI. |
-| `npm run start:dev` | Chạy development mode và tự khởi động lại khi mã nguồn thay đổi. |
-| `npm run start:debug` | Chạy watch mode kèm Node debugger. |
-| `npm run build` | Biên dịch TypeScript vào `dist/`. |
-| `npm run start:prod` | Chạy bản đã build bằng `node dist/main`. |
+| `vendors` | Thực thể trung tâm. `classification` là trạng thái phân loại hiện tại |
+| `vendor_sources` | Nguồn công khai chứng minh thông tin vendor. Xoá vendor thì cascade |
+| `vendor_summaries` | Bản tóm tắt, chỉ ghi thêm. Xoá member bị chặn để giữ dấu vết tác giả |
+| `classification_histories` | Dấu vết mọi lần đổi phân loại: trước, sau, ai, khi nào, vì sao |
+| `classification_rules` | Danh mục tiêu chí phân loại, mỗi phân loại một dòng |
+| `members` | Tài khoản và vai trò |
+| `RevokedToken` | Danh sách `jti` đã thu hồi, phục vụ logout |
 
-Chạy production tại máy local:
+**Vì sao `classification_rules` không nối khoá ngoại:** đây là bảng tra cứu, không thuộc về vendor nào. Phân loại được mô hình hoá ở ba nơi với ba vai trò khác nhau — trạng thái hiện tại (`vendors.classification`), dấu vết (`classification_histories`), tiêu chí (`classification_rules`) — và cả ba dùng chung enum `VendorClassification` nên nhất quán ở tầng kiểu dữ liệu mà không cần khoá ngoại. Cố ý không nối để sửa hoặc xoá một tiêu chí không bao giờ làm hỏng lịch sử đã ghi.
 
-```bash
-npm run build
-npm run start:prod
-```
+### Enum
+
+| Enum | Giá trị |
+| --- | --- |
+| `Role` | `ADMIN` · `DEVELOPER` · `REVIEWER` |
+| `ServiceType` | `OUTSOURCING` · `SI` · `PRODUCT` · `CONSULTING` · `SPECIALIZED_TECH` |
+| `SourceType` | `PUBLIC_WEBSITE` · `DIRECTORY` · `LINKEDIN` · `ARTICLE` · `DEMO_DATA` |
+| `SummaryType` | `PROFILE_SUMMARY` · `LLM_SUMMARY` · `MANUAL_NOTE` |
+| `VendorClassification` | `OUTSOURCING_VENDOR` · `SI_COMPANY` · `PRODUCT_COMPANY` · `CONSULTING_IT_SERVICE` · `SPECIALIZED_TECH_VENDOR` |
 
 ---
 
-## API hiện có
+## Xác thực và phân quyền
 
-Base URL mặc định: `http://localhost:3000`
+Đăng nhập trả về access token. Mọi request tới route được bảo vệ cần header:
 
-### Kiểm tra ứng dụng
-
-```http
-GET /
+```
+Authorization: Bearer <token>
 ```
 
-Response:
+`JwtAuthGuard` và `RolesGuard` đăng ký toàn cục nên **mặc định mọi route đều yêu cầu đăng nhập**; route công khai phải gắn `@Public()`.
 
-```text
-Hello World!
-```
+| Vai trò | Quyền |
+| --- | --- |
+| `ADMIN` | Toàn quyền quản trị, bao gồm quản lý tiêu chí phân loại và xoá dữ liệu |
+| `DEVELOPER` | Đăng ký, cập nhật, tìm kiếm, phân loại và tóm tắt vendor |
+| `REVIEWER` | Chỉ đọc dữ liệu vendor và kết quả phân loại |
 
-Ví dụ với cURL:
+Cơ chế: route không khai `@Roles()` thì `RolesGuard` cho qua mọi vai trò đã xác thực — đó là cách `REVIEWER` có quyền đọc mà không cần khai báo thêm.
 
-```bash
-curl http://localhost:3000/
-```
+---
 
-Hiện dự án chưa cấu hình global prefix (ví dụ `/api`) và chưa tích hợp Swagger/OpenAPI.
+## Danh sách API
 
-### Định dạng response dùng chung
+Tài liệu tương tác tại **`http://localhost:3000/api/docs`** khi app đang chạy. Bản đặc tả OpenAPI thô ở `/api/docs-json`.
 
-`ResponseInterceptor` hỗ trợ cấu trúc thành công:
+Tài liệu được sinh tự động từ decorator trong controller và DTO, nên luôn khớp với code đang chạy — không có file đặc tả viết tay nào cần đồng bộ.
+
+Cách dùng: gọi `POST /api/auth/login` để lấy `accessToken`, bấm **Authorize** rồi dán token vào. Token được giữ lại khi tải lại trang.
+
+### Auth
+
+| Method | Endpoint | Quyền | Mô tả |
+| --- | --- | --- | --- |
+| POST | `/api/auth/login` | công khai | Đăng nhập, phát JWT |
+| POST | `/api/auth/logout` | đã đăng nhập | Đăng xuất, thu hồi token |
+
+### Vendor
+
+| Method | Endpoint | Quyền | Mô tả |
+| --- | --- | --- | --- |
+| POST | `/api/vendors` | đã đăng nhập | Đăng ký vendor |
+| GET | `/api/vendors` | đã đăng nhập | Danh sách, phân trang, sắp xếp, tìm kiếm, lọc tổ hợp |
+| GET | `/api/vendors/{id}` | đã đăng nhập | Chi tiết vendor |
+| PATCH | `/api/vendors/{id}` | đã đăng nhập | Cập nhật vendor |
+| DELETE | `/api/vendors/{id}` | đã đăng nhập | Xoá vendor |
+
+### Source
+
+| Method | Endpoint | Quyền | Mô tả |
+| --- | --- | --- | --- |
+| POST | `/api/vendors/{id}/sources` | ADMIN, DEVELOPER | Thêm nguồn công khai hoặc ghi chú dữ liệu demo |
+| GET | `/api/vendors/{id}/sources` | đã đăng nhập | Danh sách nguồn của vendor, có phân trang |
+| PATCH | `/api/vendors/{id}/sources/{sourceId}` | ADMIN, DEVELOPER | Cập nhật nguồn |
+
+### Classification
+
+| Method | Endpoint | Quyền | Mô tả |
+| --- | --- | --- | --- |
+| GET | `/api/classification-rules` | đã đăng nhập | Đọc danh mục tiêu chí phân loại |
+| PATCH | `/api/vendors/{id}/classification` | ADMIN, DEVELOPER | Đổi phân loại, tự ghi lịch sử |
+| GET | `/api/vendors/{id}/classification-history` | đã đăng nhập | Lịch sử thay đổi phân loại |
+
+### Statistics
+
+| Method | Endpoint | Quyền | Mô tả |
+| --- | --- | --- | --- |
+| GET | `/api/vendors/stats` | đã đăng nhập | Tổng số và thống kê theo phân loại, địa điểm, loại dịch vụ |
+
+### LLM
+
+| Method | Endpoint | Quyền | Mô tả |
+| --- | --- | --- | --- |
+| POST | `/api/vendors/classify` | ADMIN, DEVELOPER | Gợi ý phân loại, kèm lập luận và bằng chứng |
+
+---
+
+## Định dạng response
+
+Mọi response thành công đi qua `ResponseInterceptor`:
 
 ```json
 {
   "status": 200,
   "message": "success",
-  "data": {}
+  "data": { }
 }
 ```
 
-`AllExceptionsFilter` hỗ trợ cấu trúc lỗi:
+Lỗi đi qua `AllExceptionsFilter`, có thêm `timestamp` và `path`:
 
 ```json
 {
   "status": 400,
-  "message": "Nội dung lỗi",
+  "message": "sourceUrl must be an absolute URL including http:// or https://",
   "data": null,
-  "timestamp": "2026-08-05T00:00:00.000Z",
-  "path": "/example"
+  "timestamp": "2026-08-12T10:00:00.000Z",
+  "path": "/api/vendors/1/sources"
 }
 ```
 
-Hai thành phần này đã có mã nguồn nhưng chưa được đăng ký global trong `main.ts`, vì vậy endpoint hiện tại vẫn trả về chuỗi thuần.
+Danh sách có phân trang trả về trong `data`:
 
----
-
-## Cấu trúc dự án
-
-```text
-genie_vendor_project/
-├── docs/                         # Tài liệu bổ sung
-├── prisma/
-│   ├── migrations/               # Lịch sử migration PostgreSQL
-│   ├── schema/                   # Prisma schema dạng nhiều file
-│   ├── prisma.service.ts         # Prisma service cho NestJS
-│   └── seed.ts                   # Dữ liệu mẫu
-├── src/
-│   ├── common/
-│   │   ├── constants/            # Metadata keys
-│   │   ├── decorators/           # Roles, Public, CurrentUser
-│   │   ├── filters/              # Xử lý exception dùng chung
-│   │   ├── guards/               # JWT và role guards
-│   │   ├── interceptors/         # Chuẩn hóa response
-│   │   └── interfaces/           # Kiểu dữ liệu dùng chung
-│   ├── generated/prisma/         # Prisma Client được sinh tự động
-│   ├── app.controller.ts         # Controller gốc
-│   ├── app.module.ts             # Root module
-│   ├── app.service.ts            # Service gốc
-│   └── main.ts                   # Entry point
-├── test/                         # End-to-end tests
-├── compose.yaml                  # PostgreSQL cho môi trường local
-├── Dockerfile                    # Multi-stage image cho API
-├── prisma.config.ts              # Cấu hình Prisma CLI
-├── package.json                  # Scripts và dependencies
-└── README.md
+```json
+{
+  "items": [],
+  "total": 42,
+  "page": 1,
+  "limit": 20,
+  "totalPages": 3
+}
 ```
 
 ---
 
-## Kiểm thử và chất lượng mã nguồn
+## Nghiệp vụ đã hiện thực
 
-```bash
-# Unit test
-npm test
+### Kiểm soát nguồn
 
-# Unit test ở watch mode
-npm run test:watch
+Mỗi dòng `vendor_sources` phải thoả một trong hai:
 
-# End-to-end test
-npm run test:e2e
+- có `sourceUrl` là URL tuyệt đối, hoặc
+- có `memo` chứa một trong các cụm `demo data`, `demo-data`, `source unverified` (không phân biệt hoa thường)
 
-# Báo cáo coverage
-npm run test:cov
+Ngoài ra chỉ `sourceType = DEMO_DATA` mới được phép thiếu `sourceUrl`. Một nguồn khai là `PUBLIC_WEBSITE` mà không có URL sẽ bị từ chối.
 
-# ESLint và tự động sửa lỗi có thể sửa
-npm run lint
+Quy tắc được kiểm cả khi tạo lẫn khi cập nhật — với `PATCH`, phép kiểm chạy trên dòng **sau khi gộp**, không phải trên body, để một thao tác chỉ xoá `sourceUrl` không thể để lại dòng thiếu bằng chứng.
 
-# Định dạng source và test
-npm run format
+### Cách ly dữ liệu giữa các vendor
 
-# Kiểm tra project có biên dịch được không
-npm run build
-```
+Route lồng dưới vendor luôn truy vấn theo **cả hai** id. `GET /api/vendors/2/sources/1` trả 404 nếu nguồn số 1 thuộc vendor khác — đoạn `{id}` trong đường dẫn có tác dụng thật, không phải trang trí.
 
-Lưu ý: script `lint` có tùy chọn `--fix` và script `format` ghi lại file. Hãy xem `git diff` sau khi chạy.
+### Ghi lịch sử phân loại
 
----
+Mỗi lần đổi `vendors.classification` sinh một dòng `classification_histories` ghi `previousClassification`, `newClassification`, `changedBy`, `changedAt`, `reason`. Hai thao tác nằm trong cùng một transaction.
 
-## Docker
+### Khớp tiêu chí tự động
 
-### PostgreSQL cho phát triển local
+`POST /api/classification-rules/match` nhận một đoạn văn bản, đối chiếu với `keywords` của từng tiêu chí và trả về tiêu chí khớp kèm lý do. Khi nhiều tiêu chí cùng khớp, thứ tự quyết định là `priority` tăng dần → `weight` giảm dần → `createdAt` → `id`.
 
-File `compose.yaml` hiện chỉ định nghĩa service PostgreSQL:
+Endpoint này **chỉ xem trước**, không bao giờ ghi vào `vendors.classification` hay `classification_histories`. Áp dụng kết quả phải qua `PATCH /api/vendors/{id}/classification` — đó là nơi lịch sử được ghi.
 
-```bash
-docker compose up -d postgres
-docker compose logs -f postgres
-docker compose stop postgres
-```
+### Bảo vệ dữ liệu cá nhân
 
-Dữ liệu được lưu trong named volume `postgres_data`, nên vẫn tồn tại sau khi container dừng hoặc được tạo lại.
-
-Để dừng và xóa container/network nhưng giữ dữ liệu:
-
-```bash
-docker compose down
-```
-
-Lệnh `docker compose down -v` sẽ xóa cả volume và toàn bộ dữ liệu database; chỉ sử dụng khi chắc chắn muốn reset dữ liệu local.
-
-### Build image API
-
-```bash
-docker build -t genie-vendor-api .
-```
-
-Dockerfile sử dụng multi-stage build và chạy bằng user không phải `root`. Tuy nhiên cấu hình hiện tại cần được hoàn thiện trước khi dùng production: image chỉ cài production dependencies nhưng lệnh mặc định `npm start` phụ thuộc Nest CLI trong `devDependencies`. Nên đổi lệnh chạy image thành `npm run start:prod` (và bảo đảm đường dẫn output đúng) trước khi triển khai.
+`Member.password` không bao giờ rời khỏi tầng dữ liệu. Truy vấn tác giả bản tóm tắt ghim sẵn phép chiếu `{ id, name, email }`.
 
 ---
 
-## Quy ước phát triển
+## Tính năng LLM
 
-Khi thêm một tính năng mới, nên tổ chức theo module NestJS riêng trong `src/`, ví dụ:
+`POST /api/vendors/classify` gửi hồ sơ vendor tới Groq và nhận về gợi ý phân loại:
 
-```text
-src/vendors/
-├── dto/
-├── vendors.controller.ts
-├── vendors.module.ts
-└── vendors.service.ts
+```json
+{
+  "suggestedClassification": "OUTSOURCING_VENDOR",
+  "confidence": "high",
+  "reasoning": "...",
+  "evidenceUsed": ["..."],
+  "disclaimer": "This is an AI-generated suggestion for reference only..."
+}
 ```
 
-Quy trình đề xuất:
+Thiết kế prompt và phương pháp kiểm chứng ghi ở [`docs/llm-prompt-spec.md`](docs/llm-prompt-spec.md).
 
-1. Tạo nhánh tính năng từ nhánh phát triển của nhóm.
-2. Cập nhật Prisma schema nếu có thay đổi dữ liệu.
-3. Tạo migration với tên rõ nghĩa.
-4. Sinh lại Prisma Client.
-5. Viết unit test/e2e test tương ứng.
-6. Chạy `npm run lint`, `npm test`, `npm run test:e2e` và `npm run build`.
-7. Kiểm tra migration và không commit `.env`, log, coverage hoặc `node_modules`.
+Ba điểm về cách dùng LLM:
 
-Quy ước commit gợi ý theo Conventional Commits:
+1. Endpoint **không ghi gì vào cơ sở dữ liệu**. Muốn áp dụng gợi ý phải gọi `PATCH /api/vendors/{id}/classification` — bắt buộc có người xem lại.
+2. Đầu ra được kiểm tra lại theo enum `VendorClassification`; giá trị lạ bị từ chối bằng `400` thay vì gán bừa một phân loại mặc định.
+3. Prompt gắn cứng năm tiêu chí chuẩn trong `src/llm/prompts/classify-vendor.prompt.ts`. Nó **chưa** đọc từ bảng `classification_rules` — đó là bước phát triển tiếp theo.
 
-```text
-feat(vendors): add vendor creation endpoint
-fix(auth): reject expired access token
-docs(readme): update local setup guide
-test(vendors): cover vendor classification
+---
+
+## Kiểm thử
+
+```bash
+npm test           # unit test
+npm run test:cov   # kèm báo cáo coverage
+npm run test:e2e   # end-to-end
+npm run lint       # ESLint, tự sửa được thì sửa
+npm run format     # Prettier
 ```
 
 ---
 
-## Xử lý sự cố
+## Quy trình Git
 
-### Không kết nối được PostgreSQL
-
-- Kiểm tra container: `docker compose ps`.
-- Kiểm tra log: `docker compose logs postgres`.
-- Đảm bảo `DATABASE_URL` dùng cổng host `5431` khi API chạy trực tiếp trên máy.
-- Kiểm tra cổng `5431` chưa bị ứng dụng khác sử dụng.
-
-### Prisma Client chưa tồn tại hoặc sai phiên bản schema
-
-```bash
-npx prisma generate
+```
+main              : bản phát hành
+develop           : nhánh tích hợp
+feature/{name}    : nhánh cá nhân
 ```
 
-Sau đó khởi động lại TypeScript server/IDE và ứng dụng.
-
-Nếu E2E test báo `Cannot find module './internal/class.js'` từ Prisma Client, nguyên nhân là Jest/ts-jest chưa ánh xạ các import `.js` do Prisma sinh sang source `.ts`. Cần bổ sung cấu hình `moduleNameMapper` phù hợp trong `test/jest-e2e.json` hoặc điều chỉnh chiến lược module của Prisma/Jest trước khi chạy lại.
-
-### Database chưa có bảng
-
-```bash
-npx prisma migrate deploy
-```
-
-Trong môi trường phát triển, có thể dùng `npx prisma migrate dev` để áp dụng và tạo migration mới.
-
-### `npm.ps1 cannot be loaded` trên PowerShell
-
-Sử dụng executable Windows trực tiếp:
-
-```powershell
-npm.cmd ci
-npm.cmd run start:dev
-npx.cmd prisma generate
-```
-
-### Cổng 3000 đã được sử dụng
-
-Đặt cổng khác trong `.env`:
-
-```dotenv
-PORT=3001
-```
+Mỗi người làm trên nhánh riêng, mở PR vào `develop`, cần ít nhất một người review. Quy ước commit: `feat:` `fix:` `docs:` `refactor:` `test:`. Chi tiết ở [`docs/gitflow.md`](docs/gitflow.md).
 
 ---
 
-## Giới hạn hiện tại
+---
 
-- Chưa có controller/service CRUD cho vendor.
-- Các file schema `vendors.prisma`, `vendor-sources.prisma`, `vendor-summaries.prisma`, `classification-rules.prisma`, `classification-history.prisma` và `members.prisma` hiện là placeholder.
-- Chưa có Passport JWT strategy hoặc auth module hoàn chỉnh; `JwtAuthGuard` chưa thể hoạt động độc lập.
-- Guard, interceptor và exception filter chưa được đăng ký trong application bootstrap.
-- Chưa có validation pipe, CORS, API prefix, rate limiting, logging có cấu trúc hoặc Swagger.
-- `compose.yaml` chưa chạy API service và chưa nhận cấu hình PostgreSQL từ biến môi trường.
-- Dockerfile cần điều chỉnh lệnh khởi động production như mô tả ở phần Docker.
-- Test hiện chỉ bao phủ endpoint `GET /`.
-- E2E test hiện chưa resolve được import `.js` nội bộ của Prisma Client khi chạy qua ts-jest.
+## Cấu trúc thư mục
+
+```
+prisma/
+  migrations/          # lịch sử migration
+  schema/              # schema chia theo bảng
+  prisma.module.ts     # PrismaModule dùng chung
+  prisma.service.ts
+docs/
+  erd.md               # ERD dạng dbdiagram.io
+  llm-prompt-spec.md   # thiết kế prompt và cách kiểm chứng
+  gitflow.md
+src/
+  auth/                # đăng nhập, JWT strategy, thu hồi token
+  members/
+  vendors/             # CRUD, tìm kiếm, lọc
+  vendor-sources/      # nguồn + quy tắc kiểm soát nguồn
+  vendor-summaries/    # tóm tắt, chỉ ghi thêm
+  classification/      # tiêu chí, lịch sử, bộ khớp tiêu chí
+  statistics/
+  llm/                 # gợi ý phân loại qua Groq
+  common/              # guard, decorator, filter, interceptor
+  generated/prisma/    # Prisma Client sinh tự động, không sửa tay
+test/                  # end-to-end
+```
 
 ---
 
 ## Giấy phép
 
-Dự án được đánh dấu `UNLICENSED` và là mã nguồn riêng tư (`private: true`) trong `package.json`. Không phân phối hoặc sử dụng ngoài phạm vi được chủ sở hữu cho phép.
+UNLICENSED — dự án nội bộ phục vụ chương trình OJT.

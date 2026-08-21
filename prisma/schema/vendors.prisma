@@ -1,1 +1,24 @@
+model Vendor {
+  id                 Int                  @id @default(autoincrement())
+  vendorCode         String               @unique @db.VarChar(50)
+  companyName        String               @db.VarChar(255)
+  website            String?              @db.VarChar(255)
+  location           String               @db.VarChar(255)
+  serviceType        ServiceType
+  techStack          String               @db.Text
+  industryExperience String               @db.Text
+  languageCapability String               @db.VarChar(255)
+  companySize        String               @db.VarChar(100)
+  classification     VendorClassification
+  note               String?              @db.Text
 
+  createdAt          DateTime             @default(now())
+  updatedAt          DateTime             @updatedAt
+
+  classificationHistories ClassificationHistory[]
+
+  sources                 VendorSource[]
+  summaries               VendorSummary[]
+
+  @@map("vendors")
+}

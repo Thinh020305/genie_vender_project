@@ -51,8 +51,13 @@ export const AnyNull = runtime.AnyNull
 
 
 export const ModelName = {
+  ClassificationHistory: 'ClassificationHistory',
+  ClassificationRule: 'ClassificationRule',
   Member: 'Member',
-  RevokedToken: 'RevokedToken'
+  RevokedToken: 'RevokedToken',
+  VendorSource: 'VendorSource',
+  VendorSummary: 'VendorSummary',
+  Vendor: 'Vendor'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -69,6 +74,34 @@ export const TransactionIsolationLevel = runtime.makeStrictEnum({
 } as const)
 
 export type TransactionIsolationLevel = (typeof TransactionIsolationLevel)[keyof typeof TransactionIsolationLevel]
+
+
+export const ClassificationHistoryScalarFieldEnum = {
+  id: 'id',
+  vendorId: 'vendorId',
+  changedById: 'changedById',
+  previousClassification: 'previousClassification',
+  newClassification: 'newClassification',
+  changedAt: 'changedAt',
+  reason: 'reason'
+} as const
+
+export type ClassificationHistoryScalarFieldEnum = (typeof ClassificationHistoryScalarFieldEnum)[keyof typeof ClassificationHistoryScalarFieldEnum]
+
+
+export const ClassificationRuleScalarFieldEnum = {
+  id: 'id',
+  classificationName: 'classificationName',
+  description: 'description',
+  judgmentCriteria: 'judgmentCriteria',
+  keywords: 'keywords',
+  priority: 'priority',
+  weight: 'weight',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type ClassificationRuleScalarFieldEnum = (typeof ClassificationRuleScalarFieldEnum)[keyof typeof ClassificationRuleScalarFieldEnum]
 
 
 export const MemberScalarFieldEnum = {
@@ -92,6 +125,51 @@ export const RevokedTokenScalarFieldEnum = {
 export type RevokedTokenScalarFieldEnum = (typeof RevokedTokenScalarFieldEnum)[keyof typeof RevokedTokenScalarFieldEnum]
 
 
+export const VendorSourceScalarFieldEnum = {
+  id: 'id',
+  vendorId: 'vendorId',
+  sourceType: 'sourceType',
+  sourceUrl: 'sourceUrl',
+  sourceTitle: 'sourceTitle',
+  checkedAt: 'checkedAt',
+  memo: 'memo'
+} as const
+
+export type VendorSourceScalarFieldEnum = (typeof VendorSourceScalarFieldEnum)[keyof typeof VendorSourceScalarFieldEnum]
+
+
+export const VendorSummaryScalarFieldEnum = {
+  id: 'id',
+  vendorId: 'vendorId',
+  summaryType: 'summaryType',
+  content: 'content',
+  createdById: 'createdById',
+  createdAt: 'createdAt'
+} as const
+
+export type VendorSummaryScalarFieldEnum = (typeof VendorSummaryScalarFieldEnum)[keyof typeof VendorSummaryScalarFieldEnum]
+
+
+export const VendorScalarFieldEnum = {
+  id: 'id',
+  vendorCode: 'vendorCode',
+  companyName: 'companyName',
+  website: 'website',
+  location: 'location',
+  serviceType: 'serviceType',
+  techStack: 'techStack',
+  industryExperience: 'industryExperience',
+  languageCapability: 'languageCapability',
+  companySize: 'companySize',
+  classification: 'classification',
+  note: 'note',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type VendorScalarFieldEnum = (typeof VendorScalarFieldEnum)[keyof typeof VendorScalarFieldEnum]
+
+
 export const SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -106,4 +184,12 @@ export const QueryMode = {
 } as const
 
 export type QueryMode = (typeof QueryMode)[keyof typeof QueryMode]
+
+
+export const NullsOrder = {
+  first: 'first',
+  last: 'last'
+} as const
+
+export type NullsOrder = (typeof NullsOrder)[keyof typeof NullsOrder]
 
