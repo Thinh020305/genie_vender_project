@@ -12,7 +12,7 @@ import { StatisticsService } from './statistics.service';
 import { VendorStatsResponseDto } from './dto/vendor-stats-response.dto';
 
 // [AI — HIGH PRIORITY] Route collision flag unchanged, see earlier writeup.
-@ApiTags('vendors')
+@ApiTags('Statistics API')
 @ApiBearerAuth()
 @Controller('vendors')
 @UseGuards(JwtAuthGuard, RolesGuard)

@@ -28,6 +28,12 @@ async function bootstrap() {
         'khuyến nghị đối tác, xếp hạng hay thẩm định.',
     )
     .setVersion('1.0.0')
+    .addTag('Auth API')
+    .addTag('Vendor API')
+    .addTag('Source API')
+    .addTag('Classification API')
+    .addTag('Statistics API')
+    .addTag('LLM API')
     .addBearerAuth()
     .build();
 
