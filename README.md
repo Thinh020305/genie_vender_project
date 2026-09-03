@@ -233,31 +233,13 @@ Cách dùng: gọi `POST /api/auth/login` để lấy `accessToken`, bấm **Aut
 | --- | --- | --- | --- |
 | POST | `/api/vendors/{id}/sources` | ADMIN, DEVELOPER | Thêm nguồn công khai hoặc ghi chú dữ liệu demo |
 | GET | `/api/vendors/{id}/sources` | đã đăng nhập | Danh sách nguồn của vendor, có phân trang |
-| GET | `/api/vendors/{id}/sources/{sourceId}` | đã đăng nhập | Chi tiết một nguồn |
 | PATCH | `/api/vendors/{id}/sources/{sourceId}` | ADMIN, DEVELOPER | Cập nhật nguồn |
-| DELETE | `/api/vendors/{id}/sources/{sourceId}` | ADMIN | Xoá nguồn |
-
-### Summary
-
-| Method | Endpoint | Quyền | Mô tả |
-| --- | --- | --- | --- |
-| POST | `/api/vendors/{id}/summaries` | ADMIN, DEVELOPER | Tạo bản tóm tắt |
-| GET | `/api/vendors/{id}/summaries` | đã đăng nhập | Danh sách tóm tắt, lọc theo loại và tác giả |
-| GET | `/api/vendors/{id}/summaries/{summaryId}` | đã đăng nhập | Chi tiết một bản tóm tắt |
-| DELETE | `/api/vendors/{id}/summaries/{summaryId}` | ADMIN, hoặc DEVELOPER là tác giả | Xoá bản tóm tắt |
-
-Không có route `PATCH` — bảng chỉ ghi thêm. Sửa nghĩa là xoá rồi tạo bản mới, để nội dung một `LLM_SUMMARY` không bị viết lại khác với thứ mô hình thực sự trả về.
 
 ### Classification
 
 | Method | Endpoint | Quyền | Mô tả |
 | --- | --- | --- | --- |
 | GET | `/api/classification-rules` | đã đăng nhập | Đọc danh mục tiêu chí phân loại |
-| GET | `/api/classification-rules/{id}` | đã đăng nhập | Chi tiết một tiêu chí |
-| POST | `/api/classification-rules` | ADMIN | Tạo tiêu chí |
-| PATCH | `/api/classification-rules/{id}` | ADMIN | Sửa tiêu chí |
-| DELETE | `/api/classification-rules/{id}` | ADMIN | Xoá tiêu chí |
-| POST | `/api/classification-rules/match` | ADMIN, DEVELOPER | Khớp văn bản với tiêu chí, **chỉ xem trước** |
 | PATCH | `/api/vendors/{id}/classification` | ADMIN, DEVELOPER | Đổi phân loại, tự ghi lịch sử |
 | GET | `/api/vendors/{id}/classification-history` | đã đăng nhập | Lịch sử thay đổi phân loại |
 
@@ -344,7 +326,7 @@ Endpoint này **chỉ xem trước**, không bao giờ ghi vào `vendors.classif
 
 `Member.password` không bao giờ rời khỏi tầng dữ liệu. Truy vấn tác giả bản tóm tắt ghim sẵn phép chiếu `{ id, name, email }`.
 
----
+Ba điểm về cách dùng LLM:
 
 ## Tính năng LLM
 
@@ -393,38 +375,6 @@ feature/{name}    : nhánh cá nhân
 Mỗi người làm trên nhánh riêng, mở PR vào `develop`, cần ít nhất một người review. Quy ước commit: `feat:` `fix:` `docs:` `refactor:` `test:`. Chi tiết ở [`docs/gitflow.md`](docs/gitflow.md).
 
 ---
-
-## Vấn đề đã biết
-
-### 1. Thứ tự import module quyết định `/api/vendors/stats` có chạy hay không
-
-`StatisticsController` khai `@Get('stats')` còn `VendorsController` khai `@Get(':id')` — cùng độ sâu. Express khớp theo thứ tự đăng ký, nên `/api/vendors/stats` chỉ tới được thống kê vì `StatisticsModule` đứng **trước** `VendorsModule` trong mảng `imports` của `AppModule`.
-
-Đảo thứ tự đó là `"stats"` rơi vào `:id`, `ParseIntPipe` ném 400, thống kê chết. Điều này áp dụng cho cả `/api/vendors/classify` với `LlmModule`. Đừng sắp xếp lại `imports` cho "gọn".
-
-### 2. Vendor CRUD chưa gắn phân quyền
-
-`VendorsController` không khai `@Roles()` ở route nào, kể cả `DELETE`. Nghĩa là `REVIEWER` hiện xoá được vendor, trái với yêu cầu chỉ-đọc và với ghi chú "admin only or soft delete".
-
-### 3. Lỗi 500 khi id vượt phạm vi `int4`
-
-`GET /api/vendors/2147483648/sources` trả `500` thay vì `400`. `ParseIntPipe` chấp nhận giá trị, PostgreSQL từ chối, Prisma ném lỗi không phải `HttpException` nên filter trả `500`. Nên xử lý tập trung ở `AllExceptionsFilter` bằng cách ánh xạ lỗi Prisma đã biết sang `400`.
-
-### 4. Quy tắc kiểm soát nguồn bị lách bằng JSON `null`
-
-`PATCH {"sourceUrl": null}` hiện trả `200` và lưu `null` xuống DB, để lại dòng không còn URL lẫn ghi chú demo. Nguyên nhân: `dto.sourceUrl ?? existing.sourceUrl` coi `null` là "không gửi" nên phép kiểm chạy trên giá trị cũ, còn Prisma lại ghi `null`. Cần đổi sang kiểm tra `'sourceUrl' in dto`.
-
-### 5. Tạo tiêu chí phân loại đồng thời trả 500
-
-`ClassificationRulesService.create()` kiểm tra rồi mới ghi, không bắt lỗi `P2002`. Nhiều request song song cùng `classificationName` sẽ có request nhận `500` thay vì `409`. Ràng buộc duy nhất vẫn giữ đúng, dữ liệu không hỏng.
-
-### 6. Khớp từ khoá phân biệt dấu tiếng Việt
-
-Từ khoá `gia công phần mềm` khớp văn bản có dấu, nhưng không khớp `gia cong phan mem`. Nếu dữ liệu demo có mô tả tiếng Việt, nên lưu cả hai dạng trong `keywords` hoặc chuẩn hoá bỏ dấu ở cả hai vế.
-
-### 7. Chưa có seed script
-
-`prisma/seed.ts` đã bị gỡ. Tài khoản đầu tiên và năm tiêu chí phân loại phải tạo thủ công.
 
 ---
 

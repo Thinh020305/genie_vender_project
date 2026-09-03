@@ -17,7 +17,7 @@ import { UpdateClassificationDto } from './dto/update-classification.dto';
 
 // [AI] Base path "api/vendors" — same collision caveat as before, unchanged
 // by adding Swagger. Not re-flagging in full here, see earlier writeup.
-@ApiTags('vendors')
+@ApiTags('Classification API')
 // [AI] ApiBearerAuth() references a security scheme name that must match
 // whatever Thịnh registers via DocumentBuilder().addBearerAuth() in
 // main.ts. Using the implicit default here — if he names the scheme
